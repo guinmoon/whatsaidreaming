@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
+  <title>What's AI dreaming?</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://aliceghome.online/dream/css/space.css">
+  <link rel="stylesheet" href="dream/css/style.css">  
+  <link rel="stylesheet" href="dream/css/flying.css">
+  <link rel="stylesheet" href="dream/css/top_menu.css">  
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!-- <link rel="stylesheet" href="dream/css/fontawesome.min.css"> -->
+  <script type="text/javascript" src="dream/js/jquery-3.6.3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="dream/js/lazyload.min.js"></script>
+  <script type="text/javascript" src="https://aliceghome.online/dream/js/flying_images.js"></script>
+</head>
+<!-- https://github.com/verlok/vanilla-lazyload -->
+<body>
+  <h1 class="h1_dream">What's AI dreaming?</h1>
+  <main>
+    <div id="stars" class='stars'></div>
+    <div id="twinkling" class='twinkling'></div>
+    <div id="clouds" class='clouds'></div>    
+    <div class="menu_wrapper">
+      <div id="top_menu">
+        <a href="https://aliceghome.online/dream/galery.html"><i class="top_menu_item fa fa-picture-o"></i></a>
+        <a href="https://github.com/guinmoon/guinmoon.github.io"><i class="top_menu_item fa fa-github"></i></a>
+        <a href="https://aliceghome.online/dream"><i class="top_menu_item fa fa-home"></i></a>
+      </div>
+    </div>
+    <div class="chat_wraper">
+      <div id="hello_chat"></div>
+    </div>
+
+    <div id="flying_image" class="flying_image">
+      <!-- <img id="cat" src="dream/img/hello-kitty-3d-png.png" alt="hello-kitty-3d-png.png" /> -->
+    </div>
+
+    <img id="ship" src="dream/img/ship.png">
+    <p>
+      <a href="https://github.com/guinmoon/guinmoon.github.io">guinmoon.github.io</a>
+    </p>
+  </main>
+
+</body>
+<script>
+
+  document.addEventListener("scroll", (event) => {
+    $("#stars").css('height', $("#galery").css('height')); 
+    $("#twinkling").css('height', $("#galery").css('height'));
+    $("#clouds").css('height', $("#galery").css('height'));
+});
+</script>
+</html>

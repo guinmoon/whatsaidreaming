@@ -1,0 +1,43 @@
+.flying_image {
+    font-family: comic sans ms;
+    color: white;
+    position: fixed;
+    bottom: 10em;
+    left: 0;
+    text-shadow: 2px 2px #F1599B;
+    font-size: 18px;
+    display: flex;
+    animation-name: across, float;
+    animation-iteration-count: infinite, infinite;
+    animation-duration: 25s, 6s;
+    animation-play-state: running, running;
+    transform-origin: bottom;
+    z-index: 5;
+}
+.flying_image img {
+    height: 25em;
+    bottom: 0;
+    /* background-color: #; */
+    display: block;
+    z-index: 2;
+    border-radius: 1em;
+    /* -webkit-animation:spin 1s linear infinite;
+    -moz-animation:spin 1s linear infinite;
+    animation:spin 1s linear infinite; */
+    opacity: 0.5;
+}
+.flying_image p {
+    display: inline-block;
+    margin-bottom: 5px;
+    margin-top: auto;
+    margin-right: 5px;
+}
+@keyframes across {
+    0% {left: -200px}
+    100% {left: 1400px; right: -150px}
+}
+@keyframes float {
+    0% {transform: translate(0px, 0px)}
+    50% {transform: translate(0px, -80px)}
+    100% {transform: translate(0px, 0px)}
+}

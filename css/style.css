@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  padding: 0;
+
+  font-size: 20px;
+  line-height: 1.2;
+  font-family: Helvetica, Arial, sans-serif;
+  color: #ffffff;
+
+  background-color: #2c2c2e;
+  /* overflow-y: hidden; */
+}
+.img_main{
+  height: 30em;
+  border-radius: 1em;
+  
+}
+
+.h1_dream{
+  color: #b4b2b5;
+  /* margin-bottom: 1em; */
+  width: 100%;
+  text-align: center;
+  margin-top: 1em;
+}
+
+#galery{
+  position: absolute;
+  padding: 2em 2em 12em 2em;
+  max-width: 60em;
+  /* float: right; */
+  text-align: center;
+  z-index: 2;
+  overflow-x: hidden;
+}
+
+#ship{
+  height: 70vh;
+    right: 0;
+    bottom: -20vh;
+    position: fixed;
+    z-index: 20;
+}
+
+main {
+  /* overflow-y: hidden; */
+}
+
+h1 {
+  margin: 0;
+
+  font-weight: normal;
+  letter-spacing: -1px;
+}
+
+p {
+  margin: 2em 0;
+}
+
+a:link, a:visited {
+  color: #ffffff;
+  text-decoration: underline
+}
+
+a:hover {
+  text-decoration: none
+}
+
+img:not([src]) {
+  visibility: hidden;
+  opacity:0;
+}
+
+img {
+  opacity: 1;
+  transition: opacity 3s;
+}
+
+/* Fixes Firefox anomaly during image load */
+@-moz-document url-prefix() {
+  img:-moz-loading {
+    visibility: hidden;
+  }
+}
