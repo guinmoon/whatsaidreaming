@@ -4,21 +4,31 @@
 <head>
   <meta charset="utf-8">
 	<meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://aliceghome.online/dream/img/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="https://aliceghome.online/dream/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="https://aliceghome.online/dream/img/favicon-16x16.png">
+  <link rel="manifest" href="https://aliceghome.online/dream/img/site.webmanifest">
+  <link rel="mask-icon" href="https://aliceghome.online/dream/img/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#000000">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5">
+  <meta name="viewport" content="width=device-width, initial-scale=0.5, viewport-fit=cover maximum-scale=0.5">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">  -->
+  
   <title>What's AI dreaming?</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <link rel="stylesheet" href="https://aliceghome.online/dream/css/space.css">
   <link rel="stylesheet" href="dream/css/style.css">  
+  <link rel="stylesheet" href="dream/css/chat.css">  
   <link rel="stylesheet" href="dream/css/flying.css">
   <link rel="stylesheet" href="dream/css/top_menu.css">  
+  <link rel="stylesheet" href="dream/css/cat.css">  
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
   <!-- <link rel="stylesheet" href="dream/css/fontawesome.min.css"> -->
   <script type="text/javascript" src="dream/js/jquery-3.6.3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="dream/js/lazyload.min.js"></script>
-  <script type="text/javascript" src="https://aliceghome.online/dream/js/flying_images.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <!-- https://github.com/verlok/vanilla-lazyload -->
 <body>
@@ -29,32 +39,61 @@
     <div id="clouds" class='clouds'></div>    
     <div class="menu_wrapper">
       <div id="top_menu">
-        <a href="https://aliceghome.online/dream/galery.html"><i class="top_menu_item fa fa-picture-o"></i></a>
+        <a href="https://aliceghome.online/dream/galery_today.html"><i class="top_menu_item fa fa-picture-o"></i></a>
         <a href="https://github.com/guinmoon/guinmoon.github.io"><i class="top_menu_item fa fa-github"></i></a>
-        <a href="https://aliceghome.online/dream"><i class="top_menu_item fa fa-home"></i></a>
+        <a href="https://aliceghome.online/about.html"><i class="top_menu_item fa fa-question-circle"></i></a>
       </div>
     </div>
     <div class="chat_wraper">
-      <div id="hello_chat"></div>
+      <div id="hello_chat">
+        
+      </div>
     </div>
 
     <div id="flying_image" class="flying_image">
       <!-- <img id="cat" src="dream/img/hello-kitty-3d-png.png" alt="hello-kitty-3d-png.png" /> -->
     </div>
 
-    <img id="ship" src="dream/img/ship.png">
-    <p>
-      <a href="https://github.com/guinmoon/guinmoon.github.io">guinmoon.github.io</a>
-    </p>
+    <img id="ship" src="dream/img/clouds.png">
+   
+    <div id="sleeping_cat" class="block">
+      <div class="block-cat">
+         <svg viewBox="0 0 230.6 66.8">
+         <path class="block-cat__path block-cat__bounce" d="M230.1,66.7c-1.3-7-6.3-28.1-26.2-45.5c-5.2-4.6-24-20.5-53.1-21.2C119.8-0.7,99.3,16.3,94,20.9
+            C73.7,38.2,68.5,59.6,67.1,66.7"/>
+         <path class="block-cat__path" d="M8.1,66.7c0.8-4.1,3.6-16.3,14.6-26.3c2.9-2.6,14-12.4,30.8-11.9c15.8,0.4,26,9.5,28.8,12.1
+            c10.8,10,13.5,22.1,14.2,26.1"/>
+         <path d="M31.2,41c0.5,4.6,3.1,7.8,5.8,7.5c2.5-0.3,4.6-3.4,5.1-7.5" fill="none" stroke="#141415" stroke-miterlimit="10"/>
+         <circle cx="48.2" cy="57" r="3.4" fill="#BD6560"/>
+         <path class="block-cat__path block-cat__ear" d="M12.7,11.9c1.7,11.4,3.4,22.8,5.2,34.2l21.4-14.5C30.4,25,21.6,18.4,12.7,11.9z"/>
+         <path class="block-cat__ear" d="M18.4,21.9c1,6.7,2,13.3,3,20L34,33.4C28.8,29.6,23.6,25.8,18.4,21.9z" fill="#BC7D52"/>
+         <path class="block-cat__path" d="M87.5,9.3c-9.2,7-18.3,14-27.5,21.1l23.1,11.8C84.6,31.2,86,20.3,87.5,9.3z"/>
+         <path d="M81.4,19.2c-5.4,4.1-10.7,8.2-16.1,12.3l13.5,6.9C79.7,32,80.6,25.6,81.4,19.2z" fill="#BC7D52"/>
+         <line x1="40.3" y1="58.8" x2="0.7" y2="63.8" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <line x1="40" y1="56.8" x2="5.6" y2="57.4" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <line x1="40.5" y1="54.7" x2="0.3" y2="51.2" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <line x1="56.1" y1="55" x2="95.8" y2="50.3" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <line x1="56.3" y1="57.1" x2="90.8" y2="56.8" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <line x1="55.9" y1="59.1" x2="96" y2="63" fill="none" stroke="#141415" stroke-width="0.25" stroke-miterlimit="10"/>
+         <path d="M54.4,41.2c0.5,4.6,3.1,7.8,5.8,7.5c2.5-0.3,4.6-3.4,5.1-7.5" fill="none" stroke="#141415" stroke-miterlimit="10"/>
+         </svg>
+      </div>
+      
+      
+   </div>
+    
   </main>
 
 </body>
 <script>
-
-  document.addEventListener("scroll", (event) => {
-    $("#stars").css('height', $("#galery").css('height')); 
-    $("#twinkling").css('height', $("#galery").css('height'));
-    $("#clouds").css('height', $("#galery").css('height'));
-});
+var glaery_dir_name="new";
+var chat_max_msg_count = 4;
+var image_change_delay=5000;
 </script>
+<script type="text/javascript" src="dream/js/lazyload.min.js"></script>
+<script type="text/javascript" src="https://aliceghome.online/dream/js/core.js"></script>
+<script type="text/javascript" src="https://aliceghome.online/dream/js/flying_images.js"></script>
+<script type="text/javascript" src="https://aliceghome.online/dream/js/chat.js"></script>
+
+
 </html>

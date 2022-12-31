@@ -1,7 +1,9 @@
-$(document).ready(function(){
-    global_galery={};
+var global_galery={};
+var current_image={};
+$(document).ready(function(){    
+    flying_opacity=1;
     $.ajax({
-        url: "https://aliceghome.online/dream/galery/galery.json",
+        url: `https://aliceghome.online/dream/${glaery_dir_name}/today.json`,
         type: 'GET',
         dataType: 'json', // added data type
         success: function(res) {
@@ -10,25 +12,51 @@ $(document).ready(function(){
             var img_num=0;
             gallery_len=res.images.length;
             image=res.images[Math.floor(Math.random() * gallery_len-1)];
+            current_image = image;
             flying_image_div=$("#flying_image");
-            flying_image_div.append(`<a href="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}">
-                <img id="flying_1" src="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}" alt="${image.prompt}">
+            flying_image_div.append(`
+                <a href="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}">
+                <img id="flying_0" class="flying_img" src="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                <img id="flying_1" class="flying_img" src="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
                 </a>`);
-            degr=Math.floor(Math.random() * 180)
+            degr=Math.floor(Math.random() * 360);
             $("#flying_1").css('transform', 'rotate('+degr+'deg)'); 
+            $("#flying_0").css('transform', 'rotate('+degr+'deg)');
+            $("#flying_1").css('opacity', flying_opacity);
+            $("#flying_0").css('opacity', 0);
+            update_chat();
+            update_spcae_height();
         }
     });
     var intervalId = window.setInterval(function(){      
-      gallery_len=global_galery.images.length;
-      image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
-      flying_image_div=$("#flying_image");
-      flying_image_div.empty();
-      flying_image_div.append(`<a href="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}">
-          <img id="flying_1" src="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}" alt="${image.prompt}">
-          </a>`);
-      degr=Math.floor(Math.random() * 180)
-      $("#flying_1").css('transform', 'rotate('+degr+'deg)'); 
-    }, 5000);
+        gallery_len=global_galery.images.length;
+        image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
+        current_image = image;
+        flying_image_div=$("#flying_image");
+        update_chat();
+        var new_src = `https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}`;
+        flying_1_div=$("#flying_1")  
+        flying_0_div=$("#flying_0")            
+        var values =  $("#flying_1").css('transform').split('(')[1].split(')')[0].split(',');
+        var angle = Math.round(Math.atan2(values[1], values[0]) * (180/Math.PI));       
+        var degr =0;
+        if (Math.floor(Math.random() * 2)>0)
+            degr=angle+Math.floor(Math.random() * 30);
+        else
+            degr=angle-Math.floor(Math.random() * 30);
+        flying_1_div.css('transform', 'rotate('+degr+'deg)'); 
+        flying_0_div.css('transform', 'rotate('+degr+'deg)');
+        flying_1_div.css('opacity', 0);        
+        flying_0_div.css('opacity', flying_opacity);
+        flying_0_div.attr("src",new_src)
+        flying_0_div.attr("alt",`${image.prompt}`)
+        var delayInMilliseconds = 1500;
+        setTimeout(function() {
+            flying_1_div.attr("src",new_src)
+            flying_1_div.css('opacity', flying_opacity);
+        }, delayInMilliseconds);
+      
+    }, image_change_delay);
 
     // clearInterval(intervalId) 
 });

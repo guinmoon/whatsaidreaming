@@ -2,13 +2,16 @@
 #top_menu{
     z-index: 20;
     right: 1em;
-    top: 1cm;
+    top: 2cm;
     position: fixed;
     font-size: 350%;
 }
 
 .top_menu_item{
-    color:#444444;
+    color:#727272;
+    background: #00000052;
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .top_menu_item:hover{

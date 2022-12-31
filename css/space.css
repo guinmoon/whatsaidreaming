@@ -68,18 +68,21 @@ article, aside, details, figcaption, figure, footer, header, hgroup, main, menu,
 .stars {
   z-index: 0;
   background: #000 url("https://aliceghome.online/dream/img/YKY28eT.png") repeat top center;
+  pointer-events: none;
 }
 
 .twinkling {
   z-index: 1;
   background: transparent url("https://aliceghome.online/dream/img/XYMF4ca.png") repeat top center;
   animation: move-twink-back 200s linear infinite;
+  pointer-events: none;
 }
 
 .clouds {
-  z-index: 6;
+  z-index: 8;
   background: transparent url("https://aliceghome.online/dream/img/mHbScrQ.png") repeat top center;
   animation: move-clouds-back 200s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes move-twink-back {

@@ -1,6 +1,7 @@
 $(document).ready(function(){
+    
     $.ajax({
-        url: "https://aliceghome.online/dream/galery/galery.json",
+        url: `https://aliceghome.online/dream/${glaery_dir_name}/${glaery_json_name}`,
         type: 'GET',
         dataType: 'json', // added data type
         success: function(res) {
@@ -12,8 +13,8 @@ $(document).ready(function(){
                 if (img_num>2){
                   lazy_src="data-src";
                 }
-                galery_div.append(`<a href="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}">
-                <img class="img_main lazy" ${lazy_src}="https://aliceghome.online/dream/galery/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                galery_div.append(`<a href="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}">
+                <img class="img_main lazy" ${lazy_src}="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
                 </a>`);   
                 img_num++;             
               });
@@ -64,6 +65,8 @@ $(document).ready(function(){
               })();
         }
     });
-    
+    document.addEventListener("scroll", (event) => {
+      update_spcae_height();
+  });
 });
 

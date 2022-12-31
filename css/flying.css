@@ -2,20 +2,21 @@
     font-family: comic sans ms;
     color: white;
     position: fixed;
-    bottom: 10em;
-    left: 0;
+    bottom: 5vh;
+    right: 0;
     text-shadow: 2px 2px #F1599B;
     font-size: 18px;
     display: flex;
     animation-name: across, float;
     animation-iteration-count: infinite, infinite;
-    animation-duration: 25s, 6s;
+    animation-duration: 45s, 6s;
     animation-play-state: running, running;
     transform-origin: bottom;
-    z-index: 5;
+    z-index: 5;    
+    opacity: 0.6;
 }
 .flying_image img {
-    height: 25em;
+    height: 55vh;
     bottom: 0;
     /* background-color: #; */
     display: block;
@@ -23,8 +24,8 @@
     border-radius: 1em;
     /* -webkit-animation:spin 1s linear infinite;
     -moz-animation:spin 1s linear infinite;
-    animation:spin 1s linear infinite; */
-    opacity: 0.5;
+    animation:spin 1s linear infinite; */    
+    position: absolute;
 }
 .flying_image p {
     display: inline-block;
@@ -32,9 +33,19 @@
     margin-top: auto;
     margin-right: 5px;
 }
+
+#flying_1{
+    transition: transform 4.8s, opacity .8s ease-in-out;     
+}
+
+#flying_0{
+    transition: transform 4.8s, opacity .8s ease-in-out;   
+}
+
+
 @keyframes across {
-    0% {left: -200px}
-    100% {left: 1400px; right: -150px}
+    0% {right: -10vw}
+    100% {right:110vw; bottom:60vh}
 }
 @keyframes float {
     0% {transform: translate(0px, 0px)}
