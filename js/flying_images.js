@@ -3,7 +3,7 @@ var current_image={};
 $(document).ready(function(){    
     flying_opacity=1;
     $.ajax({
-        url: `https://aliceghome.online/dream/${glaery_dir_name}/today.json`,
+        url: `${glaery_dir_name}/today.json`,
         type: 'GET',
         dataType: 'json', // added data type
         success: function(res) {
@@ -15,9 +15,9 @@ $(document).ready(function(){
             current_image = image;
             flying_image_div=$("#flying_image");
             flying_image_div.append(`
-                <a href="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}">
-                <img id="flying_0" class="flying_img" src="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
-                <img id="flying_1" class="flying_img" src="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                <a href="${glaery_dir_name}/${encodeURI(image.f_name)}">
+                <img id="flying_0" class="flying_img" src="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                <img id="flying_1" class="flying_img" src="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
                 </a>`);
             degr=Math.floor(Math.random() * 360);
             $("#flying_1").css('transform', 'rotate('+degr+'deg)'); 
@@ -34,7 +34,7 @@ $(document).ready(function(){
         current_image = image;
         flying_image_div=$("#flying_image");
         update_chat();
-        var new_src = `https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}`;
+        var new_src = `${glaery_dir_name}/${encodeURI(image.f_name)}`;
         flying_1_div=$("#flying_1")  
         flying_0_div=$("#flying_0")            
         var values =  $("#flying_1").css('transform').split('(')[1].split(')')[0].split(',');

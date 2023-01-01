@@ -7,7 +7,7 @@
   /* border-bottom: 5vw solid #444B54; */
   z-index: 7;
   /* right: -220px; */
-  bottom: 140px;
+  bottom: 175px;
   }
   .block-cat {
     width: 600px;
@@ -28,7 +28,7 @@
     }
   }
   .block-cat__path {
-    fill: #b9b7b7;
+    fill: #D1946C;
   }
   .block-cat__bounce {
     -webkit-animation: bounce 1s infinite alternate;

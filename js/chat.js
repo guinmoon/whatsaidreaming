@@ -1,5 +1,5 @@
 function update_chat(){
-    let chat_msg = $(`<a class="a_chat_message" href="https://aliceghome.online/dream/${glaery_dir_name}/${encodeURI(image.f_name)}">
+    let chat_msg = $(`<a class="a_chat_message" href="${glaery_dir_name}/${encodeURI(image.f_name)}">
     <p class="chat_message">${current_image.prompt}</p>
     </a>`);
     chat_msg.css('opacity',0);
