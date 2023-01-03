@@ -19,7 +19,11 @@ $(document).ready(function(){
                 <img id="flying_0" class="flying_img" src="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
                 <img id="flying_1" class="flying_img" src="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
                 </a>`);
-            degr=Math.floor(Math.random() * 360);
+            var gegr=0;
+            if (Math.floor(Math.random() * 2)>0)
+                degr=Math.floor(Math.random() * 30);
+            else
+                degr=-Math.floor(Math.random() * 30);
             $("#flying_1").css('transform', 'rotate('+degr+'deg)'); 
             $("#flying_0").css('transform', 'rotate('+degr+'deg)');
             $("#flying_1").css('opacity', flying_opacity);

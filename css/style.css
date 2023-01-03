@@ -18,6 +18,18 @@ body {
   /* overflow-y: hidden; */
 }
 
+#player{
+  position: absolute;
+    bottom: 5px;
+    width: 100%;
+    padding-right: 570px;
+}
+
+wave{  
+  z-index: 7;
+  opacity: 0.8;
+}
+
 #h1_title{
   position: fixed;
   color: white;
