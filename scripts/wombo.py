@@ -7,7 +7,10 @@ import random
 import os
 import pickle
 import ssl
+import asyncio
+import sys
 
+from aiobalaboba import Balaboba
 
 _unverified_context = ssl._create_unverified_context()
 
@@ -138,8 +141,22 @@ def translate(to_translate, to_language="auto", from_language="auto"):
         result = html.unescape(re_result[0])
     return (result)
 
+async def async_balaboba(orig_text,text_type):
+    bb = Balaboba()
+    # text_types = await bb.get_text_types(language="ru")
+    response = await bb.balaboba(orig_text, text_type=text_type)
+    # if response.find('http')>=0:
+    #     response = orig_text
+    # if response=='':
+    #     response = orig_text
+    return response
+
+
 
 def sync_balaboba(orig_text,text_type=32):            
+    return asyncio.run(async_balaboba(orig_text,text_type))
+
+def sync_balaboba_old(orig_text,text_type=32):            
     conn = http.client.HTTPSConnection("yandex.ru",context = ssl._create_unverified_context())    
     payload = json.dumps({
         "query": orig_text,
