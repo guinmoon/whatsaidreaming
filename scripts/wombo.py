@@ -27,7 +27,7 @@ def identify(identify_key):
 
 
 
-def create(id_token: str, prompt: str, style: int, ID=None,one=False):    
+def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False):    
     conn = http.client.HTTPSConnection("paint.api.wombo.ai",context = _unverified_context)    
     headers={
             "Authorization": "bearer " + id_token,
@@ -46,9 +46,8 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False):
         id=json.loads(data)["id"]
         conn.request("PUT", f"/api/tasks/{id}", body, headers)
         data=conn.getresponse().read()        
-        r=json.loads(data)             
-        if DEBUG:
-            print(f"Status: {r['state']}")
+        r=json.loads(data)                     
+        print(f"Status: {r['state']}")
         display_freq = r["input_spec"]["display_freq"] / 10
         with open('headers.dump', 'wb') as f:
             pickle.dump(headers, f)
@@ -57,7 +56,8 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False):
         with open('prompt.dump', 'w') as f:
             f.write(prompt)
         print(prompt)
-        exit(0)
+        if not full:
+            exit(0)        
     else:
         with open('headers.dump', 'rb') as f:
             headers = pickle.load(f)

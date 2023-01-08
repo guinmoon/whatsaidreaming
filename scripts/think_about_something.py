@@ -9,8 +9,18 @@ import random
 import os
 import pickle
 import ssl
+import urllib.request    
+from datetime import datetime
+from PIL import Image
+
+import os
+from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.orm import relationship, backref,Session
+from sqlalchemy.ext.declarative import declarative_base
 
 from wombo import *
+from thinks_model import *
 
 DEBUG=False
 
@@ -21,9 +31,9 @@ DEBUG=False
 identify_key = "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
 
 style = "r"
-prompt = "r"
+prompt_en = "r"
 task_id = None
-res_f_name = __dir=os.path.dirname(os.path.realpath(__file__))+'/res.jpg'
+
 
 parser = argparse.ArgumentParser(
                     prog = 'wombo create',
@@ -43,92 +53,64 @@ parser.add_argument('-p', '--prompt')
 args = parser.parse_args()
 
 
-
+out_dir = '../new/'
 
 if __name__ == '__main__':
     
     __dir=os.path.dirname(os.path.realpath(__file__)) 
+    sqlite_filepath = os.path.join(__dir,"thinks.db")
+
     if args.update:
         update_styles("styles.txt")
         print("done")
         exit(0)
 
-    # prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
-    # prompt_balaboba = sync_balaboba(prompt,11)
-    # # prompt_balaboba = sync_balaboba(prompt,27)
-    # with open('balaboba.dump', 'wb') as f:
-    #     pickle.dump(prompt_balaboba, f)
+    prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
+    prompt_balaboba = sync_balaboba(prompt,11)
+    print(prompt_balaboba['query'])
+    print(prompt_balaboba['text'])
+    # prompt_balaboba = sync_balaboba(prompt,27)
+    with open('balaboba.dump', 'wb') as f:
+        pickle.dump(prompt_balaboba, f)
 
+    engine = create_engine('sqlite:///'+sqlite_filepath, echo=True)
+    Base.metadata.create_all(engine)    
+    tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'])    
+    with Session(engine) as session:
+        session.add(tmp_think)        
+        session.commit()
     
-
-    # if args.key is not None:
-    #     identify_key =   args.key                        
-    # if args.style is not None:    
-    #     style = args.style
-    # if args.prompt is not None:  
-    #     prompt = args.prompt
-    # if args.iterations:  
-    #     task_id = args.iterations
-
-    # if args.crop:
-    #     from PIL import Image
-    #     im = Image.open(res_f_name)
-    #     width, height = im.size
-    #     left = 62
-    #     top = 215
-    #     right = width-62
-    #     bottom = height-154
-        
-    #     im = im.crop((left, top, right, bottom))
-    #     if args.rename:
-    #         from datetime import datetime
-    #         now = datetime.now()            
-    #         dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
-    #         res_f_name = __dir=os.path.dirname(os.path.realpath(__file__))+f'/out/{dt_string}.jpg'
-    #         with open('prompt.dump', 'r') as f:
-    #             info_prompt = f.readlines()
-    #             with open(res_f_name+'.txt', 'w') as f:
-    #                 f.writelines(info_prompt)
-    #     im.save(res_f_name)
-    #     print("crop done")
-    #     exit(0)
-
+    # ##PICKLE
+    # prompt_balaboba = {}
+    # with open('balaboba.dump', 'rb') as f:
+    #     prompt_balaboba = pickle.load(f)    
     
-
-    # if prompt=="r":       
-    #     prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
-    # if prompt=="b":
-    #     prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
-    #     prompt=sync_balaboba(prompt,27)
-
-    # if args.translate:    
-    #     prompt = prompt.replace('\n','')
-    #     prompt = prompt.replace('+','')
-    #     prompt=translate(prompt, 'en')
-
-    # if style=="r":        
-    #     if args.blacklist:
-    #         style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")    
-    #     else:
-    #         style = get_random_style(__dir+"/styles.txt")    
-
-
-    # prompt = escape_prompt(prompt)
-
-    # if  not args.download:
-    #     res = identify(identify_key=identify_key)
-    #     img_uri = create(res["id_token"], prompt, style,task_id,args.one)
-    #     with open('url.dump', 'w') as f:
-    #         f.write(img_uri)    
-    #     print("get url done")   
-    # else:
-    #     with open('url.dump', 'r') as f:
-    #         import urllib.request        
-    #         img_uri=f.readline()
-    #         ssl._create_default_https_context = ssl._create_unverified_context                
-    #         urllib.request.urlretrieve(img_uri, res_f_name)
-    #     print("download img done")   
-
-    # print(img_uri)
-
-    # python3 wombo_create.py -p b && python3 wombo_create.py -i && python3 wombo_create.py -d && python3 wombo_create.py -c
+    prompt_en = prompt_balaboba['text'].replace('\n','')
+    prompt_en = prompt_en.replace('+','')
+    prompt_en=translate(prompt_en, 'en')
+    prompt_en = escape_prompt(prompt_en)
+    style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")
+    res = identify(identify_key=identify_key)
+    img_uri = create(res["id_token"], prompt_en, style,None,False,full=True)
+    # img_uri='https://images.wombo.art/exports/f4fca3bc-f2d3-4ae9-95ba-da203ab6661b/blank_tradingcard.jpg?Expires=1680405084&Signature=FbSsHfOE~wdpaAtmTAJpcGjZqpUxXchfQ3vemmwKQH1d~NUOYcwgML8WLHtxSFxTLgZx37XDbfcDIdS29jIyMg7mzEuI2y94GQwVgzgUJce2YIZLLRhZ-hWKC8Gp3JyxL01h5jA6jYDRLuDGzMI-5bixsJwiR7Tpx6o3Ijc2yp-QLNXkGGjIk18~1YZZ0by8yWC6sve0IQ5eeyFHOVmQVS1n2FawqO5-2pqRYRVBzPw89yOw-96hJz57c5H90l~hPR-JD4LgUgrGb2C5k4p~5oH6vnw9AFI59VjfBPr1wrcI46wUlALRrsP-zFCINEQHfzAxx9KuENLacgXU8F~Qjw__&Key-Pair-Id=K1ZXCNMC55M2IL'    
+    ssl._create_default_https_context = ssl._create_unverified_context    
+    now = datetime.now()               
+    dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
+    res_f_name = os.path.join(__dir,out_dir)
+    res_f_name = os.path.join(res_f_name,f'{dt_string}.jpg')
+    urllib.request.urlretrieve(img_uri, res_f_name)
+    print("download img done")       
+    im = Image.open(res_f_name)
+    width, height = im.size
+    left = 62
+    top = 215
+    right = width-62
+    bottom = height-154
+    im = im.crop((left, top, right, bottom))        
+             
+    with open(res_f_name+'.txt', 'w') as f:
+        f.writelines(prompt_en)
+    im.save(res_f_name)
+    print("crop done")
+    a=1
+    
