@@ -69,6 +69,8 @@
     bottom: 2vw;
   }
   
+
+
   @keyframes bounce {
     100% {
       transform: scale(0.98) translateY(3px) translateX(5px);

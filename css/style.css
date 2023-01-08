@@ -25,6 +25,20 @@ body {
     padding-right: 570px;
 }
 
+#play_pause_cat{
+  color: rgb(188, 125, 82);
+  position: absolute;
+  /* left: 65%; */
+  right: 0;
+  margin-right: 170px;
+  font-size: 80px;
+  top: 40%;
+}
+
+#play_pause_cat:hover{
+  color:white;
+}
+
 wave{  
   z-index: 7;
   opacity: 0.8;
@@ -67,6 +81,7 @@ wave{
   z-index: 2;
   overflow-x: hidden;
   margin-top: 2cm;
+  
 }
 
 #ship{
@@ -75,6 +90,10 @@ wave{
     bottom: -20vh;
     position: fixed;
     z-index: 3;
+}
+
+#main_container{
+  transition: opacity 1s;
 }
 
 main {

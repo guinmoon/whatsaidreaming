@@ -31,10 +31,35 @@ document.addEventListener('DOMContentLoaded', function() {
         options.scrollParent = true;
     }
 
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://aliceghome.online/radio/HabraRadio_320', true);
+    xhr.responseType = 'arraybuffer';
+    xhr.onload = function(e) { 
+        console.log(xhr.response);
+        var context = new AudioContext();
+        context.decodeAudioData(xhr.response, function(buffer) {
+                    this.wavesurfer = WaveSurfer.create({
+            xhr: { mode: "no-cors" },
+            container: "#waveform",
+            waveColor: "rgba(255, 42, 131, 0.5)",
+            progressColor: "rgb(255, 42, 131)"
+        });
+                wavesurfer.loadDecodedBuffer(buffer);
+                wavesurfer.on("ready", function() {
+                // wavesurfer.play();
+                // app.wavePlaying = true;
+                // app.wavesurfer.play();
+            });
+        }, null);
+    };
+	xhr.send();
+    
+					
     // Init
-    wavesurfer = WaveSurfer.create(options);
-    // Load audio from URL
-    wavesurfer.load('/parts/0.mp3');
+    // wavesurfer = WaveSurfer.create(options);
+    // // Load audio from URL
+    // // wavesurfer.load('parts/0.mp3');
+    // wavesurfer.load('https://aliceghome.online/radio/HabraRadio_320');
 
     // Regions
     if (wavesurfer.enableDragSelection) {

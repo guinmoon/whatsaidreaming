@@ -31,8 +31,8 @@ $(document).ready(function(){
             update_chat();
             update_spcae_height();
         }
-    });
-    var intervalId = window.setInterval(function(){      
+    });    
+    flying_interval = window.setInterval(function(){      
         gallery_len=global_galery.images.length;
         image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
         current_image = image;

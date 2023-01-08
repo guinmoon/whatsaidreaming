@@ -1,11 +1,5 @@
-$(document).ready(function(){
-    
-    $.ajax({
-        url: `${glaery_dir_name}/${glaery_json_name}`,
-        type: 'GET',
-        dataType: 'json', // added data type
-        success: function(res) {
-            console.log(res);
+function parse_galery(res){
+  console.log(res);
             galery_div=$("#galery") ;
             var img_num=0;
             var lazy_src="src";
@@ -63,10 +57,20 @@ $(document).ready(function(){
                   callback_finish: callback_finish
                 });
               })();
+}
+
+$(document).ready(function(){
+    
+    $.ajax({
+        url: `${glaery_dir_name}/${glaery_json_name}`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function(res) {
+            parse_galery(res);
         }
     });
     document.addEventListener("scroll", (event) => {
-      update_spcae_height();
-  });
+    update_spcae_height();
+    });
 });
 

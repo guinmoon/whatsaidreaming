@@ -1,0 +1,16 @@
+<script src="js/icecast-metadata-player-1.14.1.min.js"></script>
+    <script>
+      const onMetadata = (metadata) => {
+        document.getElementById("metadata").innerHTML = metadata.StreamTitle;
+      };
+      const player = 
+        new IcecastMetadataPlayer(
+          "radio/ai_radio_vorbis_cbr", // stream endpoint
+          { onMetadata }                        // options (onMetadata callback)
+        );
+    </script>
+    <body>
+      <button onclick="player.play();"> Play </button>
+      <button onclick="player.stop();"> Stop </button>
+      <p> Now Playing: <span id="metadata"></span> </p>
+    </body>
