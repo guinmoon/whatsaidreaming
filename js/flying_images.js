@@ -1,5 +1,18 @@
 var global_galery={};
 var current_image={};
+
+function update_galery(){
+    $.ajax({
+        url: `${glaery_dir_name}/today.json`,
+        type: 'GET',
+        dataType: 'json', // added data type
+        success: function(res) {
+            global_galery= res;   
+            console.log(global_galery);         
+        }
+    }); 
+}
+
 $(document).ready(function(){    
     flying_opacity=1;
     $.ajax({
@@ -32,6 +45,7 @@ $(document).ready(function(){
             update_spcae_height();
         }
     });    
+    galery_interval = window.setInterval(function(){ update_galery();},60000);
     flying_interval = window.setInterval(function(){      
         gallery_len=global_galery.images.length;
         image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
@@ -61,7 +75,5 @@ $(document).ready(function(){
         }, delayInMilliseconds);
       
     }, image_change_delay);
-
-    // clearInterval(intervalId) 
 });
 

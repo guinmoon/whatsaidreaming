@@ -6,6 +6,7 @@ function update_spcae_height(){
 
 function load_template(template_name){    
     clearInterval(flying_interval);
+    clearInterval(galery_interval);    
     $.ajax({
         url: `/templates/${template_name}`,
         type: 'GET',        

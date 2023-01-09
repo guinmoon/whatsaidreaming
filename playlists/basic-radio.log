@@ -25552,3 +25552,562 @@
 2023/01/09 17:40:21 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
 2023/01/09 17:40:31 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
 2023/01/09 17:40:31 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 5).
+2023/01/09 17:42:00 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:42:10 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:42:10 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 1).
+2023/01/09 17:42:29 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:42:40 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:42:40 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 3).
+2023/01/09 17:42:58 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:43:09 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:43:09 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 6).
+2023/01/09 17:44:37 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:44:48 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:44:48 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 7).
+2023/01/09 17:46:16 [parts:3] Loading playlist...
+2023/01/09 17:46:16 [parts:3] Playlist is a directory.
+2023/01/09 17:46:16 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 17:46:16 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:46:27 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:46:27 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 8).
+2023/01/09 17:47:56 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:48:06 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:48:06 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 17:49:35 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:49:45 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:49:45 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 10).
+2023/01/09 17:50:03 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:50:14 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:50:14 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 17:50:32 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:50:43 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:50:43 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 2).
+2023/01/09 17:52:12 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:52:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:52:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 5).
+2023/01/09 17:53:51 [parts:3] Loading playlist...
+2023/01/09 17:53:51 [parts:3] Playlist is a directory.
+2023/01/09 17:53:51 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 17:53:51 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:54:01 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:54:01 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 1).
+2023/01/09 17:54:19 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:54:30 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:54:30 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 9).
+2023/01/09 17:55:59 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:56:09 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:56:09 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 6).
+2023/01/09 17:56:27 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:56:38 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:56:38 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 11).
+2023/01/09 17:58:07 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:58:17 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:58:17 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 7).
+2023/01/09 17:59:46 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:59:56 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:59:56 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 4).
+2023/01/09 18:00:14 [parts:3] Loading playlist...
+2023/01/09 18:00:14 [parts:3] Playlist is a directory.
+2023/01/09 18:00:14 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:00:14 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:00:14 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:00:25 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:00:25 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 13).
+2023/01/09 18:01:54 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:02:04 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:02:04 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 18:02:22 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:02:33 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:02:33 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 10).
+2023/01/09 18:04:02 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:04:12 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:04:12 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 2).
+2023/01/09 18:05:41 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:05:51 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:05:51 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 1).
+2023/01/09 18:06:10 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:06:20 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:06:20 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 3).
+2023/01/09 18:07:49 [parts:3] Loading playlist...
+2023/01/09 18:07:49 [parts:3] Playlist is a directory.
+2023/01/09 18:07:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:07:49 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:07:59 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:07:59 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 5).
+2023/01/09 18:08:18 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:08:28 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:08:28 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 9).
+2023/01/09 18:08:47 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:08:57 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:08:57 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 11).
+2023/01/09 18:10:26 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:10:36 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:10:36 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 4).
+2023/01/09 18:10:55 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:11:06 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:11:06 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 7).
+2023/01/09 18:12:34 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:12:45 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:12:45 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 0).
+2023/01/09 18:14:13 [parts:3] Loading playlist...
+2023/01/09 18:14:13 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:14:13 [parts:3] Playlist is a directory.
+2023/01/09 18:14:13 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:14:24 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:14:24 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 8).
+2023/01/09 18:14:42 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:14:53 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:14:53 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 12).
+2023/01/09 18:15:11 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:15:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:15:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 13).
+2023/01/09 18:16:51 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:17:01 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:17:01 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 1).
+2023/01/09 18:18:30 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:18:40 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:18:40 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 2).
+2023/01/09 18:18:58 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:19:09 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:19:09 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 3).
+2023/01/09 18:20:38 [parts:3] Loading playlist...
+2023/01/09 18:20:38 [parts:3] Playlist is a directory.
+2023/01/09 18:20:38 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:20:38 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:20:38 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:20:48 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:20:48 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 9).
+2023/01/09 18:22:17 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:22:27 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:22:27 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 4).
+2023/01/09 18:22:45 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:22:56 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:22:56 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 11).
+2023/01/09 18:23:14 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:23:25 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:23:25 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 7).
+2023/01/09 18:24:54 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:25:04 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:25:04 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 0).
+2023/01/09 18:26:33 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:26:43 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:26:43 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 8).
+2023/01/09 18:28:12 [parts:3] Loading playlist...
+2023/01/09 18:28:12 [parts:3] Playlist is a directory.
+2023/01/09 18:28:12 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:28:12 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:28:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:28:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 10).
+2023/01/09 18:28:40 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:28:51 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:28:51 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 13).
+2023/01/09 18:29:09 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:29:20 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:29:20 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 1).
+2023/01/09 18:30:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:30:59 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:30:59 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 2).
+2023/01/09 18:32:28 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:32:38 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:32:38 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 3).
+2023/01/09 18:32:56 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:33:07 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:33:07 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 5).
+2023/01/09 18:34:36 [parts:3] Loading playlist...
+2023/01/09 18:34:36 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:34:36 [parts:3] Playlist is a directory.
+2023/01/09 18:34:36 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:34:46 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:34:46 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 4).
+2023/01/09 18:36:15 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:36:25 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:36:25 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 7).
+2023/01/09 18:37:54 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:38:04 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:38:04 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 0).
+2023/01/09 18:39:33 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:39:43 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:39:43 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 8).
+2023/01/09 18:40:02 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:40:12 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:40:12 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 9).
+2023/01/09 18:41:41 [parts:3] Loading playlist...
+2023/01/09 18:41:41 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:41:41 [parts:3] Playlist is a directory.
+2023/01/09 18:41:41 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:41:41 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:41:52 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:41:52 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 11).
+2023/01/09 18:43:20 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:43:31 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:43:31 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 2).
+2023/01/09 18:43:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:44:00 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:44:00 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 3).
+2023/01/09 18:45:28 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:45:39 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:45:39 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 5).
+2023/01/09 18:45:57 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:46:08 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:46:08 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 6).
+2023/01/09 18:47:37 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:47:47 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:47:47 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 4).
+2023/01/09 18:49:16 [parts:3] Loading playlist...
+2023/01/09 18:49:16 [parts:3] Playlist is a directory.
+2023/01/09 18:49:16 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:49:16 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:49:26 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:49:26 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 7).
+2023/01/09 18:50:55 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:51:05 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:51:05 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 0).
+2023/01/09 18:52:34 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:52:44 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 18:52:44 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 1).
+2023/01/09 18:54:13 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:54:23 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:54:23 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 2).
+2023/01/09 18:55:52 [parts:3] Loading playlist...
+2023/01/09 18:55:52 [parts:3] Playlist is a directory.
+2023/01/09 18:55:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:55:52 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 18:56:02 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:56:02 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 3).
+2023/01/09 18:56:20 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:56:31 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:56:31 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 5).
+2023/01/09 18:56:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:57:00 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 18:57:00 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 9).
+2023/01/09 18:57:18 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:57:29 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 18:57:29 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 10).
+2023/01/09 18:58:58 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 18:59:08 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 18:59:08 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 6).
+2023/01/09 19:00:37 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:00:47 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:00:47 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 19:02:16 [parts:3] Loading playlist...
+2023/01/09 19:02:16 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:02:16 [parts:3] Playlist is a directory.
+2023/01/09 19:02:16 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:02:26 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:02:26 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 7).
+2023/01/09 19:02:44 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:02:55 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:02:55 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 12).
+2023/01/09 19:04:24 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:04:34 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:04:34 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 19:04:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:05:03 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:05:03 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 1).
+2023/01/09 19:06:32 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:06:42 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:06:42 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 2).
+2023/01/09 19:08:11 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:08:21 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:08:21 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 3).
+2023/01/09 19:08:40 [parts:3] Loading playlist...
+2023/01/09 19:08:40 [parts:3] Playlist is a directory.
+2023/01/09 19:08:40 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:08:40 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:08:50 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:08:50 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 5).
+2023/01/09 19:10:19 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:10:29 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:10:29 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 9).
+2023/01/09 19:11:58 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:12:08 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:12:08 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 6).
+2023/01/09 19:13:37 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:13:48 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:13:48 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 4).
+2023/01/09 19:15:16 [parts:3] Loading playlist...
+2023/01/09 19:15:16 [parts:3] Playlist is a directory.
+2023/01/09 19:15:16 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:15:16 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:15:27 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:15:27 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 19:15:45 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:15:56 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:15:56 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 10).
+2023/01/09 19:17:24 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:17:35 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:17:35 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 1).
+2023/01/09 19:19:04 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:19:14 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:19:14 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 2).
+2023/01/09 19:19:32 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:19:43 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:19:43 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 3).
+2023/01/09 19:21:12 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:21:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:21:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 5).
+2023/01/09 19:21:40 [parts:3] Loading playlist...
+2023/01/09 19:21:40 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:21:40 [parts:3] Playlist is a directory.
+2023/01/09 19:21:40 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:21:51 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:21:51 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 8).
+2023/01/09 19:22:09 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:22:20 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:22:20 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 9).
+2023/01/09 19:23:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:23:59 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:23:59 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 6).
+2023/01/09 19:25:28 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:25:38 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:25:38 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 4).
+2023/01/09 19:25:56 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:26:07 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:26:07 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 7).
+2023/01/09 19:27:36 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:27:46 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:27:46 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 0).
+2023/01/09 19:28:04 [parts:3] Loading playlist...
+2023/01/09 19:28:04 [parts:3] Playlist is a directory.
+2023/01/09 19:28:04 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:28:04 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:28:15 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:28:15 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 10).
+2023/01/09 19:29:44 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:29:54 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:29:54 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 1).
+2023/01/09 19:30:12 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:30:23 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:30:23 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 2).
+2023/01/09 19:31:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:32:02 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:32:02 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 3).
+2023/01/09 19:33:31 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:33:41 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:33:41 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 5).
+2023/01/09 19:35:10 [parts:3] Loading playlist...
+2023/01/09 19:35:10 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:35:10 [parts:3] Playlist is a directory.
+2023/01/09 19:35:10 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:35:20 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:35:20 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 8).
+2023/01/09 19:35:38 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:35:49 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:35:49 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 11).
+2023/01/09 19:36:08 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:36:18 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:36:18 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 6).
+2023/01/09 19:37:47 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:37:57 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:37:57 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 19:39:26 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:39:36 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:39:36 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 19:39:55 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:40:05 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:40:05 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 7).
+2023/01/09 19:41:34 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:41:34 [parts:3] Loading playlist...
+2023/01/09 19:41:34 [parts:3] Playlist is a directory.
+2023/01/09 19:41:34 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:41:44 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:41:44 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 1).
+2023/01/09 19:43:13 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:43:24 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:43:24 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 2).
+2023/01/09 19:44:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:45:03 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:45:03 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 3).
+2023/01/09 19:46:31 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:46:42 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:46:42 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 5).
+2023/01/09 19:47:00 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:47:11 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:47:11 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 8).
+2023/01/09 19:47:29 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:47:40 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:47:40 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 9).
+2023/01/09 19:49:09 [parts:3] Loading playlist...
+2023/01/09 19:49:09 [parts:3] Playlist is a directory.
+2023/01/09 19:49:09 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:49:09 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:49:19 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:49:19 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 6).
+2023/01/09 19:50:48 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:50:58 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:50:58 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 0).
+2023/01/09 19:52:27 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:52:37 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:52:37 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 19:54:06 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:54:16 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 19:54:16 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 1).
+2023/01/09 19:54:34 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:54:45 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:54:45 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 7).
+2023/01/09 19:55:03 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:55:14 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 19:55:14 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 10).
+2023/01/09 19:56:43 [parts:3] Loading playlist...
+2023/01/09 19:56:43 [parts:3] Playlist is a directory.
+2023/01/09 19:56:43 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 19:56:43 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:56:53 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:56:53 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 2).
+2023/01/09 19:57:11 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:57:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 19:57:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 12).
+2023/01/09 19:58:51 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 19:59:01 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 19:59:01 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 5).
+2023/01/09 20:00:30 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:00:40 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:00:40 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 8).
+2023/01/09 20:02:09 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:02:19 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:02:19 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 6).
+2023/01/09 20:02:37 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:02:48 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:02:48 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 9).
+2023/01/09 20:03:06 [parts:3] Loading playlist...
+2023/01/09 20:03:06 [parts:3] Playlist is a directory.
+2023/01/09 20:03:06 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:03:06 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:03:17 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:03:17 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 0).
+2023/01/09 20:03:35 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:03:46 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:03:46 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 13).
+2023/01/09 20:04:04 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:04:15 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:04:15 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 14).
+2023/01/09 20:05:44 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:05:54 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:05:54 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 1).
+2023/01/09 20:06:13 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:06:23 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:06:23 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 20:07:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:08:02 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:08:02 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 2).
+2023/01/09 20:09:31 [parts:3] Loading playlist...
+2023/01/09 20:09:31 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:09:31 [parts:3] Playlist is a directory.
+2023/01/09 20:09:31 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:09:41 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:09:41 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 3).
+2023/01/09 20:10:00 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:10:10 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:10:10 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 10).
+2023/01/09 20:11:39 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:11:50 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:11:50 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 5).
+2023/01/09 20:13:18 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:13:29 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:13:29 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 6).
+2023/01/09 20:14:57 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:15:08 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:15:08 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 0).
+2023/01/09 20:15:26 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:15:37 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:15:37 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 8).
+2023/01/09 20:15:55 [parts:3] Loading playlist...
+2023/01/09 20:15:55 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:15:55 [parts:3] Playlist is a directory.
+2023/01/09 20:15:55 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:15:55 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:16:06 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:16:06 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 12).
+2023/01/09 20:16:24 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:16:35 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:16:35 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 1).
+2023/01/09 20:18:04 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:18:14 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:18:14 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 4).
+2023/01/09 20:19:43 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:19:53 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:19:53 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 2).
+2023/01/09 20:21:22 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:21:32 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:21:32 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 3).
+2023/01/09 20:21:50 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:22:01 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:22:01 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 7).
+2023/01/09 20:22:19 [parts:3] Loading playlist...
+2023/01/09 20:22:19 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:22:19 [parts:3] Playlist is a directory.
+2023/01/09 20:22:19 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:22:30 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:22:30 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 10).
+2023/01/09 20:23:59 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:24:09 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:24:09 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 5).
+2023/01/09 20:25:38 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:25:48 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:25:48 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 0).
+2023/01/09 20:27:17 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:27:27 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:27:27 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 6).
+2023/01/09 20:27:45 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:27:56 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:27:56 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 8).
+2023/01/09 20:29:25 [parts:3] Loading playlist...
+2023/01/09 20:29:25 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:29:25 [parts:3] Playlist is a directory.
+2023/01/09 20:29:25 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:29:35 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:29:35 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 1).
+2023/01/09 20:29:53 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:30:04 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:30:04 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 11).
+2023/01/09 20:31:33 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:31:43 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:31:43 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 2).
+2023/01/09 20:33:12 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:33:22 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:33:22 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 3).
+2023/01/09 20:33:28 [clock.wallclock_main:2] We must catchup 1.72 seconds!
+2023/01/09 20:33:32 [clock.wallclock_main:2] We must catchup 5.45 seconds!
+2023/01/09 20:33:36 [clock.wallclock_main:2] We must catchup 9.38 seconds!
+2023/01/09 20:33:40 [clock.wallclock_main:2] We must catchup 13.29 seconds!
+2023/01/09 20:33:42 [clock.wallclock_main:2] We must catchup 15.46 seconds!
+2023/01/09 20:33:44 [clock.wallclock_main:2] We must catchup 17.25 seconds!
+2023/01/09 20:33:46 [clock.wallclock_main:2] We must catchup 18.68 seconds!
+2023/01/09 20:33:47 [clock.wallclock_main:2] We must catchup 20.30 seconds!
+2023/01/09 20:33:50 [clock.wallclock_main:2] We must catchup 23.48 seconds!
+2023/01/09 20:33:55 [clock.wallclock_main:2] We must catchup 28.19 seconds!
+2023/01/09 20:33:59 [clock.wallclock_main:2] We must catchup 32.13 seconds!
+2023/01/09 20:34:00 [clock.wallclock_main:2] We must catchup 33.15 seconds!
+2023/01/09 20:34:01 [clock.wallclock_main:2] We must catchup 28.15 seconds (we've been late for 100 rounds)!
+2023/01/09 20:34:02 [clock.wallclock_main:2] We must catchup 23.24 seconds (we've been late for 100 rounds)!
+2023/01/09 20:34:02 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:34:03 [clock.wallclock_main:2] We must catchup 19.60 seconds (we've been late for 100 rounds)!
+2023/01/09 20:34:04 [clock.wallclock_main:2] We must catchup 13.68 seconds (we've been late for 100 rounds)!
+2023/01/09 20:34:04 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:34:04 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 4).
+2023/01/09 20:34:05 [clock.wallclock_main:2] We must catchup 8.80 seconds (we've been late for 100 rounds)!
+2023/01/09 20:34:06 [clock.wallclock_main:2] We must catchup 3.17 seconds (we've been late for 100 rounds)!
+2023/01/09 20:35:20 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:35:30 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:35:30 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 7).
+2023/01/09 20:35:49 [parts:3] Loading playlist...
+2023/01/09 20:35:49 [parts:3] Playlist is a directory.
+2023/01/09 20:35:49 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:35:49 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 20:35:59 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:35:59 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 5).
+2023/01/09 20:37:28 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:37:38 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:37:38 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 0).
+2023/01/09 20:37:57 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:38:07 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 20:38:07 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 6).
+2023/01/09 20:38:26 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:38:37 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 20:38:37 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 12).
+2023/01/09 20:40:05 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:40:16 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 20:40:16 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 1).
+2023/01/09 20:41:44 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 20:41:55 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 20:41:55 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 8).
