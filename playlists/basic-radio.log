@@ -25532,3 +25532,23 @@
 2023/01/09 17:32:57 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
 2023/01/09 17:32:57 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//out.mp3" (RID 12).
 2023/01/09 17:34:26 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:34:36 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//out.mp3".
+2023/01/09 17:34:36 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 8).
+2023/01/09 17:36:05 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:36:15 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:36:15 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//1.mp3" (RID 4).
+2023/01/09 17:36:34 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:36:44 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//1.mp3".
+2023/01/09 17:36:44 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3" (RID 10).
+2023/01/09 17:38:13 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:38:23 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2023-01-06_22_08_26.mp3".
+2023/01/09 17:38:23 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 0).
+2023/01/09 17:39:52 [parts:3] Loading playlist...
+2023/01/09 17:39:52 [parts:3] Playlist is a directory.
+2023/01/09 17:39:52 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:39:52 [parts:3] Successfully loaded a playlist of 5 tracks.
+2023/01/09 17:40:02 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:40:02 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//0.mp3" (RID 2).
+2023/01/09 17:40:21 [decoder:3] Method "MAD" accepted "/home/m_vs_m/whatsaidreaming/parts//2.mp3".
+2023/01/09 17:40:31 [parts:3] Finished with "/home/m_vs_m/whatsaidreaming/parts//0.mp3".
+2023/01/09 17:40:31 [parts:3] Prepared "/home/m_vs_m/whatsaidreaming/parts//2.mp3" (RID 5).

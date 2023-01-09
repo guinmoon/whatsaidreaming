@@ -75,7 +75,7 @@ wave{
 #galery{
   position: absolute;
   padding: 2em 2em 12em 2em;
-  max-width: 90vw;
+  /* max-width: 90vw; */
   /* float: right; */
   text-align: center;
   z-index: 2;
