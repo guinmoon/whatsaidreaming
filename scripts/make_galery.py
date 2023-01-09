@@ -53,7 +53,7 @@ def run(outf,only_today=False,verbose=False,clnup=False):
 
 
 if __name__ == '__main__':
-    config_path = os.path.join(os.path.dirname(__file__),'config.json')
+    config_path = os.path.join(os.path.dirname(__file__),'config_galary.json')
     with open(config_path) as json_file:
         Config = json.load(json_file)
     target_dir = Config['target_dir']

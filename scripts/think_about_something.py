@@ -66,7 +66,7 @@ if __name__ == '__main__':
         exit(0)
 
     prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
-    prompt_balaboba = sync_balaboba(prompt,11)
+    prompt_balaboba = sync_balaboba_old(prompt,11)
     print(prompt_balaboba['query'])
     print(prompt_balaboba['text'])
     # prompt_balaboba = sync_balaboba(prompt,27)
