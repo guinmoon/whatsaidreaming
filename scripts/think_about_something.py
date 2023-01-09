@@ -84,10 +84,10 @@ if __name__ == '__main__':
     # prompt_balaboba = {}
     # with open('balaboba.dump', 'rb') as f:
     #     prompt_balaboba = pickle.load(f)    
-    
-    prompt_en = prompt_balaboba['text'].replace('\n','')
-    prompt_en = prompt_en.replace('+','')
-    prompt_en=translate(prompt_en, 'en')
+    prompt_ru = prompt_balaboba['query']+prompt_balaboba['text']
+    prompt_ru = prompt_ru.replace('\n','')
+    prompt_ru = prompt_ru.replace('+','')
+    prompt_en=translate(prompt_ru, 'en')
     prompt_en = escape_prompt(prompt_en)
     style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")
     res = identify(identify_key=identify_key)
