@@ -4,7 +4,7 @@
 set("log.file.path","/home/m_vs_m/whatsaidreaming/playlists/basic-radio.log")
 
 # Music
-myplaylist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/parts/")
+myplaylist = playlist(reload = 60,"/home/m_vs_m/whatsaidreaming/parts/")
 # Some jingles
 #jingles = playlist("~/radio/jingles.m3u")
 # If something goes wrong, we'll play this
@@ -54,7 +54,7 @@ radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
  
 out(
 	%mp3(bitrate = 192, id3v2 = true),
-	description = "MP3 193 Kbps",
+	description = "MP3 192 Kbps",
 	mount = "ai_radio_192",
 	mksafe(radio)
 )
