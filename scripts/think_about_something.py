@@ -67,7 +67,7 @@ if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__),'config_think.json')
     with open(config_path) as json_file:
         Config = json.load(json_file)
-    sqlite_filepath = os.path.join(__dir,"thinks.db")
+    sqlite_filepath = os.path.join(__dir,"thinks_map.db")
 
     if args.update:
         update_styles("styles.txt")
