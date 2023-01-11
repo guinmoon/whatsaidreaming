@@ -82,6 +82,7 @@ if __name__ == '__main__':
     choice=random.choices(numberList, weights=(80, 20), k=1)[0]
     
     # choice='mutate'
+
     print(choice)
     
     prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
