@@ -14,7 +14,7 @@ from datetime import datetime
 from PIL import Image
 
 import os
-from sqlalchemy import create_engine, ForeignKey
+from sqlalchemy import create_engine, ForeignKey,select
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship, backref,Session
 from sqlalchemy.ext.declarative import declarative_base
@@ -26,7 +26,7 @@ DEBUG=False
 
 
 
-
+Config={}
 
 identify_key = "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
 
@@ -41,23 +41,32 @@ parser = argparse.ArgumentParser(
                     epilog = 'Enjoy.')
 parser.add_argument('-k','--key')
 parser.add_argument('-u','--update',action='store_true')          
-parser.add_argument('-i','--iterations',action='store_true')
-parser.add_argument('-o','--one',action='store_true')
-parser.add_argument('-c','--crop',action='store_true')
-parser.add_argument('-d','--download',action='store_true')          
-parser.add_argument('-r','--rename',action='store_true')
-parser.add_argument('-b','--blacklist',action='store_true')
-parser.add_argument('-s', '--style')      
-parser.add_argument('-t', '--translate',action='store_true')
-parser.add_argument('-p', '--prompt')      
+# parser.add_argument('-i','--iterations',action='store_true')
+# parser.add_argument('-o','--one',action='store_true')
+# parser.add_argument('-c','--crop',action='store_true')
+# parser.add_argument('-d','--download',action='store_true')          
+# parser.add_argument('-r','--rename',action='store_true')
+# parser.add_argument('-b','--blacklist',action='store_true')
+# parser.add_argument('-s', '--style')      
+# parser.add_argument('-t', '--translate',action='store_true')
+# parser.add_argument('-p', '--prompt')      
 args = parser.parse_args()
 
 
 out_dir = '../new/'
 
+def get_random_think(engine):
+    rand_think_query=select(Think).order_by(func.random())
+    with Session(engine) as session:   
+        rand_think=session.execute(rand_think_query).first()
+        return rand_think
+
 if __name__ == '__main__':
     
     __dir=os.path.dirname(os.path.realpath(__file__)) 
+    config_path = os.path.join(os.path.dirname(__file__),'config_think.json')
+    with open(config_path) as json_file:
+        Config = json.load(json_file)
     sqlite_filepath = os.path.join(__dir,"thinks.db")
 
     if args.update:
@@ -65,18 +74,36 @@ if __name__ == '__main__':
         print("done")
         exit(0)
 
+
+    engine = create_engine('sqlite:///'+sqlite_filepath, echo=True)
+    Base.metadata.create_all(engine)    
+
+    numberList = ['mutate','new']
+    choice=random.choices(numberList, weights=(80, 20), k=1)[0]
+    
+    # choice='mutate'
+    print(choice)
+    
     prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
-    prompt_balaboba = sync_balaboba_old(prompt,11)
+    base_id= None
+    if choice=='mutate':
+        rand_think=get_random_think(engine)
+        prompt = rand_think[0].base_text+' '+rand_think[0].balaboba_text
+        base_id = rand_think[0].id
+
+    prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+    if prompt_balaboba['text'].find('www')>=0:
+        print("[bad balaboba]")
+        exit(0)
     print(prompt_balaboba['query'])
     print(prompt_balaboba['text'])
     # prompt_balaboba = sync_balaboba(prompt,27)
     with open('balaboba.dump', 'wb') as f:
         pickle.dump(prompt_balaboba, f)
 
-    engine = create_engine('sqlite:///'+sqlite_filepath, echo=True)
-    Base.metadata.create_all(engine)    
-    tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'])    
-    with Session(engine) as session:
+    tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'],base_id=base_id)        
+        
+    with Session(engine) as session:        
         session.add(tmp_think)        
         session.commit()
     
@@ -85,6 +112,8 @@ if __name__ == '__main__':
     # with open('balaboba.dump', 'rb') as f:
     #     prompt_balaboba = pickle.load(f)    
     prompt_ru = prompt_balaboba['query']+prompt_balaboba['text']
+    if choice=='mutate':
+        prompt_ru=prompt_balaboba['text']
     prompt_ru = prompt_ru.replace('\n','')
     prompt_ru = prompt_ru.replace('+','')
     prompt_en=translate(prompt_ru, 'en')
