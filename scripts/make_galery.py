@@ -22,6 +22,9 @@ def cleanup(galery):
         if not in_galery:
             os.remove(txt)
 
+def sort_by_str_date(val):
+    return val['created']
+
 def run(outf,only_today=False,verbose=False,clnup=False):        
     images=glob.glob(target_dir+"/*.jpg")
     galery={}
@@ -29,8 +32,11 @@ def run(outf,only_today=False,verbose=False,clnup=False):
     for image in images:
         img_base_name=os.path.basename(image)
         c_date=datetime.fromtimestamp(os.path.getmtime(image))
+        diff_dates = (datetime.today() - c_date)
+        diff_dates_hours = (diff_dates.days*24 * 60 * 60+diff_dates.seconds)/3600
         if only_today:
-            if c_date.date() != datetime.today().date():
+            # if c_date.date() != datetime.today().date():
+            if diff_dates_hours>=24.0:
                 continue
         tmp_img_info = {"f_name":img_base_name,"prompt":img_base_name,"created":str(c_date)}
         if os.path.exists(image+".txt"):
@@ -45,6 +51,7 @@ def run(outf,only_today=False,verbose=False,clnup=False):
         galery["images"].append(tmp_img_info)
     if clnup:
         cleanup(galery)
+    galery["images"].sort(key=sort_by_str_date,reverse=True)
     gelery_json = json.dumps(galery,indent=4)
     with open(os.path.join(target_dir,outf),'w') as f:
         f.write(gelery_json)

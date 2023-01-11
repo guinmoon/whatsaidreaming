@@ -3,6 +3,12 @@ function update_spcae_height(){
     $("#twinkling").css('height', $("#galery").css('height'));
     $("#clouds").css('height', $("#galery").css('height'));
 }
+function reset_spcae_height(){
+    $("#stars").css('height', '100vh'); 
+    $("#twinkling").css('height', '100vh');
+    $("#clouds").css('height', '100vh');
+}
+
 
 function load_template(template_name){    
     clearInterval(flying_interval);
@@ -18,6 +24,7 @@ function load_template(template_name){
                 $("#main_container").append(res);
                 $("#main_container").css('opacity',1);
             }, delayInMilliseconds);
+            reset_spcae_height();
         }
     });
     
