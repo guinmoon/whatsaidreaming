@@ -157,7 +157,7 @@ async def async_balaboba(orig_text,text_type):
 def sync_balaboba(orig_text,text_type=32):            
     return asyncio.run(async_balaboba(orig_text,text_type))
 
-def sync_balaboba_old(orig_text,text_type=32):            
+def sync_balaboba_old(orig_text,text_type=32,cookie=''):            
     conn = http.client.HTTPSConnection("yandex.ru",context = ssl._create_unverified_context())    
     payload = json.dumps({
         "query": orig_text,
@@ -169,7 +169,7 @@ def sync_balaboba_old(orig_text,text_type=32):
         'accept': '*/*',
         'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,tr;q=0.6',
         'content-type': 'application/json',   
-        'cookie': 'yandexuid=1607909291673207985; _yasc=4l7vZXE7c+2FFpK+BxxByPfNJNKBec7dhfOAy2U8KS+TtPL0i8p6Fb0Zvi8rItBd; is_gdpr=0; is_gdpr_b=CJaLGxDenwE=; i=Ddwf3WkHBw9odVOiiIj95KfAxGTMxm7S6jRmDFOyF6jHzcWyJRd6LPy3NwGibN+O3IBtOGgdIP0l3B7WXyprrlI8Mqo=; spravka=dD0xNjczMjA4MDE5O2k9MTg1LjIyOC4yMzMuMTI5O0Q9MjlBNEMxRThEMzk3OTNEMjE3MTc3NjI2MkM3MzAyQzQ5MDk0RDNBQzkwMEE2MjU4QjVFOTI2MzEwNjBBNjE4MjlDM0EwRTg2MTQzRjQwQjI5QUU2NzQ0NDEzN0E1MDt1PTE2NzMyMDgwMTk3NTM5NzExNjI7aD01ZDY4NGI4MzhhOGFiY2M3MjdiYWEzNjEwYTE2ZjY5NQ==',     
+        'cookie': cookie,     
         'origin': 'https://yandex.ru',        
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
     }    
