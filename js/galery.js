@@ -7,38 +7,41 @@ function parse_galery(res){
                 if (img_num>2){
                   lazy_src="data-src";
                 }
-                galery_div.append(`<a href="${glaery_dir_name}/${encodeURI(image.f_name)}">
+                galery_div.append(`<div class="img_galery">
+                <a href="${glaery_dir_name}/${encodeURI(image.f_name)}">
                 <img class="img_main lazy" ${lazy_src}="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                <p class="img_caption">${image.prompt}</p>
+                </div>
                 </a>`);   
                 img_num++;             
               });
               (function () {
-                function logElementEvent(eventName, element) {
-                  console.log(Date.now(), eventName, element.getAttribute("data-src"));
-                }
+                // function logElementEvent(eventName, element) {
+                //   console.log(Date.now(), eventName, element.getAttribute("data-src"));
+                // }
         
-                var callback_enter = function (element) {
-                  logElementEvent("🔑 ENTERED", element);
-                };
-                var callback_exit = function (element) {
-                  logElementEvent("🚪 EXITED", element);
-                };
-                var callback_loading = function (element) {
-                  logElementEvent("⌚ LOADING", element);
-                };
-                var callback_loaded = function (element) {
-                  logElementEvent("👍 LOADED", element);
-                };
-                var callback_error = function (element) {
-                  logElementEvent("💀 ERROR", element);
-                  element.src = "https://via.placeholder.com/440x560/?text=Error+Placeholder";
-                };
-                var callback_finish = function () {
-                  logElementEvent("✔️ FINISHED", document.documentElement);
-                };
-                var callback_cancel = function (element) {
-                  logElementEvent("🔥 CANCEL", element);
-                };
+                // var callback_enter = function (element) {
+                //   logElementEvent("🔑 ENTERED", element);
+                // };
+                // var callback_exit = function (element) {
+                //   logElementEvent("🚪 EXITED", element);
+                // };
+                // var callback_loading = function (element) {
+                //   logElementEvent("⌚ LOADING", element);
+                // };
+                // var callback_loaded = function (element) {
+                //   logElementEvent("👍 LOADED", element);
+                // };
+                // var callback_error = function (element) {
+                //   logElementEvent("💀 ERROR", element);
+                //   element.src = "https://via.placeholder.com/440x560/?text=Error+Placeholder";
+                // };
+                // var callback_finish = function () {
+                //   logElementEvent("✔️ FINISHED", document.documentElement);
+                // };
+                // var callback_cancel = function (element) {
+                //   logElementEvent("🔥 CANCEL", element);
+                // };
         
                 var ll = new LazyLoad({
                   class_applied: "lz-applied",
@@ -48,13 +51,13 @@ function parse_galery(res){
                   class_entered: "lz-entered",
                   class_exited: "lz-exited",
                   // Assign the callbacks defined above
-                  callback_enter: callback_enter,
-                  callback_exit: callback_exit,
-                  callback_cancel: callback_cancel,
-                  callback_loading: callback_loading,
-                  callback_loaded: callback_loaded,
-                  callback_error: callback_error,
-                  callback_finish: callback_finish
+                  // callback_enter: callback_enter,
+                  // callback_exit: callback_exit,
+                  // callback_cancel: callback_cancel,
+                  // callback_loading: callback_loading,
+                  // callback_loaded: callback_loaded,
+                  // callback_error: callback_error,
+                  // callback_finish: callback_finish
                 });
               })();
 }

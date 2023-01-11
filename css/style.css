@@ -56,11 +56,6 @@ wave{
   left: 20px;
 }
 
-.img_main{
-  height: 30em;
-  border-radius: 1em;
-  
-}
 
 .h1_dream{
   color: #b4b2b5;
@@ -82,6 +77,31 @@ wave{
   overflow-x: hidden;
   margin-top: 2cm;
   
+}
+
+.img_main{
+  /* height: 30em; */
+  border-radius: 1em;
+  width: 350px;
+}
+
+
+.img_caption{
+  position: absolute;
+    z-index: 6;
+    width: 330px;
+    max-height: 80px;
+    margin-top: -80px;
+    overflow: hidden;
+    background: #9c918387;
+    margin-left: 10px;
+    border-radius: 5px;
+}
+
+.img_galery{
+  float: left;
+  display: block;
+  margin: 10px;
 }
 
 #ship{
