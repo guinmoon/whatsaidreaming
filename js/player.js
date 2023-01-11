@@ -8,6 +8,7 @@ $(document).ready(function(){
     stream_player = 
     new IcecastMetadataPlayer(
         "radio/ai_radio_192", // stream endpoint
+        // "radio/vorbis_avg_128", // stream endpoint
         { onMetadata }                        // options (onMetadata callback)
     );
     // const { mediasource, html5, webaudio } = IcecastMetadataPlayer.canPlayType();
