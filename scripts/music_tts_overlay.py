@@ -8,7 +8,7 @@ from pydub import AudioSegment
 from PIL import Image, ImageDraw
 
 
-class Waveform(object):
+class Overlay(object):
 
     bar_count = 400
     db_ceiling = 140
@@ -106,5 +106,5 @@ class Waveform(object):
 if __name__ == '__main__':
     filename = os.path.join(os.path.dirname(__file__),'../parts/2.mp3')
 
-    waveform = Waveform(filename)
+    waveform = Overlay(filename)
     waveform.save()
