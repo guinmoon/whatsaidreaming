@@ -4,7 +4,7 @@
     <!-- <a href="galery_today.html"><i class="top_menu_item fa fa-picture-o"></i></a> -->
     <i class="top_menu_item fa fa-picture-o" onclick="load_template('galery_today.html')"></i>
     <a href="https://github.com/guinmoon/whatsaidreaming"><i class="top_menu_item fa fa-github"></i></a>
-    <a href="about.html"><i class="top_menu_item fa fa-question-circle"></i></a>
+    <i class="top_menu_item fa fa-question-circle"  onclick="load_template('about.html')"></i>
     </div>
 </div>    
 <div class="chat_wraper">
@@ -43,5 +43,8 @@
         </svg>
     </div>
 </div>
-<script type="text/javascript" src="js/flying_images.js"></script>
-<script type="text/javascript" src="js/chat.js"></script>
+<script>
+    chat_max_msg_count = 4;
+    image_change_delay=5000;
+    init_flying_images();
+</script>

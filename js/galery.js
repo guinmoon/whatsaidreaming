@@ -62,18 +62,16 @@ function parse_galery(res){
               })();
 }
 
-$(document).ready(function(){
-    
-    $.ajax({
-        url: `${glaery_dir_name}/${glaery_json_name}`,
-        type: 'GET',
-        dataType: 'json', // added data type
-        success: function(res) {
-            parse_galery(res);
-        }
-    });
-    document.addEventListener("scroll", (event) => {
-    update_spcae_height();
-    });
+function init_galery(){
+  $.ajax({
+    url: `${glaery_dir_name}/${glaery_json_name}`,
+    type: 'GET',
+    dataType: 'json', // added data type
+    success: function(res) {
+        parse_galery(res);
+    }
 });
+}
+
+
 

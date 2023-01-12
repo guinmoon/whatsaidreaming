@@ -13,6 +13,7 @@ function reset_spcae_height(){
 function load_template(template_name){    
     clearInterval(flying_interval);
     clearInterval(galery_interval);    
+    about_page = false;
     $.ajax({
         url: `/templates/${template_name}`,
         type: 'GET',        
@@ -34,3 +35,8 @@ function update_player_width(){
     $("#player").css('width', $("#galery").css('height')); 
 }
 
+$(document).ready(function(){    
+    document.addEventListener("scroll", (event) => {
+        update_spcae_height();
+    });
+});
