@@ -5,6 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: yandex tts free",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/yandex_tts_free.py",
+            "cwd": "${workspaceFolder}/scripts/",
+            "console": "integratedTerminal",
+            "args": ["../music_tmp/speech.ogg"],
+            "justMyCode": true
+        },
+        {
+            "name": "Python: music tts overlay",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/music_tts_overlay.py",
+            "cwd": "${workspaceFolder}/scripts/",
+            "console": "integratedTerminal",
+            "args": ["../music_tmp/2023-01-09_21_26_33.mp3","../music_tmp/speech.ogg","../music_tmp/overlayed.mp3","-w"],
+            "justMyCode": true
+        },
+        {
             "name": "Python: think some",
             "type": "python",
             "request": "launch",

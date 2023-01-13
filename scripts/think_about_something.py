@@ -62,7 +62,7 @@ def get_random_think(engine):
         return rand_think
 
 if __name__ == '__main__':
-    
+    # exit(0)
     __dir=os.path.dirname(os.path.realpath(__file__)) 
     config_path = os.path.join(os.path.dirname(__file__),'config_think.json')
     with open(config_path) as json_file:
@@ -92,7 +92,9 @@ if __name__ == '__main__':
         prompt = rand_think[0].base_text+' '+rand_think[0].balaboba_text
         base_id = rand_think[0].id
 
-    prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+    prompt_balaboba = sync_balaboba_urlib(prompt,11,Config['balaboba_cookie'])
+    # prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+    # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")
         exit(0)
