@@ -5,7 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: yandex tts free",
+            "name": "Py: mubert gen",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/mubert_gen.py",
+            "cwd": "${workspaceFolder}/scripts/",
+            "console": "integratedTerminal",
+            "args": ["../music_tmp/speech.ogg"],
+            "justMyCode": true
+        },
+        {
+            "name": "Py: yandex tts free",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/scripts/yandex_tts_free.py",
@@ -15,17 +25,17 @@
             "justMyCode": true
         },
         {
-            "name": "Python: music tts overlay",
+            "name": "Py: music tts overlay",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/scripts/music_tts_overlay.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
-            "args": ["../music_tmp/2023-01-09_21_26_33.mp3","../music_tmp/speech.ogg","../music_tmp/overlayed.mp3","-w"],
+            "args": ["../music_tmp/2023-01-19_14_24_17.mp3","../music_tmp/speech.ogg","../music_tmp/overlayed.mp3","-w"],
             "justMyCode": true
         },
         {
-            "name": "Python: think some",
+            "name": "Py: think some",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/scripts/think_about_something.py",
@@ -34,7 +44,7 @@
             "justMyCode": true
         },
         {
-            "name": "Python: make galery",
+            "name": "Py: make galery",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/scripts/make_galery.py",
@@ -43,7 +53,7 @@
             "justMyCode": true
         },
         {
-            "name": "Python: Current File",
+            "name": "Py: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",

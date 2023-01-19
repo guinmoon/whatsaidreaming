@@ -1,7 +1,7 @@
 import time
 import base64
-import gradio as gr
-from sentence_transformers import SentenceTransformer
+# import gradio as gr
+
 
 import urllib.request        
 import ssl
@@ -10,17 +10,21 @@ import os
 
 import httpx
 import json
+from pydub import AudioSegment
 
 import numpy as np
 
 # MUBERT_TAGS_STRING = 'tribal,action,kids,neo-classic,run 130,pumped,jazz / funk,ethnic,dubtechno,reggae,acid jazz,liquidfunk,funk,witch house,tech house,underground,artists,mystical,disco,sensorium,r&b,agender,psychedelic trance / psytrance,peaceful,run 140,piano,run 160,setting,meditation,christmas,ambient,horror,cinematic,electro house,idm,bass,minimal,underscore,drums,glitchy,beautiful,technology,tribal house,country pop,jazz & funk,documentary,space,classical,valentines,chillstep,experimental,trap,new jack swing,drama,post-rock,tense,corporate,neutral,happy,analog,funky,spiritual,sberzvuk special,chill hop,dramatic,catchy,holidays,fitness 90,optimistic,orchestra,acid techno,energizing,romantic,minimal house,breaks,hyper pop,warm up,dreamy,dark,urban,microfunk,dub,nu disco,vogue,keys,hardcore,aggressive,indie,electro funk,beauty,relaxing,trance,pop,hiphop,soft,acoustic,chillrave / ethno-house,deep techno,angry,dance,fun,dubstep,tropical,latin pop,heroic,world music,inspirational,uplifting,atmosphere,art,epic,advertising,chillout,scary,spooky,slow ballad,saxophone,summer,erotic,jazzy,energy 100,kara mar,xmas,atmospheric,indie pop,hip-hop,yoga,reggaeton,lounge,travel,running,folk,chillrave & ethno-house,detective,darkambient,chill,fantasy,minimal techno,special,night,tropical house,downtempo,lullaby,meditative,upbeat,glitch hop,fitness,neurofunk,sexual,indie rock,future pop,jazz,cyberpunk,melancholic,happy hardcore,family / kids,synths,electric guitar,comedy,psychedelic trance & psytrance,edm,psychedelic rock,calm,zen,bells,podcast,melodic house,ethnic percussion,nature,heavy,bassline,indie dance,techno,drumnbass,synth pop,vaporwave,sad,8-bit,chillgressive,deep,orchestral,futuristic,hardtechno,nostalgic,big room,sci-fi,tutorial,joyful,pads,minimal 170,drill,ethnic 108,amusing,sleepy ambient,psychill,italo disco,lofi,house,acoustic guitar,bassline house,rock,k-pop,synthwave,deep house,electronica,gabber,nightlife,sport & fitness,road trip,celebration,electro,disco house,electronic'
-MUBERT_TAGS_STRING = 'ambient,synthwave,deep house'
+# MUBERT_TAGS_STRING = 'ambient,synthwave,deep house'
+MUBERT_TAGS_STRING = 'ambient,synthwave,chillout'
 MUBERT_TAGS = np.array(MUBERT_TAGS_STRING.split(','))
 MUBERT_LICENSE = "ttmmubertlicense#f0acYBenRcfeFpNT4wpYGaTQIyDI4mJGv5MfIhBFz97NXDwDNFHmMRsBSzmGsJwbTpP1A6i07AXcIeAHo5"
 MUBERT_MODE = "loop"
 MUBERT_TOKEN = "4951f6428e83172a4f39de05d5b3ab10d58560b8"
 
-
+# from sentence_transformers import SentenceTransformer
+# minilm = SentenceTransformer('all-MiniLM-L6-v2')
+# mubert_tags_embeddings = get_mubert_tags_embeddings(minilm)
 
 
 
@@ -69,8 +73,6 @@ def get_tags_for_prompts(w2v_model, mubert_tags_embeddings, prompts, top_n=3, de
     return ret
 
 
-minilm = SentenceTransformer(' ')
-mubert_tags_embeddings = get_mubert_tags_embeddings(minilm)
 
 
 def get_track_by_tags(tags, pat, duration, maxit=200, loop=False):
@@ -104,8 +106,9 @@ def get_track_by_tags(tags, pat, duration, maxit=200, loop=False):
 
 def generate_track_by_prompt(prompt,m_len):
     try:
-        pat = get_pat("mail@mail.com")
-        _, tags = get_tags_for_prompts(minilm, mubert_tags_embeddings, [prompt, ])[0]
+        pat = get_pat("guinmoon@mail.com")
+        # _, tags = get_tags_for_prompts(minilm, mubert_tags_embeddings, [prompt, ])[0]
+        tags = ['chillout','synthwave','ambient']
         result = get_track_by_tags(tags, pat, m_len, loop=False)
         print(result)
         return result 
@@ -119,5 +122,5 @@ _unverified_context = ssl._create_unverified_context()
 ssl._create_default_https_context = ssl._create_unverified_context       
 now = datetime.now()            
 dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
-res_f_name =os.path.dirname(os.path.realpath(__file__))+f'/out/{dt_string}.mp3'        
+res_f_name =os.path.dirname(os.path.realpath(__file__))+f'/../music_tmp/{dt_string}.mp3'        
 urllib.request.urlretrieve(img_uri, res_f_name)
