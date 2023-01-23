@@ -64,7 +64,7 @@ res = conn.getresponse()
 data = res.read()
 data=json.loads(data)[0]
 __dir=os.path.dirname(os.path.realpath(__file__)) 
-timestamp = time.strftime("%a_%d_%b_%Y_%H_%M_%S", time.localtime()) 
+timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime()) 
 abc = "X:1\n"+data['generated_text'].replace('\\n','\n')
 with open(__dir+'/../output_tunes/'+timestamp+'.abc', 'w') as f:
     f.write(abc)

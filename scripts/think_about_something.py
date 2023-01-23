@@ -92,8 +92,8 @@ if __name__ == '__main__':
         prompt = rand_think[0].base_text+' '+rand_think[0].balaboba_text
         base_id = rand_think[0].id
 
-    prompt_balaboba = sync_balaboba_urlib(prompt,11,Config['balaboba_cookie'])
-    # prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+    # prompt_balaboba = sync_balaboba_urlib(prompt,11)
+    prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")

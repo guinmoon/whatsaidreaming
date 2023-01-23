@@ -75,7 +75,7 @@ def get_tags_for_prompts(w2v_model, mubert_tags_embeddings, prompts, top_n=3, de
 
 
 
-def get_track_by_tags(tags, pat, duration, maxit=200, loop=False):
+def get_track_by_tags(tags, pat, duration, maxit=15, loop=False):
     if loop:
         mode = "loop"
     else:
@@ -116,11 +116,15 @@ def generate_track_by_prompt(prompt,m_len):
         return str(e)
 
 
-img_uri = generate_track_by_prompt("I want to eat. I need to eat.",60)
-
-_unverified_context = ssl._create_unverified_context()
-ssl._create_default_https_context = ssl._create_unverified_context       
-now = datetime.now()            
-dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
-res_f_name =os.path.dirname(os.path.realpath(__file__))+f'/../music_tmp/{dt_string}.mp3'        
-urllib.request.urlretrieve(img_uri, res_f_name)
+for i in range(100):
+    try:
+        img_uri = generate_track_by_prompt("I want to eat. I need to eat.",60)
+        _unverified_context = ssl._create_unverified_context()
+        ssl._create_default_https_context = ssl._create_unverified_context       
+        now = datetime.now()            
+        dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
+        __dir=os.path.dirname(os.path.realpath(__file__))
+        res_f_name =__dir+f'/../parts/{dt_string}.mp3'        
+        urllib.request.urlretrieve(img_uri, res_f_name)
+    except Exception as e:
+        print(e)
