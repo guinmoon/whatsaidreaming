@@ -1,0 +1,269 @@
+#!/usr/bin/env lua
+---------------------------------------------------------------------
+--     This Lua5 script is Copyright (c) 2018, Peter J Billam      --
+--                       www.pjb.com.au                            --
+--  This script is free software; you can redistribute it and/or   --
+--         modify it under the same terms as Lua5 itself.          --
+---------------------------------------------------------------------
+-- guitar_tab   gtrtab_raw   gtrtab
+-- names:
+-- midiplaytab  midigtrtab   gtrtab2midi
+-- tabscript    gtrtab2ps
+-- tab2muscript ?
+-- systematic is gtrtab_raw, gtrtab2midi, gtrtab2ps
+-- consistent with midiecho, midiedit etc would be midigtrtab
+-- neat is:  gtrtab -raw   gtrtab -midi   gtrtab -ps   :-)
+-- BUT is runs into lots of option-letter conflicts ...
+Version = '1.0  for Lua5'
+VersionDate  = '23jul2018'
+Synopsis = [[
+  gtrtab                 # outputs one systems
+  gtrtab -s 7            # outputs seven systems
+  gtrtab -t DADGAd       # strings labelled D A D G A d
+  gtrtab -t D,A,D,F#,A,d # strings labelled D A D F# A d
+  gtrtab -p 18           # outputs bars of 18 dashes (=rhythmic pulses)
+]]
+Systems = 1   -- 7 just fits onto one printer page
+Tuning  = {'E','A','D','G','B','e'}
+PulsesPerBar = 24
+
+local function split(s, pattern, maxNb) -- http://lua-users.org/wiki/SplitJoin
+	if not s or string.len(s)<2 then return {s} end
+	if not pattern then return {s} end
+	if maxNb and maxNb <2 then return {s} end
+	local result = { }
+	local theStart = 1
+	local theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+	local nb = 1
+	while theSplitStart do
+		table.insert( result, string.sub(s,theStart,theSplitStart-1) )
+		theStart = theSplitEnd + 1
+		theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+		nb = nb + 1
+		if maxNb and nb >= maxNb then break end
+	end
+	table.insert( result, string.sub(s,theStart,-1) )
+	return result
+end
+
+
+local iarg=1; while arg[iarg] ~= nil do
+	if not string.find(arg[iarg], '^-[a-z]') then break end
+	local first_letter = string.sub(arg[iarg],2,2)
+	if first_letter == 'v' then
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate)
+		os.exit(0)
+	elseif first_letter == 'p' then
+		iarg = iarg+1
+		PulsesPerBar = tonumber(arg[iarg])
+	elseif first_letter == 's' then
+		iarg = iarg+1
+		Systems = tonumber(arg[iarg])
+	elseif first_letter == 't' then
+		iarg = iarg+1
+		local tmp = split(arg[iarg], ',') -- eg: D,A,D,G,A,d
+		if #tmp == 1 then              -- eg: DADGAd
+			for i = 1, 6 do Tuning[i] = string.sub(tmp[1],i,i) end
+		else
+			Tuning = tmp
+		end
+	else
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate.."\n\n"..Synopsis)
+		os.exit(0)
+	end
+	iarg = iarg+1
+end
+
+
+function stave ()
+	local stave_lines = {'',}
+	for i = #Tuning, 1, -1 do
+		local v = Tuning[i]
+		local tun = string.format('%2s',v)..'|'
+		if PulsesPerBar == 0 then
+			table.insert(stave_lines, tun..string.rep('-',74))
+		else
+			local s = tun
+			while true do
+				if #s+PulsesPerBar > 78 then break end
+				s = s..string.rep('-',PulsesPerBar)
+				s = s..'|'
+			end
+			table.insert(stave_lines, s)
+		end
+	end
+	table.insert(stave_lines, '')
+	return stave_lines
+end
+
+--print('type(Systems)='..type(Systems)..'   Systems='..tostring(Systems))
+for i = 1, Systems do
+	for i,v in ipairs(stave()) do print(v) end
+	print('')
+end
+
+--    ·/.    pick slide
+
+--[=[
+
+=pod
+
+=head1 NAME
+
+gtrtab - outputs an empty ascii-tab template
+
+=head1 SYNOPSIS
+
+ gtrtab                 # output seven systems
+ gtrtab -s 2            # outputs two systems
+ gtrtab -t DADGAd       # strings labelled D A D G A d
+ gtrtab -t D,A,D,F#,A,d # strings labelled D A D F# A d
+ gtrtab -p 18           # outputs bars of 18 dashes (=rhythmic pulses)
+
+=head1 DESCRIPTION
+
+This script outputs an empty ascii-tab template,
+allowing different tunings,
+different numbers of systems, and different bar-lengths.
+It's like manuscript music-paper.
+You can then edit this, using Your Favourite Text Editor,
+to produce a guitar piece in ascii-tab form, eg:
+
+ e|3-0---------|--0-----0---|--3--02-02-3|---3--3--3-3|
+ B|---3-0------|-----3-----0|--2---3--3-0|---0-0--12-3|
+ G|------3-02-0|1----1------|------2--2-0|------------|
+ D|---0-----0--|---0-----0--|---2--0-----|---3--2--1--|
+ A|------------|------------|0--------0--|------------|
+ E|3-----3-----|0-----0-----|------------|3-----------|
+   G            E            Am    D      G  G7 C  Cm
+
+Such ascii-tab can be converted into MIDI, using I<gtrtab2midi>
+
+It might be nice to be able to convert it into PostScript,
+perhaps even to integrate ascii-tab systems into a I<muscript> score.
+
+=head1 ANNOTATIONS
+
+Tablature can use various lines, arrows, and other symbols to denote bends,
+hammer-ons, trills, pull-offs, slides, and so on. These are the symbols
+that usually represent various techniques, though the symbols may vary:
+
+    h     hammer on
+    p     pull off
+    b     bend string up
+    r     release bend
+    /     slide up
+    \     slide down
+    v     vibrato (sometimes written as ~)
+    t     right hand tap
+    s     legato slide
+    S     shift slide
+    *     natural harmonic
+    [n]   artificial harmonic
+    n(n)  tapped harmonic
+    tr    trill
+    T     tap
+    TP    tremolo picking
+    PM    palm muting (also written as _ and .)
+    N.C.  No chord: tacet or rest
+    \n/   tremolo arm dip; n = amount to dip
+    \n    tremolo arm down
+    n/    tremolo arm up
+    /n\   tremolo arm inverted dip
+    =     hold bend; also acts as connecting device for hammers/pulls
+    <>    volume swell (louder/softer)
+    x     on rhythm slash represents muted slash
+    o     on rhythm slash represents single note slash
+
+Guitar tablature is not standardized and different sheet-music
+publishers adopt different conventions. Songbooks and guitar magazines
+usually include a legend setting out the convention in use.
+I find these extra symbols useful above the system:
+
+    d     down-stroke (usually with a plectrum; or also with fingernail)
+    u     up-stroke   (usually with a plectrum; or also with fingernail)
+
+And, within the system, using hexadecimal notation for the high frets:
+
+    A     play the tenth 10th fret
+    B     play the eleventh 11th fret
+    C     play the twelfth 12th fret (the octave)
+    D     play the thirteenth 13th fret
+    E     play the fourteenth 14th fret
+    F     play the fifteenth 15th fret
+
+=head1 ARGUMENTS
+
+=over 3
+
+=item I<-p 12>
+
+Sets the number of B<P>ulses per bar, each pulse being indicated by a
+minus-sign.
+The number of bars per system is calculated to fit onto a screen
+of 80 colums.
+So C<gtrtab -t DADGAd -p 12 -s 1>
+will print out:
+
+ d|------------|------------|------------|------------|------------|
+ A|------------|------------|------------|------------|------------|
+ G|------------|------------|------------|------------|------------|
+ D|------------|------------|------------|------------|------------|
+ A|------------|------------|------------|------------|------------|
+ D|------------|------------|------------|------------|------------|
+
+The default B<-p> is 24, with which three bars I<just> fit onto one line.
+If B<-p> is set to 0, then no barlines are added.
+
+=item I<-s 4>
+
+This example outputs just four B<S>ystems.
+The default is seven, which takes up 63 lines of text output,
+which probably just fits on one page on your printer ...
+
+=item I<-t DADGAd> or I<-t D,A,D,G,A,d> or I<-t D,A,D,F#,A,d>
+
+Sets the B<T>uning, from the lowest string to the highest.
+This is the order, bottom upwards, in which the letters will be
+shown in the output.
+The strings can also be specified in comma-separated form,
+such as I<-t D,A,D,G,A,d>
+which is especially useful if there are sharps or flats involved,
+for example I<-t D,A,D,F#,A,d>
+
+=item I<-v>
+
+Print the Version
+
+=back
+
+=head1 DOWNLOAD
+
+This script is available at
+http://www.pjb.com.au/midi/free/gtrtab
+
+=head1 CHANGES
+
+ 20180801 1.0 initial release
+
+=head1 AUTHOR
+
+Peter J Billam, http://www.pjb.com.au/comp/contact.html
+
+=head1 SEE ALSO
+
+ https://en.wikipedia.org/wiki/Tablature#Guitar_tablature
+ https://en.wikipedia.org/wiki/ASCII_tab
+ https://www.guitartricks.com/helptab.php
+ https://how-to-play-electric-guitar.net/tab-symbols.html
+ http://www.pjb.com.au/midi/gtrtab2midi.html
+ http://www.pjb.com.au/midi/free/gtrtab2midi
+ http://www.pjb.com.au/mus/arr.html#folk_gtr_solos
+ http://www.pjb.com.au/
+
+=cut
+
+]=]
+

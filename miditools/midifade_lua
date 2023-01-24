@@ -1,0 +1,608 @@
+#!/usr/bin/env lua
+---------------------------------------------------------------------
+--     This Lua5 script is Copyright (c) 2021, Peter J Billam      --
+--                         pjb.com.au                              --
+--  This script is free software; you can redistribute it and/or   --
+--         modify it under the same terms as Lua5 itself.          --
+---------------------------------------------------------------------
+Version      = '2.1' -- translated into lua
+VersionDate  = '28dec2021'
+local Synopsis = [[
+  midifade [options] [filenames]
+]]
+
+--
+-- see 20111002    midislide ?
+-- 20140306 seconded ! : for pitch-adjusting the midi
+--   when there are midi files and audio-files
+--   so that the synth can be tuned by hand to an arbitrary wav file
+-- could simply offer pitchbend as a alternative to cc=?
+--   perhaps just the letter "p" instead of the cc number !
+-- Or, should always apply to all channels ? This will be the common case...
+--
+-- Also: an audiofile-mixer option, which starts up a suitable ecasound
+-- and offers vol,pan,filter on each audiofile !
+--   midifade -audio v,p gtr.wav v,f,q str.wav v brass.wav backing.wav
+
+-- and could record its fadermovements in a midi file
+--   which (or several of which) can be replayed behind subsequent passes
+--   should contain a comment on which vpfq and which audiofile,
+--     so the ecasound commands can be reconstructed.
+--   midifade -audio -replay mix0.mid,mix1.mid v,p,f,q vocal.wav final.wav
+--     those midifiles should automatically replay their audio-file.
+-- However the whole mechanism only redoes what can be done by producing
+--   a mixed-down .wav, and then using that as subsequent audio input.
+-- Therefore forget the -replay option and the custom midi-comments.
+
+
+-- Curses interface from midiedit, midi stuff from midikbd.
+-- On exit, could print the equivalent muscript, or Perl,Python,or Lua ?
+-- 20130814: midifade could conceiveably take an a=auto for the value,
+--   asking somehow for min, max, period, perhaps sin/tri/sawup/sawdown,
+--   and then behave like panfarm. Probably need a child process...
+-- 20130815: Also, then what would the Up/Down/PgUp/PgDown/Home/End keys do ?
+--   or, instead of n=new, perhaps w=wahwah and p=pan ?  74 wants also 71
+--   should this be in our hypothetical midihub? Only really applies to 11,74
+
+OutputPort   = os.getenv('ALSA_OUTPUT_PORTS')
+ColsPerFader = 6
+AlsaName     = "midifade"
+
+--------------------------- infrastucture
+function die(...) warn(...);  os.exit(1) end
+function split(s, pattern, maxNb) -- http://lua-users.org/wiki/SplitJoin
+	if not s or string.len(s)<2 then return {s} end
+	if not pattern then return {s} end
+	if maxNb and maxNb <2 then return {s} end
+	local result = { }
+	local theStart = 1
+	local theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+	local nb = 1
+	while theSplitStart do
+		table.insert( result, string.sub(s,theStart,theSplitStart-1) )
+		theStart = theSplitEnd + 1
+		theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+		nb = nb + 1
+		if maxNb and nb >= maxNb then break end
+	end
+	table.insert( result, string.sub(s,theStart,-1) )
+	return result
+end
+local function round(x)
+	if not x then return nil end
+	return math.floor(x+0.5)
+end
+function _debug(...)
+	local DEBUG = io.open('/tmp/debug', 'a')
+	local a = {}
+	for k,v in pairs{...} do table.insert(a, tostring(v)) end
+	DEBUG:write(table.concat(a),'\n') ; DEBUG:flush()
+	DEBUG:close()
+end
+
+------------------------- require the modules
+local ALSA   = nil
+pcall(function() ALSA = require 'midialsa' end)
+if not ALSA then
+	die([[you need to install midialsa, e.g.:
+  luarocks install midialsa]])
+end
+
+local POSIX = nil
+pcall(function() POSIX = require 'posix' end)  -- just for signal-handling
+if not POSIX then
+	die([[can't find posix; you need to install luaposix, e.g.:
+  luarocks install luaposix]])
+end
+pcall(function() MC = require 'minicurses' end)
+if not MC then
+	die([[can't find minicurses; you need to install minicurses, e.g.:
+  luarocks install minicurses]])
+end
+
+
+---------------- Infrastructure for the Curses version -------------
+function addl (lin,col,str)
+	MC.move(lin,col); MC.addstr(str); MC.clrtoeol()
+end
+
+function all_sounds_off ()
+	for c = 0,15 do ALSA.output(ALSA.controllerevent(c,120,0)) end
+	ALSA.stop()
+end
+
+function cc2str(c)
+	if not c2s then c2s = {
+		[0] = 'Bank Select (MSB)',
+		[32] = 'Bank Select (LSB)',
+		[64] = 'Sustain Pedal',
+		[96] = 'Data Increment',
+		[1] = 'Modulation (MSB)',
+		[33] = 'Modulation (LSB)',
+		[65] = 'Portamento on/off',
+		[97] = 'Data Decrement',
+		[2] = 'Breath Control (MSB)',
+		[34] = 'Breath Control (LSB)',
+		[66] = 'Sostenuto Pedal',
+		[98] = 'non-reg param lsb',
+		[67] = 'Soft Pedal',
+		[99] = 'non-reg param msb',
+		[4] = 'Foot Control (MSB)',
+		[36] = 'Foot Control (LSB)',
+		[68] = 'Legato Pedal',
+		[100] = 'Reg Param (LSB)',
+		[5] = 'Portamento Time (MSB)',
+		[37] = 'Portamento Time (LSB)',
+		[69] = 'Hold 2',
+		[101] = 'Reg Param (MSB)',
+		[6] = 'Data Entry (MSB)',
+		[38] = 'Data Entry (LSB)',
+		[70] = 'Sound Variation',
+		[7] = 'Channel Volume (MSB)',
+		[39] = 'Channel Volume (LSB)',
+		[71] = 'Resonance, Q',
+		[8] = 'Balance (MSB)',
+		[40] = 'Balance (LSB)',
+		[72] = 'Release Time',
+		[73] = 'Attack Time',
+		[10] = 'Pan (MSB)',
+		[42] = 'Pan (LSB)',
+		[74] = 'Cut-off Frequency',
+		[11] = 'Expression (MSB)',
+		[43] = 'Expression (LSB)',
+		[75] = 'Decay Time',
+		[12] = 'Effects Controller 1',
+		[76] = 'Vibrato Rate',
+		[13] = 'Effects Controller 2',
+		[77] = 'Vibrato Depth',
+		[78] = 'Vibrato Delay',
+		[84] = 'Portamento Control',
+		[120] = 'All Sound Off',
+		[121] = 'Reset All Controllers',
+		[122] = 'Local Control',
+		[91] = 'Reverb Depth',
+		[123] = 'All Notes Off',
+		[92] = 'Tremolo Depth',
+		[124] = 'Omni Off',
+		[93] = 'Chorus Depth',
+		[125] = 'Omni On',
+		[94] = 'Celeste (De-tune)',
+		[126] = 'Mono On (Poly off)',
+		[95] = 'Phaser Depth',
+		[127] = 'Poly On (Mono off)',
+		}
+	end
+	return c2s[c] or ''
+end
+
+IFader = -1
+function add_new_fader (c,m,v)
+	if not v then v = 64 end
+	c = tonumber(c); m = tonumber(m); v = tonumber(v)
+	for i = 1, #Faders do
+		local this_c,this_m,this_v = table.unpack(Faders[i])
+		if this_c == c and this_m == m then  -- a duplicate; update $v
+			Faders[i] = {c,m,v};  IFader = i
+			output_fader(IFader); return true
+		elseif this_c > c or (this_c == c and this_m > m) then
+			table.insert(Faders, i, {c,m,v});  IFader = i
+			output_fader(IFader); return true
+		end
+		i = i+1
+	end
+	table.insert(Faders, {c,m,v}); IFader = #Faders or 0
+	output_fader(IFader); return true
+end
+
+function display_faders(i)
+	-- BUG: after 'D', the now superfluous last doesn't get its cc2str removed
+	for irow =1, LINES-4 do MC.move(irow, 0); MC.clrtoeol() end
+	for i = 1, #Faders do display_fader(i) end
+	MC.refresh()
+end
+
+function output_fader (i)
+	if i<1 or i>#Faders then die("output_fader: i="..tostring(i).."\n") end
+	local c,m,v = table.unpack(Faders[i])
+	local status_time_events = ALSA.status()
+	ALSA.output(ALSA.controllerevent(c,m,v,status_time_events[2]))
+	ALSA.syncoutput()
+end
+function display_fader (i)
+	-- for smoother movement, should really use ' ' and the eight utf8 chars:
+	-- "\xe2\x96\x81\xe2\x96\x82\xe2\x96\x83\xe2\x96\x84"
+	-- "\xe2\x96\x85\xe2\x96\x86\xe2\x96\x87\xe2\x96\x88"
+	if i<1 or i>#Faders then die("output_fader: i="..tostring(i).."\n") end
+	local icol = 2 + ColsPerFader * (i-1)
+	local c,m,v = table.unpack(Faders[i])
+	MC.move(LINES-6,icol); MC.addstr(string.sub(" c="..c.."   ",1,6))
+	MC.move(LINES-5,icol); MC.addstr(string.sub(" m="..m.."   ",1,6))
+	MC.move(LINES-4,icol); MC.addstr(string.sub(" v="..v.."   ",1,6))
+	local top_of_fader = 0 + round((LINES-7) * (128-v) / 128)
+	local irow = 1 while irow <= top_of_fader do
+		MC.move(irow, icol); MC.attrset('NORMAL')
+		MC.addstr(string.rep(' ', ColsPerFader))
+		irow = irow+1
+	end
+	while irow < (LINES-6) do
+		MC.move(irow, icol+2)
+		if i == IFader then
+			MC.attrset(MC.REVERSE); MC.addstr('  '); MC.attrset(MC.NORMAL)
+		else
+			MC.addstr('XX')
+		end
+		irow = irow+1
+	end
+	if i == IFader then
+		MC.move(0,0); MC.clrtoeol()
+		local s1 = cc2str(m)
+		local x = icol + 4 - round(0.5 * string.len(s1))
+		if x < 0 then x = 0
+		elseif x > COLS then x = COLS - string.len(s1)
+		end
+		display_clientstr()
+		MC.move(0,x); MC.addstr(s1..' ')
+	end
+	if i == #Faders then
+		for irow = 1, (LINES-4) do MC.move(irow, icol+6); MC.clrtoeol() end
+	end
+	MC.move(LINES-4, (IFader-1)*ColsPerFader + 4)
+end
+
+function display_clientstr ()   -- 1.6
+	local s2 = "client "..ID..", "..AlsaName
+	-- if (icol+4)>0.5*COLS then MC.move(0,0) -- WHAT IS THIS? WHAT IS icol?
+	local icol = COLS-string.len(s2)-1
+	if icol < 0 then icol=0 end
+	MC.move(0, icol)
+	MC.addstr(s2)
+	MC.refresh()
+end
+
+function display_keystrokes ()
+	TopKeystrokesLine = LINES-4
+	if Message then
+		MC.move(LINES-2,2); MC.clrtoeol()
+		addl(LINES-2, round(0.4*(COLS-string.len(Message))), Message)
+		-- MC.move($LINES-3,2); MC.clrtoeol()
+		Message = nil
+	else
+		addl(LINES-2,2,
+		'Left,Right,Tab=move between faders  n=new  D=Delete  q=quit')
+	end
+	addl(LINES-1,2,
+		  'k/Up/j/Down=+-1,  K/PageUp/J/PageDown=+-10,  Home=127,  End=0')
+	MC.refresh()
+end
+
+function display_screen ()
+	MC.move(LINES-3,1); MC.hline(COLS-2)
+	display_keystrokes()
+	display_faders()
+	MC.refresh()
+end
+
+function display_message (str)
+	local y,x; getyx(y,x)
+	Message = str; display_keystrokes()
+	MC.move(y,x)
+	MC.refresh()
+end
+
+function new_fader_dialogue ()
+	-- Could introduce value=A meaning Auto like panfarm
+	-- and then ask for min, max, period, perhaps sin/tri/sawup/sawdown
+	addl(LINES-3,2,'        Channel (0..15)  ?')
+	addl(LINES-2,2,'MIDI-Controller (0..127) ?')
+	addl(LINES-1,2,'          Value (0..127) ?')
+	MC.refresh()
+	local newfader = {}
+	local iline = 3
+	while iline > 0 do
+		MC.move(LINES-iline,29)
+		local str
+		MC.echo()
+		if iline==3 then str = MC.getnstr(2)   -- 1.2
+		else str = MC.getnstr(3)
+		end
+		MC.noecho()
+		if str and string.len(str)>0 then
+			newfader[4-iline] = tonumber(str)
+		end
+		iline = iline-1
+	end
+	return table.unpack(newfader)
+end
+
+function quit ()
+	MC.move(LINES-2,2); MC.clrtobot()
+	addl(LINES-2,round(0.4*(COLS-24)),"OK to quit (y/n) ? ")
+	local c = MC.getch()
+	if c == 'y' then MC.endwin(); os.exit(0) end
+	display_keystrokes()
+	MC.move(LINES-4, (IFader-1) * ColsPerFader + 4)
+	MC.refresh()
+end
+
+------------------------- options and arguments
+Synopsis = [[
+Usage:
+   midifade c13m71v120 c2m11v80 # 2 faders: cha2 cc11=80, cha13 cc71=120
+   midifade -o 128:0            # outputs to port 0 of client 128
+   midifade -N fad9             # sets AlsaClientName to 'fad9'
+   midifade -v                  # prints the Version number
+   perldoc midifade             # read the manual :-)
+Version ]]..Version..'   '..VersionDate..'   http://www.pjb.com.au/midi\n'
+
+local iarg=1; while arg[iarg] ~= nil do
+	if not string.find(arg[iarg], '^-[a-zN]') then break end
+	local first_letter = string.sub(arg[iarg],2,2)
+	if first_letter == 'v' then
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.." for Lua   "..VersionDate)
+		os.exit(0)
+	elseif first_letter == 'd' then
+		UseCurses = false
+	elseif first_letter == 'o' then
+		iarg = iarg+1 ; OutputPort = arg[iarg]
+	elseif first_letter == 'N' then
+		iarg = iarg+1 ; AlsaName   = arg[iarg]
+	else
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.." for Lua   "..VersionDate.."\n\n"..Synopsis)
+		os.exit(0)
+	end
+	iarg = iarg+1
+end
+-- if arg[iarg] then F = assert(io.open(arg[iarg], 'r')) else F = io.stdin end
+-- c = {utf8.codepoint(F:read('a'),1,-1)}
+Faders = {}  -- array of arrays {c,m,v}
+IFader = nil
+
+note2letter={'C','C','D','E','E','F','F','G','G','A','B','B',
+             'c','c','d','e','e','f','f','g','g','a','b','b'}
+note2acc = {'','#','','b','','','#','','#','','b',''}
+
+if not ALSA.client(AlsaName, 0,1, true) then
+	die("can't start the ALSA client\n")
+end
+for i, cl_po in ipairs(split(OutputPort, ',')) do
+	if cl_po ~= '0' then
+		if not ALSA.connectto( 1, cl_po ) then
+			die("can't connect to ALSA client "..cl_po.."\n")
+		end
+	end
+end
+
+if not ALSA.start() then die("can't start the ALSA client queue\n") end
+ID = ALSA.id()
+
+-- must start client first before this ...
+while arg[iarg] and string.find(arg[iarg], '^c%d+m%d+(v%d+)?$') do
+	local c,m,v = string.match(arg[iarg], '^c(%d+)m(%d+)(v(%d+))?$')
+	if not v then v = 50 end
+	add_new_fader(c,m,v)
+	iarg = iarg + 1
+end
+-- eval 'sub END {all_sounds_off();}'  Should go before every endwin() ?
+
+------- the Curses app...
+LINES, COLS = MC.initscr()
+MC.cbreak(); MC.noecho(); MC.nonl(); MC.clear()
+POSIX.signal( 2, function (signo)  -- SIGINT handler
+	MC.endwin(); os.exit()
+end )
+POSIX.signal(15, function (signo)  -- SIGTERM handler
+	MC.endwin(); os.exit()
+end )
+
+display_clientstr();  display_screen()
+
+while true do  -- the loop
+	local c = MC.getkey()
+	if     c == 'q'  then quit()
+	elseif c == 'Q'  then MC.endwin(); os.exit(0)
+	elseif c == 'D' then
+		if Faders[IFader] then
+			table.remove(Faders, IFader)
+			if IFader > #Faders then IFader = #Faders end
+		end
+		display_screen()
+	elseif c == 'n' then
+		local c,m,v = new_fader_dialogue()
+		if m then add_new_fader(c,m,v) end
+		display_screen()
+	elseif c == 'UP' or c == 'k' then
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			v = v+1; if v > 127 then v = 127 end
+			Faders[IFader] = {c,m,v}; output_fader(IFader); display_screen()
+		end
+	elseif c == 'DOWN' or c == 'j' then
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			v = v-1; if v < 0 then v = 0 end
+			Faders[IFader] = {c,m,v}; output_fader(IFader); display_screen()
+		end
+	elseif c == 'LEFT' or c == 'h' then
+		if IFader>1 then IFader = IFader-1 end
+		display_screen()
+	elseif c == 'RIGHT' or c == 'l' then
+		if Faders[IFader] then
+			if IFader<#Faders then IFader = IFader+1 end
+			display_screen()
+		end
+	elseif c == "\t" then
+		if IFader<#Faders then IFader = IFader+1 else IFader = 1 end
+		display_screen()
+	elseif c == 'PAGEUP' or c == 'K' then
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			v = v+10; if v > 127 then v = 127 end
+			Faders[IFader] = {c,m,v}
+			output_fader(IFader); display_screen()
+		end
+	elseif c == 'PAGEDOWN' or c == 'J' then
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			v = v-10; if v < 0 then v = 0 end
+			Faders[IFader] = {c,m,v}
+			output_fader(IFader); display_screen()
+		end
+	elseif c == 'HOME'  then
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			Faders[IFader] = {c,m,127}
+			output_fader(IFader); display_screen()
+		end
+	elseif c == 'END'   then  -- all_sounds_off ? or v=0?
+		if Faders[IFader] then
+			local c,m,v = table.unpack(Faders[IFader])
+			Faders[IFader] = {c,m,0}
+			output_fader(IFader); display_screen()
+		end
+	end
+end
+
+--[[
+
+=pod
+
+=head1 NAME
+
+midifade - Provides faders generating midi-controller events
+
+=head1 SYNOPSIS
+
+ midifade c13m71v120 c2m11v80 -- 2 faders: cha2 cc11=80, cha13 cc71=120
+ midifade -o 128:0            -- outputs to port 0 of client 128
+ midifade -o TiMidity         -- outputs to TiMidity
+ midifade -N fad9             -- sets AlsaClientName to 'fad9'
+ midifade -v                  -- prints the Version number
+ perldoc midifade             -- read the manual :-)
+
+=head1 DESCRIPTION
+
+B<Midifade> is a Curses and ALSA application which provides on-screen faders,
+to control various midi-controllers on various midi-channels.
+
+It uses a simple user-interface:
+The Left and Right arrow keys move from one fader to the next,
+the Up and Down arrow keys adjust the value of the current fader by 1,
+the PageUp and PageDown keys adjust the value by 10,
+and the Home and End keys set it to maximum (127) or minimum (0).
+
+The faders are always displayed sorted by channel-number
+then by midi-controller-number.
+
+The available keystrokes are displayed in the bottom three lines of the screen.
+
+It uses the B<Curses> CPAN module for the user-interface,
+and the B<MIDI::ALSA> CPAN module to set up an ALSA client
+which can communicate with your synth.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-o 128:0>
+
+This example plays into the ALSA port 128:0.
+This option allows I<midifade> to use the same port-specification
+as the other alsa-utils, e.g. I<aplaymidi> and I<aconnect>. 
+For port 0 of a client, the ":0" part of the port specification
+can be omitted.
+The port specification is taken from the ALSA_OUTPUT_PORTS
+environment variable if none is given on the command line.
+Since Version 1.3, you may supply a comma-separated list of ports,
+e.g. B<-o 20,128:1>
+
+If the ALSA port is specified as B<0> then I<midifade> will start
+up without connecting to anything. This allows you, for example,
+to use I<midifade> (assumed here to be starting up as ALSA-client
+129 ; check with I<aconnect -ol>)
+to control I<ecasound>:
+
+ midifade -o 0 c0m9v102 c1m9v105 c2m9v96 c3m9v64
+
+ ecasound -c -r -Md:alsaseq,midifade:0 \
+  -a:1 -i drums.wav                -ea:200 -km:1,0,250,9,1 \
+  -a:2 -i synth-chords.wav -epp:30 -ea:120 -km:1,0,150,9,2 \
+  -a:3 -i bass-guitar_take-2.ewf   -ea:75  -km:1,0,100,9,3 \
+  -a:4 -i brass-lead.wav   -epp:70 -ea:50  -km:1,0,100,9,4 \
+  -a:1,2,3,4 -o loop,1 \
+  -a:5,6 -i loop,1 \
+  -a:5 -o alsa \
+  -a:6 -o current-mix.wav
+
+Here I chose midi-controller 9 because it isn't defined in General-MIDI,
+and therefore General-MIDI-labels, useless in this context,
+do not appear in the I<midifade> screen.
+See I<ecasound_manpage.html> and I<examples.html> in the
+I<ecasound> documentation for details of the B<-ea> and B<-km> options.
+
+=item I<-N my_fade>
+
+Sets the Alsa-Client name, to I<my_name> in this example.
+
+This is useful in scripts,
+to be able to connect from a specific I<midifade> by a known name.
+
+The default Alsa-Client name is "I<midifade>"
+
+=item I<-v>
+
+Prints version number.
+
+=back
+
+=head1 ARGUMENTS
+
+=over 3
+
+=item I<c14m74v123>
+
+This example starts I<midifade> up with a fader on channel 14 (0..15),
+midi-controller 74 (0..127), set initially to a value of 123 (0..127).
+( In I<muscript>, that would be expressed I<cha14 cc74=123> )
+Multiple arguments can be specified.
+The B<c> and B<m> and B<v> bits must be in that order,
+all in one word with no spaces.
+The B<v> bit is optional; its default value is 64.
+
+=back
+
+=head1 CHANGES
+
+ 2.0, 20150809, a new fader with val=0 does not get given val=64
+ 1.9, 20140907, -N my_name  sets the AlsaClientName
+ 1.8, 20130323, D can now delete the only fader
+ 1.7, 20120831, -o "string" works
+ 1.6, 20120820, display_clientstr called at start
+ 1.5, 20111216, if  -o 0  then midifade starts up but connects to nothing
+ 1.4, 20111103, use the new MIDI-ALSA 1.11 to handle portnames
+ 1.3, 20111028, OutputPort can be a comma-separated list
+ 1.2, 20111027, add-new-fader dialogue allows 3-digit controller-nums
+ 1.1, 20111023, much irrelevant code eliminated; q asks y/n first
+ 1.0, 20111022, first working version
+
+=head1 AUTHOR
+
+Peter J Billam  http://www.pjb.com.au/comp/contact.html
+
+=head1 CREDITS
+
+Based on the I<Curses> and I<MIDI::ALSA> CPAN modules.
+
+=head1 SEE ALSO
+
+ aconnect -oil
+ http://www.pjb.com.au/muscript/index.html#midi_in_a_stave
+ http://www.pjb.com.au/muscript/gm.html#cc
+ http://ecasound.sourceforge.net/ecasound/Documentation/examples.html
+ http://search.cpan.org/perldoc?Curses
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://www.pjb.com.au/midi
+
+=cut
+--]]

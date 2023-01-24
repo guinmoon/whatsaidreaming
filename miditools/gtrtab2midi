@@ -1,0 +1,556 @@
+#!/usr/bin/env lua
+---------------------------------------------------------------------
+--     This Lua5 script is Copyright (c) 2018, Peter J Billam      --
+--                       www.pjb.com.au                            --
+--  This script is free software; you can redistribute it and/or   --
+--         modify it under the same terms as Lua5 itself.          --
+---------------------------------------------------------------------
+local Version = '1.7  for Lua5' -- add back-compatible *a for io.read()
+local VersionDate  = '02jun2020'
+local Synopsis = [[
+  gtrtab2midi infile.gtab > /tmp/t.mid
+  gtrtab2midi infile.gtab | aplaymidi -
+  gtrtab2midi -p 24  infile.gtab | aplaymidi - # midi patch 24
+  gtrtab2midi -t 140 infile.gtab | fluadity -  # 140mS/pulse
+  gtrtab2midi -T 8   infile.gtab | fluadity -  # 8 pulses/sec
+  perldoc gtrtab2midi   # read the manual :-)
+]]
+
+local MIDI = require 'MIDI'
+
+MsPerPulse = 167   -- or MsPerBar ?
+Patch      = 25
+VoicePatch = 82    -- 1.6
+NoteTable  = {}    -- 1.6
+
+-- 20180819
+-- Could perhaps offer a vocal-line VF or VM ? But how to do accidentals ?
+-- VM|---A-----F#-|G-----------|x--F#-E--D--|A_--------F#E|  <== :-(
+-- could use the guitar-fret notation, but are 16 semitones enough ?
+-- could invent some keysig notation ?   VM|1# ?  but then accidentals ?
+-- Treat [#bn_~] as zero-pulse characters !  like ' ' on the guitar strings
+-- except of course "b" is a note :-( so must treat "Ab" unlike "A-b" or "A b"
+-- VM|---A-----F#--|G-----------|x--F#--E--D--|A_--------F#E|  <== :-)
+-- default patch 82 ? 85 ? -P ?
+
+------------------------ infrastructure -----------------------
+function warn(...)
+	local a = {}
+	for k,v in ipairs{...} do table.insert(a, tostring(v)) end
+	io.stderr:write(table.concat(a),'') ; io.stderr:flush()
+end
+function die(msg) warn(msg..'\n');  os.exit(1) end
+local function split(s, pattern, maxNb) -- http://lua-users.org/wiki/SplitJoin
+	if not s or string.len(s)<2 then return {s} end
+	if not pattern then return {s} end
+	if maxNb and maxNb <2 then return {s} end
+	local result = { }
+	local theStart = 1
+	local theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+	local nb = 1
+	while theSplitStart do
+		table.insert( result, string.sub(s,theStart,theSplitStart-1) )
+		theStart = theSplitEnd + 1
+		theSplitStart,theSplitEnd = string.find(s,pattern,theStart)
+		nb = nb + 1
+		if maxNb and nb >= maxNb then break end
+	end
+	table.insert( result, string.sub(s,theStart,-1) )
+	return result
+end
+local function round(x)
+	if not x then return nil end
+	return math.floor(x+0.5)
+end
+---------------------------------------------------------------
+
+function generate_notetable()   -- pasted in from muscript_lua
+	local raw_notetable = {  -- defined for alto clef
+	  ['f~~']=89, ['e~~']=88, ['d~~']=86, ['c~~']=84, ['b~']=83,
+	  ['a~']=81, ['g~']=79, ['f~']=77, ['e~']=76, ['d~']=74, ['c~']=72,
+	  b=71,   a=69,  g=67,  f=65,  e=64,  d=62,  c=60,
+	  B=59,   A=57,  G=55,  F=53,  E=52,  D=50,  C=48,
+	  B_=47,  A_=45, G_=43, F_=41, E_=40, D_=38, C_=36,
+	  B__=12, A__=10,
+	}
+	local notetable = {}
+	for k,v in pairs(raw_notetable) do
+		notetable[k]       = v
+		notetable[k..'#']  = v + 1
+		notetable[k..'b']  = v - 1
+		notetable[k..'##'] = v + 2
+		notetable[k..'bb'] = v - 2
+		notetable[k..'n']  = v  -- the A#__ order is a syntax error
+	end
+	return notetable
+end
+
+function openstring2midipitch (string_number, strtxt)
+	strtxt = string.gsub(strtxt, '^ +', '')
+	local default_midipitch = { 64, 59, 55, 50, 45, 40 }
+	local strtxt2midipitch = {
+		-- will be octave-adjusted to fit the string's default
+		A=45, ['A#']=46, Bb=46, B=47, C=48, ['C#']=49, Db=49,
+		D=50, ['D#']=51, Eb=51, E=52, F=53, ['F#']=54, Gb=54,
+		G=55, ['G#']=56, Ab=56, A=57, ['A#']=58, Bb=58, B=59,
+		a=45, ['a#']=46, bb=46, b=47, c=48, ['c#']=49, db=49,
+		d=50, ['d#']=51, eb=51, e=52, f=53, ['f#']=54, gb=54,
+		g=55, ['g#']=56, ab=56, a=57, ['a#']=58, bb=58, b=59,
+	}
+	local default = default_midipitch[string_number]
+	local openstr = strtxt2midipitch[strtxt]
+	if (openstr-default)%12 == 0 then return default end
+	if openstr > default then
+		while true do
+			local gap = openstr - default
+			if gap <= 4 and gap >= -7 then return openstr end
+			openstr = openstr - 12
+		end
+	end
+	if openstr < default then
+		while true do
+			local gap = openstr - default
+			if gap <= 4 and gap >= -7 then return openstr end
+			openstr = openstr + 12
+		end
+	end
+	return nil
+end
+
+---------------------------------------------------------------
+
+local iarg=1; while arg[iarg] ~= nil do
+	if not string.find(arg[iarg], '^-[a-zA-Z]') then break end
+	local first_letter = string.sub(arg[iarg],2,2)
+	if first_letter == 'v' then
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate)
+		os.exit(0)
+	elseif first_letter == 'p' then
+		iarg = iarg+1
+		Patch = round(tonumber(arg[iarg]))
+	elseif first_letter == 'P' then  -- 1.6
+		iarg = iarg+1
+		VoicePatch = round(tonumber(arg[iarg]))
+	elseif first_letter == 't' then
+		iarg = iarg+1
+		MsPerPulse = round(tonumber(arg[iarg]))
+	elseif first_letter == 'T' then  -- 1.5
+		iarg = iarg+1
+		MsPerPulse = round(1000 / tonumber(arg[iarg]))
+	else
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate.."\n\n"..Synopsis)
+		os.exit(0)
+	end
+	iarg = iarg+1
+end
+InFile = arg[iarg]
+if (not InFile) or (InFile=='-') then
+	InFh = io.stdin
+else
+	InFh, msg = io.open(InFile, 'r')
+	if not InFh then die('  '..msg) end
+end
+InpTxt = InFh:read('*a')
+io.close(InFh)
+
+Str2onNote     = {}   -- start with no on_notes
+-- Str2channel  = { }  -- to be free to bend, just use six channels :-)
+StrIsDetuned   = { false, false, false, false, false, false }
+Str2bendEnd    = { false, false, false, false, false, false }
+Str2openString = { 64, 59, 55, 50, 45, 40 }
+StringNumber   = 0
+-- Voice2onNote   = nil   -- only one Voice ...
+MyScoretrack   = {
+	{'set_tempo', 1, 1000000},
+	{'patch_change',  2, 1, Patch},
+	{'patch_change',  5, 2, Patch},
+	{'patch_change',  8, 3, Patch},
+	{'patch_change', 11, 4, Patch},
+	{'patch_change', 14, 5, Patch},
+	{'patch_change', 17, 6, Patch},
+	{'patch_change', 20, 0, VoicePatch},
+}
+TimeAtStartOfLine = 27
+InbetweenSystems  = true
+JustDoneVoiceSystem  = false  -- If true, unrecognised line doesn't advance t
+
+function noteoff (strnum, t)  -- note_off if needed
+	-- strnum==0 means the Voice
+	if not Str2onNote[strnum] then return nil end
+	local time,  pitch = table.unpack(Str2onNote[strnum])
+	table.insert(MyScoretrack,
+	  {'note', time, t-time-1, strnum, pitch, 98} )
+--	  {'note', time, t-time-1, Str2channel[strnum] or 1, pitch, 98} )
+	Str2onNote[strnum] = nil
+end
+
+function bend (strnum, t, semitones)   -- 0 up to 4096 or 8191
+	if not Str2onNote[strnum] then return nil end
+	-- {'pitch_wheel_change', dtime, channel, pitch_wheel}
+	--   where pitch_wheel = a value -8192 to 8191 (\x1FFF)
+	-- 10 pitches per semitone, subject to a minimum of 10mSec
+	local time,  pitch = table.unpack(Str2onNote[strnum])
+	local range = round(8191*semitones/2)
+	for i = 1, 10 do
+		local t_i = time + round( (t + (MsPerPulse/2) - time) *i/10)
+		local bnd = round(range * i/10)
+		table.insert(MyScoretrack, {'pitch_wheel_change', t_i, strnum, bnd})
+	end
+	StrIsDetuned[strnum] = true
+	Str2bendEnd[strnum] = round(t + MsPerPulse/2)
+end
+function pre_bend (strnum, t, semitones)   -- immediately to 4096 or 8191
+	noteoff (strnum, t)
+	table.insert(MyScoretrack,
+	  {'pitch_wheel_change', t-1, strnum, round(8191*semitones/2)}
+	)
+end
+function release (strnum, t, semitones)   -- 4096 or 8191 down to 0
+	if not Str2onNote[strnum] then return nil end
+	local time = Str2bendEnd[strnum]
+	if not time then
+		local pitch
+		time,  pitch = table.unpack(Str2onNote[strnum])
+	end
+-- NO! if there's been a bend, the time must be when that previous bend ended!
+	local range = round(8191*semitones/2)
+	for i = 1, 10 do
+		local t_i = time + round( (t + (MsPerPulse/2) - time) *i/10)
+		local bnd = round(range * (10-i)/10)
+		table.insert(MyScoretrack, {'pitch_wheel_change', t_i, strnum, bnd})
+	end
+end
+
+local current_time = TimeAtStartOfLine
+
+local lines = split(InpTxt, '\r?\n')
+for i,line in ipairs(lines) do
+	if string.match(line, '^ ?[a-gA-G][b#]?|') then
+		if InbetweenSystems and not JustDoneVoiceSystem then  -- a new system
+			InbetweenSystems = false
+			TimeAtStartOfLine = current_time
+		else    -- a new string in the same system
+			current_time = TimeAtStartOfLine
+		end
+		StringNumber = StringNumber + 1
+		local strtxt,strline = string.match(line, '^ ?([a-gA-G][b#]?)(|.*)$')
+		local openstring = openstring2midipitch(StringNumber,strtxt)
+		Str2openString[StringNumber] = openstring   -- 1.5
+		local fret_number   -- remembered to be used by '*'=harmonic
+		for j = 1, #strline do
+			local c = string.sub(strline, j, j)
+			if c == '|' or c == ' ' then -- NOP current_time does not advance
+			elseif c == '-' then
+				current_time = current_time + MsPerPulse
+				fret_number = nil
+			elseif string.find(c,'[0-9A-F]') then
+				noteoff(StringNumber, current_time)
+				if string.find(c,'[0-9]') then
+					fret_number = tonumber(c)
+				else   -- 'A' is ascii 65  and 65-10 = 55
+					fret_number = string.byte(c,1,1) - 55
+				end
+				local midipitch = openstring + fret_number
+				Str2onNote[StringNumber] = { current_time, midipitch }
+				if StrIsDetuned[StringNumber] then
+					table.insert(MyScoretrack,
+					  {'pitch_wheel_change', current_time, StringNumber, 0})
+					StrIsDetuned[StringNumber] = false
+					Str2bendEnd[StringNumber]  = false
+				end
+				current_time = current_time + MsPerPulse
+			elseif c == 'x' then   
+				noteoff(StringNumber, current_time)
+				current_time = current_time + MsPerPulse
+				fret_number = nil
+			elseif c == '*' then
+				local dp = 0   -- delta-pitch
+				if     fret_number == 7 then dp = 12
+				elseif fret_number == 5 or fret_number == 9 then dp = 19
+				elseif fret_number == 4 then dp = 24
+				end
+				Str2onNote[StringNumber][2] = Str2onNote[StringNumber][2] + dp
+				current_time = current_time + MsPerPulse
+				fret_number = nil
+			elseif c == 'b' then    --- bend one semitone
+				bend(StringNumber, current_time, 1)
+				current_time = current_time + MsPerPulse
+			elseif c == '^' then    --- bend two semitones
+				bend(StringNumber, current_time, 2)
+				current_time = current_time + MsPerPulse
+			elseif c == 'p' then    --- pre-bend one semitone
+				pre_bend(StringNumber, current_time, 1)
+				current_time = current_time + MsPerPulse
+			elseif c == 'P' then    --- pre-bend two semitones
+				pre_bend(StringNumber, current_time, 2)
+				current_time = current_time + MsPerPulse
+			elseif c == 'r' then    --- release the one-semitone bend
+				release(StringNumber, current_time, 1)
+				current_time = current_time + MsPerPulse
+			elseif c == 'R' then    --- release the two-semitone bend
+				release(StringNumber, current_time, 2)
+				current_time = current_time + MsPerPulse
+			end
+		end
+	elseif string.match(line, '^ ?V[MF]?|') then  -- 1.6
+		if #NoteTable == 0 then NoteTable = generate_notetable() end
+		if string.match(line, '^ ?VF|') then
+			for i = 1,#NoteTable do NoteTable[i] = NoteTable[i]+12 end
+		end
+		if InbetweenSystems and not JustDoneVoiceSystem then  -- a new system
+			InbetweenSystems = false
+			TimeAtStartOfLine = current_time
+		else    -- a new voice in the same system
+			current_time = TimeAtStartOfLine
+		end
+		local strtxt,strline = string.match(line, '^ ?V([MF]?)(|.*)$')
+		local j = 1 ; while j <= #strline do
+			local c = string.sub(strline, j, j)
+			if c == '|' or c == ' ' then -- NOP current_time does not advance
+			elseif c == '-' then
+				current_time = current_time + MsPerPulse
+			elseif string.find(c,'[a-gA-G]') then
+				local note = c
+				if NoteTable[note] then
+					if Str2onNote[0] then noteoff(0, current_time) end
+					if j < #strline then -- multiple [_~]+[#b]+ ? eg: B__bb ?
+						local next = string.sub(strline, j+1, j+1)
+						if next == '~' or next == '_' then
+							note = note .. next ; j = j + 1
+						end
+					end
+					if j < #strline then
+						local next = string.sub(strline, j+1, j+1)
+						if next == 'b' or next == '#' then
+							note = note .. next ; j = j + 1
+						end
+					end
+					Str2onNote[0] = { current_time, NoteTable[note] }
+					current_time = current_time + MsPerPulse
+				else
+					warn(' unrecognised note syntax: ',note,'\n')
+				end
+			end
+			j = j + 1
+		end 
+		JustDoneVoiceSystem = true
+	else
+		StringNumber = 0
+		InbetweenSystems = true
+	end
+end
+for stringnumber = 0,6 do noteoff(stringnumber, current_time) end
+
+io.stdout:write(MIDI.score2midi({ 1000, MyScoretrack, }))
+warn('\n')
+
+--[=[
+
+=pod
+
+=head1 NAME
+
+gtrtab2midi - converts ascii-tab guitar tablature to MIDI
+
+=head1 SYNOPSIS
+
+ gtrtab2midi infile.gtab | aplaymidi -
+ gtrtab2midi infile.gtab | fluadity -
+
+ gtrtab2midi -p 24  infile.gtab | aplaymidi - # midi patch 24
+ gtrtab2midi -t 140 infile.gtab | fluadity -  # 140mS/pulse
+ gtrtab2midi -T 8   infile.gtab | fluadity -  # 8 pulses/sec
+
+ gtrtab2midi infile.gtab > outfile.mid
+ midiedit outfile.mid
+
+ perldoc gtrtab2midi   # read the manual :-)
+
+=head1 DESCRIPTION
+
+This script converts ascii-tab guitar tablature to MIDI,
+which can then be played using I<fluadity> or I<aplaymidi>,
+or edited using I<midiedit>
+
+I<gtrtab2midi> uses a more compact and rhythmic version
+of ascii-tab guitar tablature, in which each character 
+represents a particular elapsed time (by default one sixth of a second).
+This means the ascii text is (at least) twice as compact,
+and the rhythm is clearly specified.
+It looks something like this example:
+
+ e|3-0---------|--0-----0---|--3--02-02-3|---3--3--3-3|
+ B|---3-0------|-----3-----0|--2---3--3-0|---0-0--12-3|
+ G|------3-02-0|1----1------|------2--2-0|------------|
+ D|---0-----0--|---0-----0--|---2--0-----|---3--2--1--|
+ A|------------|------------|0--------0--|------------|
+ E|3-----3-----|0-----0-----|------------|3-----------|
+
+Therefore, to represent the high frets with one character,
+I<gtrtab2midi> supports the following extension
+to standard guitar tablature notation:
+within the system, using hexadecimal notation for the high frets:
+
+    A     play the tenth 10th fret
+    B     play the eleventh 11th fret
+    C     play the twelfth 12th fret (the octave)
+    D     play the thirteenth 13th fret
+    E     play the fourteenth 14th fret
+    F     play the fifteenth 15th fret
+
+I<gtrtab2midi> supports only the following on-string symbols,
+which have the same rhythmic value as a dash B<-> :
+
+    x   ends the note on that string
+    *   the adjoining number on the left (eg: C,7,5 or 4) was a harmonic
+    b   bend up one semitone
+    ^   bend up two semitones
+    p   pre-bend one semitone
+    P   pre-bend two semitones
+    r   release the one-semitone bend
+    R   release the two-semitone bend
+
+Bending is only offered over one or two semitones.
+An example of bending: on the B-string,
+C<---3-b3--->
+plays a B<d> which bends smoothly up the B<eb>,
+followed immediately by a new B<d>.
+Or C<---3-b--rx--->
+plays a B<d> which bends smoothly up the B<eb>
+and then releases back down again fo the B<d>.
+
+An example of pre-bending: on the B-string,
+C<----5--p8-r-x-->
+plays an B<e> then a pre-bent B<g#> releasing back down to a B<g>
+
+More conventional ascii-tab guitar tablature is described in
+https://en.wikipedia.org/wiki/ASCII_tab  and
+https://how-to-play-electric-guitar.net/tab-symbols.html
+
+=head1 VOICE-LINE
+
+Since version 1.6, I<gtrtab2midi> offers a syntax for setting a voice-line.
+The voice-line starts with
+B<VF|> or B<VM|> for female or male voices respectively.
+It looks something like this example:
+
+  VM|---A-----------|---------F#-----|G--------------|F#-----E--D-----|
+   d|---------------|---------- -----|---------------|- --------------|
+   A|---------------|---------- -----|---------------|- --------------|
+   G|-----77-7--77-7|-----77-7- -77-7|-----77-7--77-7|- ----77-7--77-7|
+   D|7--7--7--7--7--|7--7--7--7 --7--|7--7--7--7--7--|7 --7--7--7--7--|
+   A|0--------0-----|0--------0 -----|0--------0-----|0 --------0-----|
+   D|0--------0-----|0--------0 -----|0--------0-----|0 --------0-----|
+
+Voices don't have frets, so the pitches are notated differently,
+using a notation which borrows from muscript
+https://pjb.com.au/muscript/index.html#pitches
+but uses the tablature-time-pulse for rhythm.
+
+Near the middle of each clef there is a "c". This note is written B<c>
+and the notes above it are written
+B<c# d eb en f f# g g# a bb b c~ c~# d~ e~b>
+and so on up to B<b~>.
+Likewise, the notes below B<c> are B<B Bb A Ab G F# F E Eb D C# C B_ B_b A_>
+and so on down to B<C_>.
+Thus on each voice-line you can write a range of nearly four octaves.
+
+Each such note is one time-pulse long
+even if it uses two characters like B<F#>
+so you may find it neater to pad the guitar-strings
+with a blank underneath the B<#> or B<b> in order to preserve the
+vertical alignment.
+
+The default midi-patch for the voice is 82,
+but you can change this with the B<-P> option.
+
+=head1 ARGUMENTS
+
+=over 3
+
+=item I<-p 24>
+
+This option sets the MIDI B<P>atch,
+to 24 = Acoustic Guitar(nylon) in this example.
+The default is 25 = Acoustic Guitar(steel).
+See
+http://www.pjb.com.au/muscript/gm.html
+for a list of the General-MIDI patch numbers.
+
+=item I<-P 85>
+
+This option sets the MIDI B<V>oice-patch,
+to 85 = Lead 6 (voice) in this example.
+The default is 82 = Lead 3 (calliope).
+See
+http://www.pjb.com.au/muscript/gm.html
+for a list of the General-MIDI patch numbers.
+
+=item I<-t 140>
+
+This option sets the B<T>empo, in milliseconds per pulse,
+where a pulse is the time taken by a '-' in the ascii-tab input.
+The pulse is therefore the shortest time-interval you can
+express in ascii-tab - a sixteenth-note (semiquaver) for example.
+The default is 167, meaning a sixth of a second.
+
+=item I<-T 8>
+
+This option is an alternative to the B<-t> option;
+it sets the B<T>empo in pulses per second,
+where a pulse is the time taken by a '-' in the ascii-tab input.
+The pulse is therefore the shortest time-interval you can express in ascii-tab.
+The default is 6, meaning 167 milliseconds.
+
+=item I<-v>
+
+Print the B<V>ersion
+
+=back
+
+=head1 DOWNLOAD
+
+This script is freely available at
+http://www.pjb.com.au/midi/free/gtrtab2midi
+
+It needs the I<MIDI.lua> module, which is available from
+http://www.luarocks.org
+so you should be able to install it by:
+
+     luarocks install midi
+
+=head1 CHANGES
+
+ 20200602 1.7 add back-compatible argument *a for io.read()
+ 20180826 1.6 add a VM or VF voice-line
+ 20180819 1.5 -T option for pulses/sec
+ 20180809 1.4 bending with -3-b3- and -p3-r1- also ^, P and R
+ 20180807 1.3 C* 7* 5* 4* are the natural harmonics
+ 20180806 1.2 x ends the note on that string
+ 20180804 1.1 introduce -t and -p options
+ 20180801 1.0 initial release
+
+=head1 AUTHOR
+
+Peter J Billam, http://www.pjb.com.au/comp/contact.html
+
+=head1 SEE ALSO
+
+ https://pjb.com.au/mus/arr/tab/folk_gtr_solos.tab
+ https://en.wikipedia.org/wiki/ASCII_tab
+ https://www.guitartricks.com/helptab.php
+ https://how-to-play-electric-guitar.net/tab-symbols.html
+ https://en.wikipedia.org/wiki/Tablature#Guitar_tablature
+ https://en.wikipedia.org/wiki/List_of_guitar_tablature_software
+ https://pjb.com.au/muscript/gm.html
+ https://pjb.com.au/midi/gtrtab.html
+ https://pjb.com.au/midi/midiedit.html
+ https://luarocks.org/modules/peterbillam
+ https://pjb.com.au/muscript/index.html#pitches
+ https://pjb.com.au/
+
+=cut
+
+]=]

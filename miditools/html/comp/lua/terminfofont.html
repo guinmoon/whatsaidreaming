@@ -1,0 +1,329 @@
+<HTML><HEAD><TITLE>terminfofont.lua</TITLE>
+<LINK rel=stylesheet type="text/css"
+href="../styles.css" title="PJB Computing Styles">
+<META HTTP-EQUIV="Keywords"
+CONTENT="terminfofont, Lua, module, gaussian, randomget">
+</HEAD>
+<BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
+<DIV>
+<H1><IMG SRC="../logo.jpg" ALT=" " WIDTH=126 HEIGHT=52>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<FONT COLOR="#800000"><I>terminfofont.lua</I></FONT>
+</H1>
+<p><a name="__index__"></a></p>
+
+<!-- INDEX BEGIN -->
+<TABLE ALIGN="center" WIDTH="85%" BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left">
+<ul>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+	<li><a href="#functions">FUNCTIONS</a></li>
+	<li><a href="#constants">CONSTANTS</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+	<li><a href="#download">DOWNLOAD</a></li>
+	<li><a href="#changes">CHANGES</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+</TD></TR>
+</TABLE>
+<!-- INDEX END -->
+
+<h2><a name="name">NAME</a></h2>
+<p>terminfofont.lua&nbsp; - &nbsp;big fonts for use in a console or an xterm </p>
+<HR>
+<h2><a name="synopsis">SYNOPSIS</a>
+<A HREF ="img/terminfofont_synopsis.png"><IMG ALIGN="right" WIDTH="31%" SRC="img/terminfofont_synopsis.png"></A>
+</h2>
+<pre>
+ local TIF = require 'terminfofont'
+ TIF.<A HREF="#clear">clear()</A>
+ TIF.<A HREF="#civis">civis()</A>
+ local y = 0   -- start at the top
+ local dx, dy
+ TIF.<A HREF="#setfontsize">setfontsize(4)</A>
+ dx,dy = TIF.<A HREF="#show">show</A>(1, y, 'AbcdEfghIjklMnoP', 1)
+ TIF.<A HREF="#setfontsize">setfontsize(7)</A>
+ y = y+dy - 1
+ TIF.<A HREF="#rectfill">rectfill</A>(TIF.cols*0.2, y+1, TIF.cols*0.6, 6, 'cyan')
+ dx,dy = TIF.<A HREF="#show">show</A>(0, y, 'HijkLmnoP', 4)
+ y = y+dy
+ TIF.<A HREF="#setfontsize">setfontsize(2)</A>
+ TIF.bold()
+ dx,dy = TIF.<A HREF="#centreshow">centreshow</A>(y, 'The Title', 'blue')
+ y = y+dy - 1
+ TIF.<A HREF="#setfontsize">setfontsize(4)</A>
+ dx,dy = TIF.<A HREF="#centreshow">centreshow</A>(y, 'The Title', 'violet')
+ y = y+dy
+ TIF.<A HREF="#setfontsize">setfontsize(7)</A>
+ dx,dy = TIF.<A HREF="#centreshow">centreshow</A>(y, 'The Title', 'red')
+ TIF.<A HREF="#moveto">moveto(0, TIF.lines-1)</A>
+ TIF.<A HREF="#sgr0">sgr0()</A>
+ TIF.<A HREF="#cnorm">cnorm()</A>
+
+ -- for example, I run this when shutting down to
+ -- remind me to put out the garbage on Wednesday evenings:
+ local date_t = os.date('*t')
+ if date_t['wday'] == 4 and  date_t['hour'] &gt; 17 then   -- Wed after 6pm
+    local TIF = require 'terminfofont'
+    TIF.clear() ; TIF.setfontsize(7)
+    local dx,dy = TIF.show(0, 4, 'GARBAGE', 'red')
+    TIF.moveto(0, 12) ; TIF.sgr0()
+ end
+
+</pre>
+<p>
+</p>
+<hr />
+<h2><a name="description">DESCRIPTION</a></h2>
+<p>
+This module implements in Lua two big fonts
+for use when <I>terminfo</I> is supported,
+such as in a console, or an xterm. &nbsp;
+It was inspired by the <I>Bitfont5x7</I> font in the PostScript module
+<A HREF="http://pjb.com.au/comp/ps/fonts.html">fonts.ps</A>,
+except that these are variable-width fonts because they're very big
+and space is at a premium.
+<BR>
+The functions were inspired by PostScript procedures. &nbsp;
+</P><TABLE WIDTH="99%"><TR><TD>
+<A HREF="img/terminfofont_screenshot_5.png">
+<IMG ALIGN="right" WIDTH="32%" SRC="img/terminfofont_screenshot_5.png"></A>
+<A HREF="img/terminfofont_screenshot_4.png">
+<IMG ALIGN="right" WIDTH="32%" SRC="img/terminfofont_screenshot_4.png"></A>
+These are some screenshots on a 79x23 <I>xterm</I> .&nbsp;.&nbsp;.<BR>
+The default big font is four lines high.<BR>
+It uses some <I>utf-8</I> characters,
+and therefore depends on your <I>xterm</I> using a <I>utf-8</I> font:
+</TD></TR></TABLE>
+<TABLE WIDTH="99%"><TR><TD>
+The other font is seven lines high
+( see <a href="#setfontsize"><B>setfontsize()</B></a> ) :
+</P><P>
+<A HREF="img/terminfofont_screenshot_1.png">
+<IMG WIDTH="32%" SRC="img/terminfofont_screenshot_1.png"></A>
+<A HREF="img/terminfofont_screenshot_2.png">
+<IMG WIDTH="32%" SRC="img/terminfofont_screenshot_2.png"></A>
+<A HREF="img/terminfofont_screenshot_3.png">
+<IMG WIDTH="32%" SRC="img/terminfofont_screenshot_3.png"></A>
+</TD></TR></TABLE>
+<hr />
+
+<h2><a name="functions">FUNCTIONS</a></h2><P>
+<a href="#show"><B>show()</B></a>,
+<a href="#stringwidth"><B>stringwidth()</B></a>,
+<a href="#setfontsize"><B>setfontsize()</B></a>,
+<a href="#moveto"><B>moveto()</B></a>,
+<a href="#rectfill"><B>rectfill()</B></a>,
+<a href="#centreshow"><B>centreshow()</B></a>,<BR>
+<a href="#clear"><B>clear()</B></a>,
+<a href="#civis"><B>civis()</B></a>,
+<a href="#cnorm"><B>cnorm()</B></a>, &nbsp;
+<a href="#fg_color"><B>fg_color()</B></a>,
+<a href="#bg_color"><B>bg_color()</B></a>,
+<a href="#bold"><B>bold()</B></a>,
+<a href="#sgr0"><B>sgr0()</B></a>,
+</P>
+<dl>
+<dt><strong><a name="show" class="item">
+width, height = TIF.<em>show</em> (x,y, string, colour)</a></strong></dt>
+<dd>
+<p>
+This displays the <B>string</B>,
+in the current font-size,
+starting at column <B>x</B> and line <B>y</B>,
+in the ANSI colour <B>colour</B>.<BR>
+It returns the width and height (in columns and lines) of the string.<BR>
+Since version 0.5 the position <B>x</B> and <B>y</B>
+specifies the <B>top</B>-left corner of the letters.
+The reason for this change is to make the <I>height</I> return-value useful.
+</P><P>
+The available colours are: &nbsp;
+black=0, red=1, green=2, yellow=3, blue=4, violet=5, cyan=6, and white=7,
+&nbsp;
+see <B>man terminfo</B> in the <B>Colour Handling</B> section,
+where it discusses the <B>setaf</B> and <B>setbf</B> capabilites.
+<B>show</B> also supports the colours being given as strings,
+for example 'red'
+</P>
+</dd>
+
+<DT><strong><a name="stringwidth" class="item">
+width, height = TIF.<em>stringwidth</em> (string)</a></strong></DT>
+<DD><P>
+This returns the width and height (in columns and lines) that the string
+would have if it were displayed. &nbsp;
+It's like the <A HREF="#show">show</A> function,
+except that nothing is displayed.
+</P></dd>
+
+<DT><strong><a name="setfontsize" class="item">
+TIF.<em>setfontsize</em> (n)</a></strong></DT>
+<DD><P>
+The font size <B>n</B> must be either <B>1</B> or <B>2</B> or <B>4</B>
+or <B>7</B>. &nbsp; The default is <B>4</B><BR>
+<B>4</B> depends on your tty using a utf-8 font,
+and so is not completely portable:
+for example, <CODE>10x20</CODE> and <CODE>12x24</CODE>
+are not utf-8 fonts.<BR>
+<B>2</B> is even less portable; it uses two old escape-sequences
+<CODE>&lt;esc&gt;#3</CODE> and <CODE>&lt;esc&gt;#4</CODE>
+which display the upper and lower halves of a double-height font.
+&nbsp;
+These are not present on the linux console or in <I>screen</I>.
+But they are present in <I>xterm</I> and its variants
+<I>uxterm</I> and <I>lxterm</I>.
+</P></dd>
+
+<DT><strong><a name="moveto" class="item">
+TIF.<em>moveto</em> (x, y) </a></strong></DT>
+<DD><P>
+This moves the cursor to a given position, specified as column and line.
+<BR>
+<B>x</B> and <B>y</B> are 0, 0 in the top left corner,
+and increasing <B>y</B> moves downwards.<BR>
+So the bottom-left corner is &nbsp; <CODE>TIF.moveto(0, TIF.lines-1)</CODE>
+</P></dd>
+
+<dt><strong><a name="rectfill" class="item">
+TIF.<em>rectfill</em> (x,y, width,height, colour)</a></strong></dt>
+<dd>
+<p>
+This creates and fills a rectangle with corner at <B>x</B>, <B>y</B>
+and the given <B>width</B> and <B>height</B>,
+in the ANSI colour <B>colour</B>. &nbsp;
+<B>width</B> and <B>height</B> should be positive,<BR>
+As in <A HREF="#show">show</A>, the position <B>x</B> and <B>y</B>
+specifies the top-left corner of the rectangle.
+<BR>
+Be aware that most terminal-fonts are about twice as high as they are wide
+(eg 10x20 or 12x24), so that to get something like a square you have to specify
+something like &nbsp;
+<CODE>TIF.rectfill(10,10,&nbsp;50,25,&nbsp;'blue')</CODE>
+
+</P>
+</dd>
+
+<dt><strong><a name="centreshow" class="item">
+width = TIF.<em>centreshow</em> (y, string, colour)</a></strong></dt>
+<dd><P> This is a wrapper for <A HREF="#show">show</A>,
+which takes care of the <B>x</B> parameter so as to centralise
+the <B>string</B> in the middle of the screen.
+</P></dd>
+
+<dt><strong><a name="clear" class="item">
+TIF.<em>clear</em> ()</a></strong></dt>
+<dd><P> This clears the screen,
+just like &nbsp; <CODE>os.execute('clear')</CODE>
+</P></dd>
+
+<dt><strong><a name="civis" class="item">
+TIF.<em>civis</em> ()</a></strong></dt>
+<dd><P> This makes the cursor invisible
+</P> </dd>
+<dt><strong><a name="cnorm" class="item">
+TIF.<em>cnorm</em> ()</a></strong></dt>
+<dd><P> This makes the cursor normal again
+</P></dd>
+
+<dt><strong><a name="fg_color" class="item">
+TIF.<em>fg_color</em> ('red')</a></strong></dt>
+<dd><P> This sets the <I>xterm</I> 's foreground colour,
+which may be given as a number, or as a string. &nbsp;
+The available colours are: &nbsp;
+black=0, red=1, green=2, yellow=3, blue=4, violet=5, cyan=6, and white=7<BR>
+</P></dd>
+<dt><strong><a name="bg_color" class="item">
+TIF.<em>bg_color</em> (7)</a></strong></dt>
+<dd><P> This sets the <I>xterm</I> 's background colour,
+which may be given as a number, or as a string. &nbsp;
+The available colours are: &nbsp;
+black=0, red=1, green=2, yellow=3, blue=4, violet=5, cyan=6, and white=7<BR>
+</P></dd>
+<dt><strong><a name="bold" class="item">
+TIF.<em>bold</em> ()</a></strong></dt>
+<dd><P> This turns on bold mode. &nbsp;
+See <CODE>man terminfo</CODE><BR>
+</P></dd>
+<dt><strong><a name="sgr0" class="item">
+TIF.<em>sgr0</em> ()</a></strong></dt>
+<dd><P> This turns off all attributes, restoring the <I>xterm</I>
+to its normal state. See <CODE>man terminfo</CODE><BR>
+It's useful for cleaning up before exit, and is also called automatically
+at the end of each <A HREF="#show">show()</A>
+</P></dd>
+
+</dl>
+
+<hr />
+<h2><a name="constants">CONSTANTS</a></h2><P>
+To save you from having to <CODE>require 'terminfo'</CODE>,
+some integer constants: &nbsp; <B>TIF.lines</B> and <B>TIF.cols</B>
+</P>
+
+<hr />
+<h2><a name="download">DOWNLOAD</a></h2>
+<p>This module exists as a LuaRock in
+<A HREF="http://luarocks.org/modules/peterbillam">
+luarocks.org/modules/peterbillam</A>
+so you can install it with the command:<BR>
+<CODE>
+&nbsp; sudo luarocks install terminfofont</CODE><BR>
+or:<BR>
+<CODE>
+&nbsp; sudo luarocks install http://www.pjb.com.au/comp/lua/terminfofont-0.8-0.rockspec
+</CODE>
+</P><P>
+You will also need the <I>terminfo</I> module:<BR>
+<CODE> &nbsp; sudo luarocks install terminfo</CODE>
+</P><P>
+The test script used during development is
+<a href="http://pjb.com.au/comp/lua/test_terminfofont.lua">
+pjb.com.au/comp/lua/test_terminfofont.lua</a>
+</P>
+
+<hr />
+<h2><a name="changes">CHANGES</a></h2><pre>
+ 20191201 0.8 code refactored and neatened
+ 20191119 0.7 add fontsizes 1 and 2, and bold()
+ 20191118 0.6 introduce centreshow(), and refine the kerning
+ 20191116 0.5 x,y specify the <B>top</B> left corner, and introduce sgr0()
+ 20191116 0.4 introduce setfontsize() and the 4-line utf8-based font
+ 20191109 0.3 introduce clear() and $
+ 20191108 0.2 rename go_to as moveto, introduce rectfill
+ 20191106 0.1 first released version
+</pre>
+<hr />
+<h2><a name="author">AUTHOR</a></h2>
+<p>Peter J Billam, &nbsp;
+<a href="http://pjb.com.au/comp/contact.html">pjb.com.au/comp/contact.html</a>
+</p>
+
+<hr />
+<h2><a name="see_also">SEE ALSO</a></h2>
+<P>
+<CODE>man terminfo</CODE><BR>
+<A HREF="http://pjb.com.au/comp/lua/terminfo.html">
+pjb.com.au/comp/lua/terminfo.html</A><BR>
+<A HREF="https://pjb.com.au/comp/ps/fonts.html#Bitfont5x7">
+pjb.com.au/comp/ps/fonts.html#Bitfont5x7</A><BR>
+<A HREF="http://luarocks.org/modules/peterbillam/terminfofont">
+luarocks.org/modules/peterbillam/terminfofont</A><BR>
+<A HREF="http://luarocks.org/modules/peterbillam">
+luarocks.org/modules/peterbillam</A><BR>
+<A HREF="http://pjb.com.au">pjb.com.au</A><BR>
+
+</P>
+
+</body>
+
+</html>

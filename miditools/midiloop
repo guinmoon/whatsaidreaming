@@ -1,0 +1,1861 @@
+#! /usr/bin/perl
+#########################################################################
+#        This Perl script is Copyright (c) 2012, Peter J Billam         #
+#                          www.pjb.com.au                               #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#            modify it under the same terms as Perl itself.             #
+#########################################################################
+
+# 20150608 on linux console, should use setterm --blank 0 (or 10 on exit)
+# 61-note kbd uses D1-E3 like the 49-note, but of course 96 for ModeChange
+
+#use strict;
+#use warnings;
+
+use Data::Dumper; $Data::Dumper::Sortkeys = 1; # $Data::Dumper::Indent = 0;
+
+use Time::HiRes();
+select STDERR; $|=1; select STDOUT;
+my $Version = '3.7'; # -o 0 option is respected as documented
+my $VersionDate  = '25aug2015';
+
+my $RecordingChannel = undef;
+my $RecordingFree  = 0;
+my $InputPort      = '';
+my $OutputPort     = '';
+my $MuscriptHeader = 0;
+my $MuscriptFile   = '';
+my @L              = ();  # @Loopsets 1.8 LoH of BarLength and Channels
+my $NextLoopset    = undef;  # the change will occur at the next barline
+my $IL             = -1;  # $CurrentLoopset ; mnemonic $i_loop
+# push @{$L[$IL]{'Channels'}[$cha]{'LoopBars'}[$i_bar]}, \@alsaevent;
+my @Cha2Patch      = ();  # automatic; midiloop fills this in by eavesdropping
+# each Loopset remembers these channels independently;
+# this can be saved in a .mid file by replaying any patch_changes
+# just before "recording" the channels, just like in realtime.
+my $StartOfBar     = 0;   # set by the play loop, needed also when recording
+my $BarCount       = -1;  # gets incremented at the start of each loop-bar
+my $WithMetronome  = 0;
+my $Paused         = 1;   # this is global, governing all loopsets
+my $LoopStart      = 0;   # floating-point seconds
+my @LoopEvents     = ();  # events with NOTEONs and OFFs combined into NOTEs
+my $LoopIndex      = $[;  # the event within the loop
+my $IsCmdMode      = 0;   # are we in command-mode ?
+my $DefaultChannel = 0;   # set by is_mode_change(), used by do_recording()
+my $CurrentMuting = -1;
+# $L[$IL]{'Mutings'}[$i_muteset][$cha] = 1 or 0 or undef
+my $Message        = '';
+my $Message_1      = '';  # 3.1 message-ageing
+my $Message_2      = '';  # 3.1 message-ageing
+my @Num2Cmd        = (    # order: global,channel,loopset) :
+	'Pause', 'Mute', 'Unmute',
+	'Record', 'EraseChannel', 'Barlength',
+	# if channels already recorded, change barlength speeds up the whole loop
+	'SaveMuting', 'GotoMuting', 'EraseMuting',
+	'NewLoopset', 'GotoLoopset',
+	'SaveLoopsets', 'LoadLoopsets', 'Quit'
+);
+my @RelevantCmds   = (0..15);   # will get reevaluated by relevant_cmds()
+my @Num2Barlength  = (  # 3.2 tempos squeezed into smaller steps
+	1.00, 1.04, 1.08, 1.12, 1.16, 1.20, 1.26, 1.32,
+	1.38, 1.44, 1.52, 1.60, 1.68, 1.76, 1.84, 1.92,
+);
+my %Pitch2Number88 = (
+	62,0, 64,1, 65,2, 67,3, 69,4, 71,5, 72,6,
+	74,7, 76,8, 77,9, 79,10,81,11,83,12,84,13,86,14,88,15,
+);
+my %Pitch2Number49 = (
+	38,0, 40,1, 41,2, 43,3, 45,4, 47,5, 48,6,
+	50,7, 52,8, 53,9, 55,10,57,11,59,12,60,13,62,14,64,15,
+);
+my %Pitch2Number25 = (
+	48,0, 50,1, 52,2, 53,3, 55,4, 57,5, 59,6,
+	60,7, 62,8, 64,9, 65,10,67,11,69,12,71,13  # max of 13 :-(
+);
+my %Pitch2Number;  # adjust to what keys user plays, or to -k
+my $ModeChangeKey;
+my $ModeKeyString;
+my $Home = $ENV{'LOGDIR'} || $ENV{'HOME'} || (getpwuid($>))[$[+7];
+my $MidiloopDir = $ENV{'MIDILOOP_DIR'} || "$Home/midiloop";  # or -d option
+my $XdgScreensaver = which('xdg-screensaver');   # 2.1
+my $XdgScreenSuspended = 0;
+$| = 1;   # autoflush on STDOUT
+
+my %Num2patch = (
+	0 => 'Acoustic Grand',
+	1 => 'Bright Acoustic',
+	2 => 'Electric Grand',
+	3 => 'Honky-Tonk',
+	4 => 'Electric Piano 1',
+	5 => 'Electric Piano 2',
+	6 => 'Harpsichord',
+	7 => 'Clav',
+	8 => 'Celesta',
+	9 => 'Glockenspiel',
+	10 => 'Music Box',
+	11 => 'Vibraphone',
+	12 => 'Marimba',
+	13 => 'Xylophone',
+	14 => 'Tubular Bells',
+	15 => 'Dulcimer',
+	16 => 'Drawbar Organ',
+	17 => 'Percussive Organ',
+	18 => 'Rock Organ',
+	19 => 'Church Organ',
+	20 => 'Reed Organ',
+	21 => 'Accordion',
+	22 => 'Harmonica',
+	23 => 'Tango Accordion',
+	24 => 'Acoustic Guitar(nylon)',
+	25 => 'Acoustic Guitar(steel)',
+	26 => 'Electric Guitar(jazz)',
+	27 => 'Electric Guitar(clean)',
+	28 => 'Electric Guitar(muted)',
+	29 => 'Overdriven Guitar',
+	30 => 'Distortion Guitar',
+	31 => 'Guitar Harmonics',
+	32 => 'Acoustic Bass',
+	33 => 'Electric Bass(finger)',
+	34 => 'Electric Bass(pick)',
+	35 => 'Fretless Bass',
+	36 => 'Slap Bass 1',
+	37 => 'Slap Bass 2',
+	38 => 'Synth Bass 1',
+	39 => 'Synth Bass 2',
+	40 => 'Violin',
+	41 => 'Viola',
+	42 => 'Cello',
+	43 => 'Contrabass',
+	44 => 'Tremolo Strings',
+	45 => 'Pizzicato Strings',
+	46 => 'Orchestral Harp',
+	47 => 'Timpani',
+	48 => 'String Ensemble 1',
+	49 => 'String Ensemble 2',
+	50 => 'SynthStrings 1',
+	51 => 'SynthStrings 2',
+	52 => 'Choir Aahs',
+	53 => 'Voice Oohs',
+	54 => 'Synth Voice',
+	55 => 'Orchestra Hit',
+	56 => 'Trumpet',
+	57 => 'Trombone',
+	58 => 'Tuba',
+	59 => 'Muted Trumpet',
+	60 => 'French Horn',
+	61 => 'Brass Section',
+	62 => 'SynthBrass 1',
+	63 => 'SynthBrass 2',
+	64 => 'Soprano Sax',
+	65 => 'Alto Sax',
+	66 => 'Tenor Sax',
+	67 => 'Baritone Sax',
+	68 => 'Oboe',
+	69 => 'English Horn',
+	70 => 'Bassoon',
+	71 => 'Clarinet',
+	72 => 'Piccolo',
+	73 => 'Flute',
+	74 => 'Recorder',
+	75 => 'Pan Flute',
+	76 => 'Blown Bottle',
+	77 => 'Skakuhachi',
+	78 => 'Whistle',
+	79 => 'Ocarina',
+	80 => 'Lead 1 (square)',
+	81 => 'Lead 2 (sawtooth)',
+	82 => 'Lead 3 (calliope)',
+	83 => 'Lead 4 (chiff)',
+	84 => 'Lead 5 (charang)',
+	85 => 'Lead 6 (voice)',
+	86 => 'Lead 7 (fifths)',
+	87 => 'Lead 8 (bass+lead)',
+	88 => 'Pad 1 (new age)',
+	89 => 'Pad 2 (warm)',
+	90 => 'Pad 3 (polysynth)',
+	91 => 'Pad 4 (choir)',
+	92 => 'Pad 5 (bowed)',
+	93 => 'Pad 6 (metallic)',
+	95 => 'Pad 8 (sweep)',
+	96 => 'FX 1 (rain)',
+	97 => 'FX 2 (soundtrack)',
+	98 => 'FX 3 (crystal)',
+	100 => 'FX 5 (brightness)',
+	101 => 'FX 6 (goblins)',
+	102 => 'FX 7 (echoes)',
+	103 => 'FX 8 (sci-fi)',
+	104 => 'Sitar',
+	105 => 'Banjo',
+	106 => 'Shamisen',
+	107 => 'Koto',
+	108 => 'Kalimba',
+	109 => 'Bagpipe',
+	110 => 'Fiddle',
+	111 => 'Shanai',
+	112 => 'Tinkle Bell',
+	113 => 'Agogo',
+	114 => 'Steel Drums',
+	115 => 'Woodblock',
+	116 => 'Taiko Drum',
+	118 => 'Synth Drum',
+	119 => 'Reverse Cymbal',
+	120 => 'Guitar Fret Noise',
+	121 => 'Breath Noise',
+	122 => 'Seashore',
+	123 => 'Bird Tweet',
+	124 => 'Telephone Ring',
+	125 => 'Helicopter',
+	126 => 'Applause',
+	127 => 'Gunshot',
+);
+
+# vt100 globals
+my $CursorRow    = 7;
+my $Irow         = 1;
+my $Icol         = 1;
+my $COLS         = 80;
+my $ROWS         = 25;
+eval 'require "Term/ReadKey.pm"';
+if (! $@) {
+	($COLS, $ROWS) = Term::ReadKey::GetTerminalSize(*STDERR);
+	Term::ReadKey::ReadMode(2);
+} else {
+	eval 'require "Term/Size.pm"';   #warn "trying Term::Size\n";
+	if (! $@) { ($COLS, $ROWS) = Term::Size::chars(*STDERR); }
+}
+#warn "COLS=$COLS ROWS=$ROWS\n";
+
+use open ':locale';
+eval 'require MIDI::ALSA'; if ($@) {
+	die "you'll need to install the MIDI-ALSA module from www.cpan.org\n";
+}
+
+my @cmd = grep ($_ ne '-X', @ARGV);
+while ($ARGV[$[] =~ /^-([a-z]|X)/) {
+	if ($1 eq 'v')      { shift;
+		my $n = $0; $n =~ s{^.*/([^/]+)$}{$1};
+		print "$n version $Version $VersionDate\n";
+		exit 0;
+	} elsif ($1 eq 'd') { shift; $MidiloopDir = shift;
+	} elsif ($1 eq 'k') { shift; my $k      = shift;
+		if      ($k eq '88') {
+			$ModeChangeKey = 108;
+			$ModeKeyString = 'c~~~';
+			%Pitch2Number = %Pitch2Number88;
+		} elsif ($k eq '61') {
+			$ModeChangeKey = 96;
+			$ModeKeyString = 'c~~';
+			%Pitch2Number = %Pitch2Number49;  # as m-audio keystation 61
+		} elsif ($k eq '49') {
+			$ModeChangeKey = 84;
+			$ModeKeyString = 'c~';
+			%Pitch2Number = %Pitch2Number49;
+		} elsif ($k eq '25') {
+			$ModeChangeKey = 72;
+			$ModeKeyString = 'c';
+			%Pitch2Number = %Pitch2Number25;
+		} else { die "bad -k arg: $k, should be 88, 61, 49 or 25\n";
+		}
+	} elsif ($1 eq 'l') { shift; my $f = shift;
+		if (! load_loopset($f)) { die "$Message\n"; }
+	} elsif ($1 eq 'm') { shift;
+		$MuscriptHeader = 1;
+		if ($ARGV[$[] and $ARGV[$[] !~ /^-/) { $MuscriptFile = shift; }
+	} elsif ($1 eq 'i') { shift; $InputPort  = shift;
+	} elsif ($1 eq 'o') { shift; $OutputPort = shift;
+#	} elsif ($1 eq 'X') {
+#		exec 'xterm -geometry 80x7-1+1 -exec midiloop '.join(' ',@cmd).' &';
+#		die " exec failed: $!\n";
+	} else {
+		print "usage:\n";  my $synopsis = 0;
+		while (<DATA>) {
+			if (/^=head1 SYNOPSIS/)     { $synopsis = 1; next; }
+			if ($synopsis && /^=head1/) { last; }
+			if ($synopsis && /\S/)      { s/^\s*/   /; print $_; next; }
+		}
+		exit 0;
+	}
+}
+
+sub suspend_screensaver {
+	if ($XdgScreensaver and $ENV{'WINDOWID'}) {  # 2.1
+		if (not glob('/tmp/xdg-screensaver-*')) {
+			system("$XdgScreensaver suspend ".$ENV{'WINDOWID'});
+			$XdgScreenSuspended = 1;
+		}
+	} elsif ($ENV{'TERM'} eq 'linux') {
+		system('setterm --blank 0');
+	}
+}
+sub resume_screensaver {
+	if ($XdgScreenSuspended) {  # 2.1
+		system("$XdgScreensaver resume ".$ENV{'WINDOWID'});
+	} elsif ($ENV{'TERM'} eq 'linux') {
+		system('setterm --blank 10');
+	}
+	wait();   # ??
+}
+
+suspend_screensaver();
+
+# code based on midiecho's RealTime mode....
+
+if ($OutputPort eq '') { $OutputPort = $ENV{'ALSA_OUTPUT_PORTS'}; }
+if ($OutputPort eq '') {   # 3.7 use explicit ''
+	warn "OutputPort not specified and ALSA_OUTPUT_PORTS not set\n";
+}
+MIDI::ALSA::client( "midiloop pid=$$", 1, 1, 1 );
+foreach my $cl_po (split /,/, $InputPort) {
+	if (! MIDI::ALSA::connectfrom( 0, $cl_po )) {
+		die "can't connect from ALSA client $cl_po\n";
+	}
+}
+if ($OutputPort ne '0') {   # 3.7
+	foreach my $cl_po (split /,/, $OutputPort) {  # 3.6
+		if (! MIDI::ALSA::connectto( 1, $cl_po )) {
+			die "can't connect to ALSA client $cl_po\n";
+		}
+	}
+}
+if (! MIDI::ALSA::start()) {
+	die "can't start the queue of the ALSA client\n";
+}
+
+if (!$ModeKeyString) {    # 2.3 set $ModeChangeKey and $ModeKeyString
+	my @connectedfrom = MIDI::ALSA::listconnectedfrom();
+	my $first_input_client = $connectedfrom[0][1];
+	my %clientnumber2clientname = MIDI::ALSA::listclients();
+	my $client_name = $clientnumber2clientname{$first_input_client};
+	if ($client_name =~ /49/) {
+		$ModeChangeKey = 84;
+		$ModeKeyString = 'c~';
+		%Pitch2Number = %Pitch2Number49;
+	} elsif ($client_name =~ /61/) {
+		$ModeChangeKey = 96;
+		$ModeKeyString = 'c~~';
+		%Pitch2Number = %Pitch2Number49;
+	} elsif ($client_name =~ /25/) {
+		$ModeChangeKey = 72;
+		$ModeKeyString = 'c';
+		%Pitch2Number = %Pitch2Number25;
+	} else {
+		$ModeChangeKey = 108;
+		$ModeKeyString = 'c~~~';
+		%Pitch2Number = %Pitch2Number88;
+	}
+}
+if ($MuscriptHeader) { generate_muscript_header($MuscriptFile); exit; }
+
+END {
+    foreach my $c (0..15) {  # all notes off
+        MIDI::ALSA::output(MIDI::ALSA::controllerevent($c,120,0));
+	}
+	clrtoeos();
+	print STDERR "\n";
+	Term::ReadKey::ReadMode(0);  
+	resume_screensaver();
+}
+$SIG{'INT'} = sub { exit; };  # so that END gets invoked after ctrl-C
+
+$SIG{'ALRM'} = sub {    # play one bar, and increment the BarCount
+	if (defined $NextLoopset) {  change_to_new_loopset(); }
+	if ($Paused) { return; }
+	$BarCount += 1;   # restarts from -1 when the Loopset changes
+	my ($queue_running,$now,$events) = MIDI::ALSA::status();
+	$StartOfBar = $now;
+	if (defined $RecordingChannel) {
+		my $modbarcount = mod_bar_count($RecordingChannel);
+		display_recording($modbarcount);
+		if ($WithMetronome) {
+			my $key = 33;  if ($modbarcount < 0.5) { $key = 34; }
+			MIDI::ALSA::output(MIDI::ALSA::noteevent(9,$key,70,$now,0.2));
+		}
+	} elsif ($RecordingFree) {  # 3.4
+		$RecordingFree = 0;   display_channels(); #  display_keystrokes();
+	}
+	my %is_unmuted = is_unmuted();
+	# also do_recording needs to know when the start of the bar was
+	foreach my $cha (keys %is_unmuted) {
+		my $i_bar = mod_bar_count($cha);
+		my $cha_ref = $L[$IL]{'Channels'}[$cha];
+		my $patch = $cha_ref->{'Patch'};
+		if ($Cha2Patch[$cha] != $patch) {
+			MIDI::ALSA::output(MIDI::ALSA::pgmchangeevent($cha, $patch));
+			$Cha2Patch[$cha] = $patch;
+		}
+		my @events = @{$cha_ref->{'LoopBars'}[$i_bar]};
+		foreach my $event_ref (@events) {
+			my @alsaevent = @{$event_ref};   # take a copy
+			$alsaevent[4] += $StartOfBar;
+			MIDI::ALSA::output(@alsaevent);
+			# debug("alsaevent=".Data::Dumper::Dumper(@alsaevent));
+		}
+	}
+	if ($L[$IL]{'BarLength'} < 0.2) { do_recording(); }  # 0.2 ?
+	Time::HiRes::ualarm(1000000*$L[$IL]{'BarLength'});   # Sec to uSec
+};
+
+display_paused();
+display_loopsets();
+display_mutings();
+display_channels();
+display_keystrokes();
+
+while (1) {   # alternate between play-mode and command-mode
+	$IsCmdMode = 0;   # play-mode
+	display_keystrokes();
+	while (1) {
+		my @alsaevent = MIDI::ALSA::input();
+		if (is_mode_change(@alsaevent)) { last; }
+		MIDI::ALSA::output(@alsaevent);   # straight-through real-time output
+		remember_patch_change(@alsaevent);
+
+	}
+	$IsCmdMode = 1;   # command-mode
+	display_keystrokes();
+	my $n = ask_n('do what', \@RelevantCmds);
+	if (defined $n) { handle_command($Num2Cmd[$n]); }  # ^C to quit :-)
+}
+exit 0;
+
+#------------------------ infrastructure ----------------------------
+
+sub which {
+	my $f;
+	my @PATH = split (":",$ENV{PATH});
+	foreach $d (@PATH) {$f="$d/$_[$[]";
+	return $f if -x $f; }
+}
+
+sub round { my $x = $_[$[];
+    if ($x > 0.0) { return int ($x + 0.5); }
+    if ($x < 0.0) { return int ($x - 0.5); }
+    return 0;
+}
+
+sub debug { open (T, '>>', '/tmp/debug'); print T $_[$[],"\n"; close T; }
+
+sub mtime { my $f = $_[$[];
+	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
+	  $blksize,$blocks) = stat "$MidiloopDir/$f";
+	return $mtime;
+}
+
+sub generate_muscript_header { my $file = $_[$[];
+	# should test   $ModeChangeKey
+	if ($ModeChangeKey == 84) { print <<'EOT';
+# This header for a 49-note keyboard was generated by  midiloop -m
+$CMD = alto 8 blank c~~
+$K0 = D_
+$K1 = E_
+$K2 = F_
+$K3 = G_
+$K4 = A_
+$K5 = B_
+$K6 = C
+$K7 = D
+$K8 = E
+$K9 = F
+$K10 = G
+$K11 = A
+$K12 = B
+$K13 = c
+$K14 = d
+$K15 = e
+EOT
+	} elsif ($ModeChangeKey == 72) { print <<'EOT';
+# This header for a 25-note keyboard was generated by  midiloop -m
+$CMD = alto 8 blank c~
+$K0 = C
+$K1 = D
+$K2 = E
+$K3 = F
+$K4 = G
+$K5 = A
+$K6 = B
+$K7 = c
+$K8 = d
+$K9 = e
+$K10 = f
+$K11 = g
+$K12 = a
+$K13 = b
+$K14 = K14 undefined on a 25-note keyboard
+$K15 = K15 undefined on a 25-note keyboard
+EOT
+	} else { print <<'EOT';
+# This header for an 88-note keyboard was generated by  midiloop -m
+$CMD = treble8va 8 blank c~~ treble
+$K0 = D
+$K1 = E
+$K2 = F
+$K3 = G
+$K4 = A
+$K5 = B
+$K6 = c
+$K7 = d
+$K8 = e
+$K9 = f
+$K10 = g
+$K11 = a
+$K12 = b
+$K13 = c~
+$K14 = d~
+$K15 = e~
+EOT
+}
+	# should test @Num2Cmd, and could also print comments with the Barlengths
+	print <<'EOT';
+$NO  = $K0
+$YES = $K1
+$PAUSE  = $K0
+$REC = $K3
+$NEWMUTES = $K6
+$NEWLOOPS = $K9
+$GOTOLOOPS = $K10
+$SAVE = $K11
+$QUIT = $K13
+EOT
+	if ($file and -f $file and open(F,'<',$file)) { print "\n",<F>; close F; }
+}
+
+sub is_mode_change {
+	if ( is_noteon(@_) and $_[$#_][1] == $ModeChangeKey ) {
+		$DefaultChannel = $_[$#_][0];
+		return 1;
+	}
+	return 0;
+}
+
+sub is_noteon { my @alsaevent = @_;
+	if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEON()
+	  and $alsaevent[$#alsaevent][2] > 0) { return 1; }
+	return 0;
+}
+
+sub is_noteoff { my @alsaevent = @_;
+	if (($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEOFF())
+	  or ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_NOTEON()
+	    and $alsaevent[$#alsaevent][2] == 0)) { return 1; }
+	return 0;
+}
+
+sub empty_loop_bars { my $nbars = $_[$[];
+	# 3.4
+	my @a = ();
+	foreach (1..$nbars) { push @a, []; }  # each bar is a ref to an empty list
+	return \@a;
+}
+
+sub display_paused {
+	if ($Paused) { puts_xy_clr(2,1,'Paused');
+	} else { puts_xy_clr(2,1,'Playing');
+	}
+	gotoxy(1,$CursorRow);
+}
+
+sub display_recording { my $mod_bar_num = $_[$[];
+	if (!  defined $RecordingChannel) {
+		my $s = "BUG: display_recording with RecordingChannel undefined";
+		debug($s); puts_xy_clr(1, $CursorRow+2, $s);
+		gotoxy(1,$CursorRow);
+		return;
+	}
+	# red bgd, white fgd
+	# BUG if the loop is 1 bar long, the user gets no clue except metronome
+	my $user_bar_num = $mod_bar_num + 1;
+	my $s = "   \e[41m\e[37m RECORDING  Channel $RecordingChannel ";
+	if (defined $mod_bar_num) { $s .= " Bar $user_bar_num "; }
+	$s .= "\e[39m\e[49m ";   # default fgd, default bgd
+	puts_xy_clr(1, $CursorRow, $s);  #BUG: the length is now wrong!
+}
+
+sub other_loopsets {  # scans the @L array
+	my @other_loopsets = ();
+	for my $i (0..$#L) { if ($i != $IL) { push @other_loopsets, $i; } }
+	# XXX surely NextLoopset might be already present in other_loopsets, no?
+	if ($NextLoopset) { push @other_loopsets, $NextLoopset; }  # 2.1
+	return @other_loopsets;
+}
+
+sub change_to_new_loopset {  # 2.1
+	if (not defined $NextLoopset) { return; }
+	$IL = $NextLoopset;
+	undef $NextLoopset;
+	if (! defined $L[$IL]{'BarLength'}) { ask_barlength(); }
+	my @mutings = @{ $L[$IL]{'Mutings'} };  # 3.3
+	if (@mutings) { $CurrentMuting=$#mutings; } else { $CurrentMuting=-1; }
+	$BarCount = -1;
+	$Message = "";
+	output_patch_changes(); display_paused(); display_loopsets();
+	display_mutings();   display_channels(); display_keystrokes();
+}
+
+sub output_patch_changes {
+	foreach my $cha (0..15) {
+		my $patch = $L[$IL]{'Channels'}[$cha]{'Patch'};
+		if (defined $patch) {
+			MIDI::ALSA::output(MIDI::ALSA::pgmchangeevent($cha,$patch));
+		}
+	}
+}
+
+sub nonexistent_loopsets {
+	return ((1+$#L) .. 15);
+}
+
+sub display_loopsets {
+	my @s = ();
+	if ($IL < 0) { push @s, "There are no Loopsets.";
+	} else {
+		push @s, "We are in Loopset $IL ";
+		my @other_loopsets = other_loopsets();
+		if (! @other_loopsets) {
+			push @s, " (there are no other Loopsets)";
+		}  elsif (1 == scalar @other_loopsets) {
+			push @s, " (we also have a Loopset $other_loopsets[$[])";
+		}  else {
+			push @s, " (we also have Loopsets ".join(',', @other_loopsets).")";
+		}
+	}
+	puts_xy_clr(2,2,join('',@s)); gotoxy(1,$CursorRow);
+}
+
+sub all_channels {
+	my @channels = ();
+	if ($IL >= 0) {
+		foreach my $i (0..15) {
+			if (defined $L[$IL]{'Channels'}[$i]{'LoopBars'}) {
+				push @channels, $i;
+			}
+		}
+	}
+	return @channels;
+}
+
+sub display_barlength {
+	my @s = ();
+	if ($IL < 0) { push @s, " No Barlength has been set";
+	} else {       push @s, " BarLength is $L[$IL]{'BarLength'} sec  ";
+	}
+	my @channels = all_channels();
+	if (! @channels) {
+		push @s, "  No Channels are set";
+	}  elsif (1 == scalar @channels) {
+		push @s, "  We have Channel ".$channels[$[];
+	} else {
+		push @s, "  We have Channels ".join(',', @channels);
+	}
+	puts_xy_clr(1, 3, join('',@s));
+}
+
+sub cha2mutingstr { my $cha = $_[$[];
+	my @str_a = ();
+	foreach my $cha (0..15) {
+		if (defined $L[$IL]{'Channels'}[$cha]{'Muted'}) {
+			if ($L[$IL]{'Channels'}[$cha]{'Muted'}) {
+				$L[$IL]{'Mutings'}[$CurrentMuting][$cha] = 1;
+			} else {
+				$L[$IL]{'Mutings'}[$CurrentMuting][$cha] = 0;
+				push @str_a, $cha;
+			}
+		}
+	}
+	return join(',', @str_a);
+}
+
+sub display_mutings {
+	my @s = ();
+	if ($IL < 0) { push @s, " No Mutings yet";
+	} else {
+		push @s, " Mutings :";
+		my $we_have_mutings = 0;
+		foreach my $im (0..15) {
+			if (not $L[$IL]{'Mutings'}[$im]) { next; }
+			my @s2 = ();
+			foreach my $cha (0..15) {
+				my $is_muted = $L[$IL]{'Mutings'}[$im][$cha];
+				if (defined $is_muted and $is_muted==0) { push @s2, "$cha"; }
+			}
+			if (@s2) {
+				push @s, "$im=".join(',',@s2);
+				$we_have_mutings = 1;
+			}
+		}
+		if (! $we_have_mutings) { push @s, " no mutings saved"; }
+	}
+	puts_xy_clr(1, 4, join(' ',@s));
+}
+
+sub display_channels {
+	display_barlength();
+	# " channel 0, patch 4 (Electric Piano), 2 bars, unmuted"
+	# " channel 1, patch 32 (Acoustic Bass), 1 bar, unmuted"
+	my $y = 5;
+	gotoxy(1,$y); clrtoeos();  # so must remember to call display_keystrokes!
+	my @channels = all_channels();
+	foreach my $cha (@channels) {
+		my $muted =   $L[$IL]{'Channels'}[$cha]{'Muted'};
+		my $patch =   $L[$IL]{'Channels'}[$cha]{'Patch'};
+		my @bars  = @{$L[$IL]{'Channels'}[$cha]{'LoopBars'}};
+		my $m = "unmuted"; if ($muted) { $m = "  muted"; }
+		my $nbars = scalar @bars;
+		my $s = "  channel $cha $m, $nbars bars,";
+		if ($cha == 9) {
+			puts_xy_clr(2,$y, "$s percussion");
+		} elsif (defined $patch) {
+			my $patch_s = $Num2patch{$patch};
+			puts_xy_clr(2,$y, "$s patch $patch = $patch_s");
+		} else { puts_xy_clr(2,$y, "$s patch not yet set");
+		}
+		$y = $y+1;
+	}
+	$CursorRow = $y+1;
+	gotoxy(1,$CursorRow);
+}
+
+sub display_keystrokes {
+	gotoxy(1,$CursorRow); clrtoeos();
+	if ($Message) { puts_clr(' '.$Message); } # bold?
+	my $y = $CursorRow + 2;
+	if ($RecordingFree) {
+		puts_xy_clr(2,$y,"free loop; play $ModeKeyString to stop recording");
+	} elsif ($RecordingChannel) {
+		puts_xy_clr(2,$y, "play treble $ModeKeyString to enter play-mode");
+	} elsif ($IsCmdMode) {
+		# BUT @other_loopsets has already been calculated by display_loopsets
+		# and @channels has already been calculated by display_channels ...
+		@RelevantCmds = relevant_cmds();  # set this here so others can use it
+		my @a = ();
+		foreach my $i (@RelevantCmds) { push @a, "$i=$Num2Cmd[$i]"; }
+		push @a, "$ModeKeyString to re-enter play-mode";
+		my @rows = ();  my $irow = $[;
+		foreach my $a_str (@a) {
+			if (! $rows[$irow]) {
+				$rows[$irow] = $a_str;
+			} elsif ((length($rows[$irow]) + length($a_str) + 4) < $COLS) {
+				$rows[$irow] = $rows[$irow].',  '.$a_str;
+			} else {
+				$irow += 1;
+				$rows[$irow] = $a_str;
+			}
+		}
+		foreach my $row (@rows) { puts_xy_clr(2,$y,$row);  $y += 1; }
+	} else {
+		puts_xy_clr(2,$y,"play treble $ModeKeyString to enter command-mode");
+	}
+	gotoxy(1,$CursorRow);
+}
+
+sub do_recording {
+	if (!defined $L[$IL]{'BarLength'} or $L[$IL]{'BarLength'} < 0.5) {
+		ask_barlength();  display_keystrokes();
+	}
+	gotoxy(1,$CursorRow);  clrtoeos();
+	# We take the channel from the previous c~~~
+	my $cha = $DefaultChannel;
+	if (! defined $cha) { display_keystrokes(); return; }
+	# 3.4 introduces 0 meaning free, press c~~~ to end loop
+	my $nbars=ask_n( "channel $cha loop should be how many bars long",[0..15]);
+	if (! defined $nbars) { display_keystrokes(); return; }
+	$L[$IL]{'Channels'}[$cha]{'Muted'} = 0;
+	$L[$IL]{'Channels'}[$cha]{'Patch'} = $Cha2Patch[$cha];
+	$L[$IL]{'Channels'}[$cha]{'LoopBars'} = empty_loop_bars($nbars);
+	display_channels();
+	$WithMetronome = confirm("with metronome");
+	$RecordingChannel = $cha;
+	if ($nbars == 0) { $RecordingFree = 1; }  # 3.4
+	if (! defined $RecordingChannel ) { die "RecordingChannel undefined\n"; }
+	$BarCount = -1;
+	if ($Paused) {
+		$Paused = 0; display_paused();
+		Time::HiRes::ualarm(1000);   # start the loop
+	}
+	display_keystrokes();
+	while (1) {
+		my @alsaevent = MIDI::ALSA::input();
+		if (is_mode_change(@alsaevent)) {
+			if ($RecordingFree) {   # 3.4
+				$#{$L[$IL]{'Channels'}[$cha]{'LoopBars'}} = $BarCount;
+			}
+			undef $RecordingChannel; last;   # XXX
+		}
+		MIDI::ALSA::output(@alsaevent);   # straight-through real-time output
+		remember_patch_change(@alsaevent);
+		my $cha = $alsaevent[7][0];
+		if ((! defined $cha) or ($cha != $RecordingChannel)) { next; }
+		my $i_bar = mod_bar_count($cha);
+		# OR: clear the bar if a note is being recorded into it this time round
+		$alsaevent[6] = [0,0];  # so that save-and-restore works reliably
+		$alsaevent[4] -= $StartOfBar;
+		push @{$L[$IL]{'Channels'}[$cha]{'LoopBars'}[$i_bar]}, \@alsaevent;
+
+	}
+	# reduce the NOTEON (6) and NOTEOFFs (7) to NOTEs (5)
+	my %pitch2noteon     = ();
+	my %pitch2noteonbar  = ();
+	my %pitch2noteoff    = ();
+	my %pitch2noteoffbar = ();
+	my %new_channel  = (
+		Muted => $L[$IL]{'Channels'}[$cha]{'Muted'},
+		Patch => $L[$IL]{'Channels'}[$cha]{'Patch'},
+		LoopBars => []
+	);
+	my $modbarcount = mod_bar_count($cha);  # race conditions here :-(
+	foreach my $ibar (0 .. ($#{$L[$IL]{'Channels'}[$cha]{'LoopBars'}})) {
+		push @{$new_channel{'LoopBars'}}, [];
+		my @bar_events = sort {$a->[4]<=>$b->[4]}
+		  @{$L[$IL]{'Channels'}[$cha]{'LoopBars'}[$ibar]};
+		foreach my $event_ref (@bar_events) {
+			if (is_noteon(@{$event_ref})) {
+				my $pitch = $event_ref->[7][1];
+				$pitch2noteon{$pitch} = $event_ref;
+				$pitch2noteonbar{$pitch} = $ibar;
+			} elsif (is_noteoff(@{$event_ref})) {
+				my $pitch = $event_ref->[7][1];
+				if ($pitch2noteon{$pitch}) {
+					$pitch2noteon{$pitch}[0]=MIDI::ALSA::SND_SEQ_EVENT_NOTE();
+					my $start  = $pitch2noteon{$pitch}[4];
+					my $finish = $event_ref->[4];
+					$pitch2noteon{$pitch}[7][4] = $finish - $start
+					  + $L[$IL]{'BarLength'}*($ibar-$pitch2noteonbar{$pitch});
+					push @{$new_channel{'LoopBars'}[$pitch2noteonbar{$pitch}]},
+					  $pitch2noteon{$pitch};
+					if ($modbarcount >= $pitch2noteonbar{$pitch}
+					  and $modbarcount < $ibar) {  # then output the noteoff
+						my $cha = $event_ref->[7][0];
+						my @off_event=MIDI::ALSA::noteoffevent($cha,$pitch,1,
+						 $StartOfBar + $event_ref->[4]
+						  + $L[$IL]{'BarLength'}*($ibar-$modbarcount)
+						);
+						MIDI::ALSA::output(@off_event);
+					}
+					delete $pitch2noteon{$pitch};
+					delete $pitch2noteonbar{$pitch};
+				} else {
+					$pitch2noteoff{$pitch}    = $event_ref;
+					$pitch2noteoffbar{$pitch} = $ibar;
+				}
+			} elsif ($event_ref->[0]==MIDI::ALSA::SND_SEQ_EVENT_PITCHBEND()
+			     or  $event_ref->[0]==MIDI::ALSA::SND_SEQ_EVENT_CONTROLLER()) {
+				push @{$new_channel{'LoopBars'}[$ibar]}, $event_ref;
+			}
+		}
+	}
+	# if there are noteoffs before their noteons (i.e. round the loop-end)
+	foreach my $pitch (keys %pitch2noteon) {
+		if ($pitch2noteoff{$pitch}) {
+			my $start  = $pitch2noteon{$pitch}[4];
+			my $finish = $pitch2noteoff{$pitch}[4];
+			$pitch2noteon{$pitch}[0] = MIDI::ALSA::SND_SEQ_EVENT_NOTE();
+			$pitch2noteon{$pitch}[7][4] = $finish-$start + $L[$IL]{'BarLength'}
+			 * ($pitch2noteoffbar{$pitch} + $nbars - $pitch2noteonbar{$pitch});
+			push @{$new_channel{'LoopBars'}[$pitch2noteonbar{$pitch}]},
+			  $pitch2noteon{$pitch};
+			if ($modbarcount >= $pitch2noteonbar{$pitch}
+			  or $modbarcount < $pitch2noteoffbar{$pitch}) {
+				my $cha = $pitch2noteon{$pitch}->[7][0];
+				my @off_event = MIDI::ALSA::noteoffevent( $cha,$pitch,1,
+				 $StartOfBar + $finish + $L[$IL]{'BarLength'}
+				  *($pitch2noteoffbar{$pitch}-$modbarcount) );
+				MIDI::ALSA::output(@off_event);
+			}
+		} else {  # we have a problem...
+			debug("noteon without noteoff in the loop; pitch=$pitch");
+		}
+	}
+	MIDI::ALSA::output(MIDI::ALSA::controllerevent($cha,123,0)); # 3.3 notesoff
+	$L[$IL]{'Channels'}[$cha] = \%new_channel;
+	$Message = "Recorded channel $cha";
+}
+
+sub mod_bar_count { my $cha = $_[$[];
+	my $nbars = scalar @{$L[$IL]{'Channels'}[$cha]{'LoopBars'}};
+	if (($RecordingFree or $nbars==0) and $cha==$RecordingChannel) {
+		return $BarCount;  # 3.4 free loop, will terminate on mode-change
+	}
+	return $BarCount % $nbars;
+}
+
+sub is_muted {
+	my %is_muted = ();  # the ALRM loop only needs to know the unmuted
+	if ($IL >= 0) {
+		foreach my $cha (0..15) {
+			my $cha_ref = $L[$IL]{'Channels'}[$cha];
+			if ($cha_ref and @{$cha_ref->{'LoopBars'}}) {
+				if ($cha_ref->{'Muted'}) { $is_muted{$cha}=1; }
+			}
+		}
+	}
+	return %is_muted;
+}
+sub is_unmuted {
+	my %is_unmuted = ();
+	if ($IL >= 0) {
+		foreach my $cha (0..15) {
+			my $cha_ref = $L[$IL]{'Channels'}[$cha];
+			if ($cha_ref and @{$cha_ref->{'LoopBars'}}) {
+				if (! $cha_ref->{'Muted'}) { $is_unmuted{$cha}=1; }
+			}
+		}
+	}
+	return %is_unmuted;
+}
+
+sub relevant_cmds {
+	my @relevant_cmds  = ();
+	my %is_muted       = is_muted();
+	my %is_unmuted     = is_unmuted();
+	my @other_loopsets = other_loopsets();
+	foreach my $i ($[ .. $#Num2Cmd) {
+		if ($Num2Cmd[$i] eq 'Pause' and defined $L[$IL]) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'Mute' and %is_unmuted) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'Unmute' and %is_muted) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'Record' and $IL>=0) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'EraseChannel' and all_channels()) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'SaveMuting' and $CurrentMuting<15
+		  and all_channels()) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'GotoMuting' and $CurrentMuting>=0
+			and @{$L[$IL]{'Mutings'}} > 0.5) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'EraseMuting'
+		  and $IL>=0 and @{$L[$IL]{'Mutings'}} ) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'NewLoopset' and (
+			$IL<0 or (@{$L[$IL]{'Channels'}} and 15 > @other_loopsets) )) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'GotoLoopset' and @other_loopsets) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'SaveLoopsets' and $IL>=0
+		  and (@{$L[$IL]{'Channels'}} or @other_loopsets)) {
+			push @relevant_cmds, $i;
+		} elsif ($Num2Cmd[$i] eq 'LoadLoopsets') {
+			my @rawdumps = dump_files_found();   # 2.8
+			if (@rawdumps) { push @relevant_cmds, $i; }
+		} elsif ($Num2Cmd[$i] eq 'Quit') {
+			push @relevant_cmds, $i;
+		}
+	}
+	return @relevant_cmds;
+}
+
+sub saved_loopsets {
+	return glob "$MidiloopDir/*.dump";
+}
+
+sub dump_syntax_is_safe { my ($file, @txt) = @_;
+	# check for safe syntax before executing....
+	my @bad_linenums = ();
+	if ($txt[0] ne "\@L = (\n") { push @bad_linenums, 1; }
+	foreach my $i (1 .. ($#txt-1)) {
+		$txt[$i] =~ s/\(secs\)/seconds/;
+		if ($txt[$i] =~ /[)(\$`@;]/) { push @bad_linenums, $i+1; }
+	}
+	if ($txt[$#txt] ne ");\n") { push @bad_linenums, $#txt+1; }
+	if (@bad_linenums == 1) {
+		my $s = $bad_linenums[0];
+		$Message = "the syntax of $file is unsafe on line $s";
+		return 0;
+	} elsif (@bad_linenums) {
+		my $s = join(',',@bad_linenums);
+		$Message = "the syntax of $file is unsafe on lines $s";
+	} else {
+		return 1;
+	}
+}
+
+sub load_loopset { my $file = $_[$[];   # opDir
+	if ($file =~ /^\w/) { $file = "$MidiloopDir/$file"; }
+	if ($file !~ /\.dump$/) { $file = "$file.dump"; }
+	$Message = "Loaded file $file";
+	if (! open(F, '<', $file)) { die "can't open $file: $!\n"; }
+	my @txt = <F>;
+	close F;
+	if (! dump_syntax_is_safe($file, @txt)) { return 0 ; }
+	eval join('', @txt);
+	if ($@) { die " can't eval $file:\n $@"; }
+	# force the MIDI::ALSA channel to conform to the array index
+	my $n_corrected = 0;
+	foreach my $loopset_ref (@L) {
+		# my $barlength = $loopset_ref->{'BarLength'};  3.5 unused ?!
+		my @loop_channels = @{$loopset_ref->{'Channels'}};
+		foreach my $cha (0 .. $#loop_channels) {
+			my @bars = @{$loop_channels[$cha]{'LoopBars'}};
+			foreach my $bar_ref (@bars) {
+				foreach my $event_ref (@{$bar_ref}) {
+					# if scoreevent, convert with scoreevent2alsa(scoreevent)
+					if ($event_ref->[0] =~ /^[a-z]+_?[a-z]+$/) {   # 3.5
+						my @alev = MIDI::ALSA::scoreevent2alsa(@{$event_ref});
+						$event_ref = \@alev;
+					}
+					if ($cha != $event_ref->[7][0]) {
+						$n_corrected += 1;
+						$event_ref->[7][0] = $cha;
+					}
+				}
+			}
+		}
+	}
+	if ($n_corrected) {
+		$Message = "had to correct the channel on $n_corrected notes\n";
+	}
+	if ($IL < 0 or $IL > $#{$L}) { $IL = 0; }
+	return 1;
+}
+
+sub dump_files_found {   # 2.8
+	if (! -d $MidiloopDir) {
+		$Message = "no such directory: $MidiloopDir\n"; return ();
+	}
+	if (! opendir(D, $MidiloopDir)) {
+		$Message = "can't open directory $MidiloopDir: $!\n"; return ();
+	}
+	my @rawdumps = grep {/.dump$/ && -f "$MidiloopDir/$_"} readdir(D);
+	closedir D;
+	return @rawdumps;
+}
+
+sub load_loopset_interactive {   # 2.7
+	# load a loopset in ~/midiloop/ or $MIDILOOP_DIR
+	# automatically assign it to the lowest free loopset-number
+	my @rawdumps = dump_files_found();   # 2.8
+	if (not @rawdumps) {
+		$Message = "no dump-files found in $MidiloopDir";  return;
+	}
+	my @dumps = sort { mtime($b)>mtime($a) } @rawdumps;
+	my $n_choices = 16 ; if ($ModeChangeKey == 72) { $n_choices = 10; }
+	splice @dumps, $n_choices;
+	my @a = ();
+	foreach my $i (0..$#dumps) {
+		my $s = $dumps[$i] ; $s =~ s/.dump$//;
+		# borrowed from relevant_cmds and invoke display_keystrokes
+		push @a, "$i=$s";
+	}
+	gotoxy(1,$CursorRow); clrtoeos();
+	my $y = $CursorRow+2;
+	my @rows = ();  my $irow = $[;
+	foreach my $a_str (@a) {
+		if (! $rows[$irow]) {
+			$rows[$irow] = $a_str;
+		} elsif ((length($rows[$irow]) + length($a_str) + 4) < $COLS) {
+			$rows[$irow] = $rows[$irow].',  '.$a_str;
+		} else {
+			$irow += 1;
+			$rows[$irow] = $a_str;
+		}
+	}
+	foreach my $row (@rows) { puts_xy_clr(2,$y,$row);  $y += 1; }
+	my $i = ask_n('load which file', [0..$#dumps]);
+	$Paused = 1;
+	load_loopset($dumps[$i]);
+	$NextLoopset = $IL;
+	change_to_new_loopset();
+}
+
+
+sub handle_command { my $cmd = $_[$[];
+	if ($Message eq $Message_2) { $Message = ''; }  # 3.1 message-ageing
+	$Message_2=$Message_1; $Message_1=$Message;
+	if ($cmd eq 'Pause') {
+		if ($Paused) {
+			$Paused = 0; display_paused(); display_keystrokes();
+			Time::HiRes::ualarm(1000);   # wait 1 mS, and restart the loop
+		} else {
+			$Paused = 1; display_paused(); display_keystrokes();
+		}
+	} elsif ($cmd eq 'Mute') {
+		my %is_unmuted = is_unmuted();
+		my @are_unmuted = sort {$a<=>$b} keys %is_unmuted;
+		my $cha = ask_n("mute which channel", \@are_unmuted);
+		if (! defined $cha) { display_keystrokes(); return; }
+		$L[$IL]{'Channels'}[$cha]{'Muted'} = 1;
+		if ($Message =~ /^reloaded/) { $Message=''; }
+		display_channels(); display_keystrokes();
+	} elsif ($cmd eq 'Unmute') {
+		my %is_muted = is_muted();
+		my @are_muted = sort {$a<=>$b} keys %is_muted;
+		my $cha = ask_n("unmute which channel", \@are_muted);
+		if (! defined $cha) { display_keystrokes(); return; }
+		$L[$IL]{'Channels'}[$cha]{'Muted'} = 0;
+		if ($Message =~ /^reloaded/) { $Message=''; }
+		display_channels(); display_keystrokes();
+	} elsif ($cmd eq 'Record') {
+		do_recording();
+		display_keystrokes();
+	} elsif ($cmd eq 'EraseChannel') {
+		# an EraseChannel which doesn't destroy channel,barlength etc
+		my @channels = all_channels();   # 2.2
+		my $cha;
+		if (1 == scalar @channels) { $cha = $channels[$[];
+		} else { $cha = ask_n('erase which channel', \@channels);
+		}
+		if (! defined $cha) { next; }
+		my $patch = $L[$IL]{'Channels'}[$cha]{'Patch'};
+		if(confirm(" OK to erase patch $patch on channel $cha")) {
+			$L[$IL]{'Channels'}[$cha] = undef;
+			if (1 == scalar @channels) { $Paused = 1; }
+			$Message = "Erased channel $cha";
+			display_paused(); display_loopsets();
+			display_channels(); display_keystrokes();
+		}
+	} elsif ($cmd eq 'SaveMuting') {
+		if ($CurrentMuting >= 15 ) { next ; }
+		$CurrentMuting += 1;
+		$L[$IL]{'Mutings'}[$CurrentMuting] = [];
+		my $s = cha2mutingstr($cha);
+		if ($s) {
+		 $Message = "Muting $CurrentMuting created with channels $s unmuted";
+		} else {
+		 $Message = "Muting $CurrentMuting created with no channels unmuted";
+		}
+		display_mutings(); display_keystrokes();
+	} elsif ($cmd eq 'GotoMuting') {
+		if ($CurrentMuting < 0) { next ; }   # shouldn't happen
+		my $max_muting = $#{$L[$IL]{'Mutings'}};
+		my $which_muting = 0;
+		if ($max_muting > 0) {
+			$which_muting = ask_n('go to which Muting', [0..$max_muting]);
+		}
+		$CurrentMuting = $which_muting;
+		$Message = "reloaded muting $which_muting";
+		my $muting_ref = $L[$IL]{'Mutings'}[$which_muting];
+		foreach my $cha (0..15) {   # redo each channel's muted/unmuted
+			if (! defined $muting_ref->[$cha]) { next; }
+			if ($muting_ref->[$cha]==0) {
+				if (defined $L[$IL]{'Channels'}[$cha]{'Muted'}) {
+					$L[$IL]{'Channels'}[$cha]{'Muted'} = 0;
+				}
+			} elsif ($muting_ref->[$cha] == 1) {
+				if (defined $L[$IL]{'Channels'}[$cha]{'Muted'}) {
+					$L[$IL]{'Channels'}[$cha]{'Muted'} = 1;
+				}
+			}
+		}
+		display_channels(); display_keystrokes();
+	} elsif ($cmd eq 'EraseMuting') {
+		if ($CurrentMuting < 0) { next ; }   # shouldn't happen
+		my $max_muting = $#{$L[$IL]{'Mutings'}};
+		my $which_muting = 0; 
+		if ($max_muting > 0) {
+			$which_muting = ask_n('erase which Muting', [0..$max_muting]);
+		}
+		foreach my $im ($which_muting+1 .. $max_muting) {
+			$L[$IL]{'Mutings'}[$im-1] = $L[$IL]{'Mutings'}[$im];
+		}
+		$L[$IL]{'Mutings'}[$max_muting] = undef;
+		if ($which_muting <= $CurrentMuting) { $CurrentMuting -= 1; }
+		display_mutings(); display_keystrokes();
+	} elsif ($cmd eq 'NewLoopset') {
+		if (16 <= @L) { next; }
+		$NextLoopset = $#L + 1;
+		$Paused = 1;
+		change_to_new_loopset();
+	} elsif ($cmd eq 'GotoLoopset') {
+		my @other_loopsets = other_loopsets();
+		if (! @other_loopsets) { next; }
+		my $next_loopset;
+		if (1 == scalar @other_loopsets) {
+			$next_loopset = $other_loopsets[$[];
+		} else { $next_loopset
+		  = ask_n('go to which Loopset', \@other_loopsets);
+		}
+		if (! defined $next_loopset) { next; }
+		$NextLoopset = $next_loopset;
+		$Message = "next barline we will change to loopset $NextLoopset";
+		display_loopsets(); display_paused(); display_mutings();
+		display_channels(); display_keystrokes();
+	} elsif ($cmd eq 'SaveLoopsets') { # use Dumper, not .mid, for load-speed
+		# save the loopset (into ~/midiloop/ or $MIDILOOP_DIR)
+		#   (automatically assigns it a date-based filename.dump)
+		if (! -d $MidiloopDir and ! mkdir $MidiloopDir) {
+			$Message = "can't mkdir $MidiloopDir: $!\n"; return;
+		}
+		# if (! -d "$MidiloopDir/src") { mkdir "$MidiloopDir/src"; }
+		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime;
+		my $filename = sprintf ("%4.4d%2.2d%2.2d_%2.2d%2.2d",
+		  $year+1900, $mon+1, $mday, $hour, $min);
+		if (! open(F, '>', "$MidiloopDir/$filename.dump")) {
+			$Message = "can't open file $MidiloopDir/$filename.dump: $!\n";
+			return;
+		}
+		# could put this code into sub dump_text ...
+		my $Lcopy = ();  # 3.5 take a copy, so as to save events as scoreevents
+		for my $il (0 .. $#L) {
+			$Lcopy[$il] = {
+				BarLength=>$L[$il]{'BarLength'},
+				Mutings=>$L[$il]{'Mutings'},
+				Channels=>[],
+			};
+			foreach $cha (0..15) { $Lcopy[$il]{'Channels'}[$cha] = {}; }
+			# copy Muted and Patch, and loop through LoopBars
+			my @loop_channels = @{$L[$il]{'Channels'}};
+			foreach my $cha (0 .. $#loop_channels) {
+				my @bars = @{$loop_channels[$cha]{'LoopBars'}};
+				if (@bars) {
+					$Lcopy[$il]{'Channels'}[$cha]{'Muted'}
+					  = $L[$il]{'Channels'}[$cha]{'Muted'};
+					$Lcopy[$il]{'Channels'}[$cha]{'Patch'}
+					  = $L[$il]{'Channels'}[$cha]{'Patch'};
+				}
+				foreach my $bar_num (0..$#bars) {
+					my $bar_ref = $bars[$bar_num];
+					$Lcopy[$il]{'Channels'}[$cha]{'LoopBars'}[$bar_num] = [];
+					foreach my $e_ref (@{$bar_ref}) {
+						# convert with alsa2scoreevent()
+						my @e=MIDI::ALSA::alsa2scoreevent(@{$e_ref});
+                       	push @{$Lcopy[$il]{'Channels'}[$cha]{'LoopBars'}[$bar_num]}, \@e;
+					}
+				}
+			}
+		}
+		print F dump_text(@Lcopy);
+		close F;
+		$Message = "saved to file $MidiloopDir/$filename.dump";
+	} elsif ($cmd eq 'LoadLoopsets') {
+		load_loopset_interactive();
+		display_loopsets(); display_barlength(); display_mutings();
+		display_channels(); display_keystrokes();
+	} elsif ($cmd eq 'Quit') {
+		if (confirm("OK to Quit")) { exit 0; }
+	}
+}
+
+sub dump_text { my @loopsets = @_;
+	my @lines = split /\n/, Data::Dumper::Dumper(\@loopsets);
+	$lines[0] = "\@L = (";
+	$lines[$#lines] = ");";
+	my $in__an_event = 0;
+	my $loopset_num = 0; 
+	my $channel_num = 0; 
+	my $line_in_cha = 0; 
+	foreach my $line (@lines) {
+		$line .= "\n";
+		$line =~ s/^        //;
+		$line =~ s/^              //;
+		$line =~ s/^              //;
+		# $line =~ s/(\d\d\d\d\d)\d+/$1/;   # 3.5 no longer necessary
+		if ($line eq       "            [\n") {
+			$in__an_event = 1;
+			$line = "            [";
+		} elsif ($line =~ /^            ],?\n/) {
+			$in__an_event = 0;
+			$line =~ s/^\s+//;
+		} elsif ($in__an_event) {
+			$line =~ s/^\s+//;
+			$line =~ s/\n$//;
+		} elsif ($line =~ /^  {/) {
+			$line =~ s/\n/  # Loopset $loopset_num\n/;
+			$loopset_num += 1;
+			$channel_num = 0;
+		} elsif ($line =~ /'BarLength'/) {
+			$line =~ s/\n/  # seconds\n/;
+		} elsif ($line =~ /^      {?},/) {
+			$channel_num += 1;
+			$line_in_cha = 0; 
+		} elsif ($line =~ /^      {/) {
+			if ($line_in_cha == 0) {
+				$line =~ s/\n/  # Channel $channel_num\n/;
+				$line_in_cha = 0; 
+			}
+			$line_in_cha += 1; 
+		}
+	}
+	return join('', @lines);
+}
+
+sub remember_patch_change { my @alsaevent = @_;
+	if ($alsaevent[0] == MIDI::ALSA::SND_SEQ_EVENT_PGMCHANGE()) {
+		my $cha = $alsaevent[7][0];  # should factor this out w record
+		$Cha2Patch[$cha] = $alsaevent[7][5];
+		if ($IL>=0 and %{$L[$IL]{'Channels'}[$cha]}) {
+			$L[$IL]{'Channels'}[$cha]{'Patch'} = $Cha2Patch[$cha];
+			display_channels(); display_keystrokes();
+		}
+	}
+}
+
+sub confirm {   # returns true or false
+	return ask_n("$_[$[] (0=No 1=Yes) ?", [0,1]);
+}
+
+sub ask_barlength {
+	my @s1 = ();  my @s2 = ();
+	foreach my $i (0..7) { push @s1, "$i=$Num2Barlength[$i]"; }
+	puts_xy_clr(2,$CursorRow+2, join('   ',@s1));
+	foreach my $i (8..15) { push @s2, "$i=$Num2Barlength[$i]"; }
+	puts_xy_clr(2,$CursorRow+3, join('   ',@s2));
+	my $n = ask_n("at what Barlength ?", [0..15]);
+	$L[$IL]{'BarLength'} = $Num2Barlength[$n];
+	gotoxy(1,$CursorRow); clrtoeol(); display_barlength();
+}
+
+
+sub ask_n {   my ($msg, $aref) = @_;  # returns a number 0..15
+	$row = $CursorRow;    # to place it within the UI
+	my @a = sort {$a<=>$b} @{$aref};   # allows only a subset of answers
+	my $a_str = join(',',@a);
+	if (! @a) { @a = (0..15); $a_str = '0..15';
+	} elsif (2 < @a and (1 + $a[$#a] - $a[$[]) == scalar @a) {
+		$a_str = "$a[$[]..$a[$#a]";
+	}
+	my %is_ok_num = map { $_, 1 } @a;
+	my $just_waiting_for_a_noteoff = 0;
+	my $number;
+	puts_xy_clr(1,$row, "  $_[$[] ($a_str) ? ");
+	while (1) {
+		my @alsaevent = MIDI::ALSA::input();
+		my $cha = $alsaevent[$#alsaevent][0];
+		if (is_noteon(@alsaevent)) {
+			my $pitch = $alsaevent[$#alsaevent][1];
+			if ($pitch == $ModeChangeKey) {
+				gotoxy(1,$row); clrtoeol(); return undef;
+			}
+			$number = $Pitch2Number{$pitch};
+			if ($is_ok_num{$number}) {
+				puts_clr("$number"); gotoxy(1,$row);
+				$just_waiting_for_a_noteoff = 1;
+			}
+		} elsif ($just_waiting_for_a_noteoff and is_noteoff(@alsaevent)) {
+			gotoxy(1,$row); clrtoeol(); return $number;
+		}
+		# we do something to throw away the corresponding note-off,
+		# otherwise it gets recorded in the loop
+	}
+}
+
+# ---------- vt100 stuff, evolved from Term::Clui via midiecho ----------
+
+# puts_xy does it all in one string thereby reducing race-conditions
+sub puts_xy { my ($newcol, $newrow, $raw_s, $extras) = @_;   # 3.2
+	my @s = ($raw_s, $extras);
+	$newcol = round($newcol); $newrow = round($newrow);
+	if ($newrow > $Irow)  { $Icol=1; } # \n affects Icol, so detect it now
+	# small newcols would be quicker with "\r" . ' 'x($newcol-1)
+	if ($newcol <= 1) { unshift @s, "\r" ; $Icol = 1;
+	} elsif ($newcol > $Icol) {
+		unshift @s, "\e[C"x($newcol-$Icol); $Icol = $newcol;
+	} elsif ($newcol < $Icol) {
+		unshift @s, "\e[D"x($Icol-$newcol); $Icol = $newcol;
+	}
+	if ($newrow > $Irow)      {
+		unshift @s, "\r"; # because of this we needed the $Icol=1
+		unshift @s, "\n"x($newrow-$Irow); $Irow = $newrow;
+	} elsif ($newrow < $Irow) {
+		unshift @s, "\e[A"x($Irow-$newrow); $Irow = $newrow;
+	}
+	$Irow += ($raw_s =~ tr/\n/\n/);
+	if ($raw_s =~ /\r\n?$/) { $Icol = 1;
+	} else { $Icol += length($raw_s);  # BUG w multiline strings: no prob here
+	}
+	print STDERR join q{}, @s;
+}
+sub puts_xy_clr { my ($x, $y, $s) = @_;
+	$s =~ s/\t/ /g;
+	puts_xy($x, $y, $s, "\e[K");
+}
+
+sub puts   { my $s = join q{}, @_;   # not used...
+	$Irow += ($s =~ tr/\n/\n/);
+	if ($s =~ /\r\n?$/) { $Icol = 1;
+	} else { $Icol += length($s);   # BUG, wrong on multiline strings!
+	}
+	print STDERR $s;
+}
+sub puts_clr {  my $s = $_[$[];   # assumes no newlines
+	$s =~ s/\s/ /g;
+	print STDERR "$s\e[K";
+	$Icol += length($s);
+}
+sub clrtoeol {
+	print STDERR "\e[K";
+}
+sub clrtoeos {
+	print STDERR "\e[J";
+}
+sub up	{
+	print STDERR "\e[A" x $_[$[]; $Irow -= $_[$[];
+}
+sub down  {
+	print STDERR "\n" x $_[$[]; $Irow += $_[$[];
+	$Icol=1;
+}
+sub right {
+	print STDERR "\e[C" x $_[$[]; $Icol += $_[$[];
+}
+sub left  {
+	print STDERR "\e[D" x $_[$[]; $Icol -= $_[$[];
+}
+sub gotoxy { my $newcol = shift; my $newrow = shift;
+	$newcol = round($newcol); $newrow = round($newrow);
+	if ($newrow > $Irow)      { down($newrow-$Irow);   # down can affect Icol
+	} elsif ($newrow < $Irow) { up($Irow-$newrow);
+	}
+	if ($newcol <= 1) { print STDERR "\r" ; $Icol = 1;
+	} elsif ($newcol > $Icol) { right($newcol-$Icol);
+	} elsif ($newcol < $Icol) { left($Icol-$newcol);
+	}
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+midiloop - Makes multiple sets of multi-channel MIDI loops
+
+=head1 SYNOPSIS
+
+ midiloop -i ProKeys -o MySynth  # use my 88-note keyboard,
+ # on which 0..15 are mapped to notes treble D to e~ (midi 62 to 88)
+
+ midiloop -i Keystation -k 49   # to use a 49-note keyboard, or
+ midiloop -i Keystation -k 61   # to use a 61-note keyboard,
+ # on which 0..15 are mapped to notes bass D to e~ (midi 38 to 64)
+
+ midiloop -i Keystation -k 25   # use my 25-note keyboard,
+ # on which 0..13 are mapped to notes bass c to treble B (midi 48 to 59)
+
+ # Saved loopsets are expressed in Perl, the notes in MIDI::ALSA format
+ midiloop -i Pro -l 201302_1452  # loads a previously saved loopset
+ cd ~/midiloop ; ls -l           # inspect the saved loopsets
+ perldoc MIDI::ALSA     # for the event format see the "input" function
+ vi ~/midiloop/201302_1452.dump  # edit a loopset file (in Perl)
+
+ # compose your loopsets in muscript:
+ vi ~/mus/my_loop       # it's a muscript file
+ midiloop -m ~/mus/my_loop | muscript -midi | aplaymidi -p midiloop -
+
+ midiloop -v            # prints the version
+ perldoc midiloop       # read the manual :-)
+
+=head1 DESCRIPTION
+
+I<midiloop> creates an ALSA-MIDI client, and records and replays sets of loops.
+There can be up to sixteen Loopsets.
+Each loopset can have up to sixteen midi-channels,
+each of which can be muted or unmuted.
+
+Once I<midiloop> is launched,
+all the user-interface is driven by the keys of the midi-keyboard
+(not the computer-keyboard).
+This leads to fast operation in a performance situation.
+The user-interface depends on the computer-screen being
+visible by the performer, because it tells you what the current status is
+and what your options are.
+
+The top note of the keyboard switches you into and out of command-mode.
+All other data is entered using the numbers 0..15,
+which are mapped onto some of the white notes (see USER INTERFACE).
+
+This also allows a whole set-up, with several loops and many channels,
+to be performed by notes in a standard midi-file (see the B<-m> option).
+
+Each loopset has a basic barlength in seconds,
+but each channel within that loopset can loop at an integer multiple (1..15)
+of that basic barlength.
+For example, the drums could loop at 1.8 seconds,
+but the bass could play a 3.6-second riff,
+and the organ could play a 7.2-second sequence.
+
+All changes in what's being played
+(I<Play/Pause, Mute, Unmute, GotoMuting, GotoLoopset)>
+take place not immediately but at the next barline.
+This means a I<midiloop> performance never loses the beat.
+
+=head1 USER INTERFACE
+
+The user-interface is built for speed during performance.
+Your data-input-device is the white keys on your midi-keyboard;
+I<midiloop>'s output-device is the computer-screen.
+
+The top note on your (88-, 61-, 49- or 25-note) midi-keyboard
+toggles you into B<Command-mode>.
+I<midiloop> will respond immediately, telling you what the valid choices are,
+each choice having a number between 0 and 15.
+
+The only other keys involved express those numbers 0 to 15.
+The mapping is the same as is used to express channel-numbers
+by (at least) I<M-Audio Keystation> and I<ProKeys> keyboards.
+(You may want to number those keys with little white-paper sticky labels.)
+
+On an 88-note keyboard, 0..15 are B<treble D to e~> (midi 62 to 88)
+
+On an 61-note or 49-note keyboard, 0..15 are B<bass D to e~> (midi 38 to 64).
+(The 61-note keyboard is assumed to have three treble octaves
+and two bass octaves, so that middle-C lies left-of-center.)
+
+If you have to use a 25-note keyboard, the numbers 0..13
+are mapped to white notes B<bass c to treble B> (midi 48 to 59);
+that's all you need to enter the commands,
+but it restricts you to 0..13 in channels, loopsets and mutings.
+
+Whenever you are asked for a number,
+I<midiloop> displays a list of the available responses.
+Numbers not in this list will be ignored by I<midiloop>.
+Whenever you are asked for confirmation, the numbers are (0,1),
+with B<0> meaning B<No> and B<1> meaning B<Yes> (as in I<C> and I<Perl>).
+
+A couple of screenshots of I<midiloop>'s side of the dialogue:
+
+ box8:tmp> midiloop -i Pro -o Rol -l hambone
+ Paused
+ We are in Loopset 0  (we also have a Loopset 1)
+ BarLength is 3.04 sec    We have Channels 0,1,2,3,9
+ Mutings :  no mutings
+
+   channel 0,   muted, 1 bars, patch 27 = Electric Guitar(clean)
+   channel 1,   muted, 1 bars, patch 26 = Electric Guitar(jazz)
+   channel 2, unmuted, 3 bars, patch 32 = Acoustic Bass
+   channel 3,   muted, 2 bars, patch 18 = Rock Organ
+   channel 9, unmuted, 5 bars, percussion
+
+ Loaded file /home/pjb/midiloop/hambone.dump
+
+ play treble c~~~ to enter command-mode
+
+So then if we press c~~~ and enter command-mode, we get:
+
+ Paused
+ We are in Loopset 0  (we also have a Loopset 1)
+ BarLength is 3.04 sec    We have Channels 0,1,2,3,9
+ Mutings :  no mutings
+
+   channel 0,   muted, 1 bars, patch 27 = Electric Guitar(clean)
+   channel 1,   muted, 1 bars, patch 26 = Electric Guitar(jazz)
+   channel 2, unmuted, 3 bars, patch 32 = Acoustic Bass
+   channel 3,   muted, 2 bars, patch 18 = Rock Organ
+   channel 9, unmuted, 5 bars, percussion
+
+  do what (0,1,2,3,5,6,9,10,11,12,13) ? 
+
+ 0=Pause,  1=Mute,  2=Unmute,  3=Record,  5=EraseChannel,  6=SaveMuting
+ 9=NewLoopset,  10=GotoLoopset,  11=SaveLoopsets,  12=LoadLoopsets,  13=Quit
+ c~~~ to re-enter play-mode
+
+
+=head1 OPTIONS
+
+=over 3
+
+=item B<-d ~/otherstuff/wierdgrooves/>
+
+Over-ride the default I<~/midiloop/> B<D>irectory
+(and also the environment variable I<$MIDILOOP_DIR>, if that's set).
+
+=item B<-i Keyst:1>
+
+Connect the B<I>nput from ALSA-MIDI client I<Keyst:1>
+
+=item B<-k 49>
+
+Tells I<midiloop> which size B<K>eyboard you'll be using.
+The available values are 88, 61, 49 and 25.
+This affects the I<ModeChangeKey>, which is the top note on the keyboard,
+and the keys entering the numbers 0 to 15,
+which on an 88-note keyboard are the white notes treble D to e~,
+and on an 49-note keyboard are two octaves lower, bass D to e~.
+These conventions are modelled on the Channel-entry keys used by M-Audio
+(counting channels 0..15 of course :-).
+
+If no B<-k> option is specified but a B<-i> option has been provided,
+then I<midiloop> checks if the number "49" occurs in its input-client name
+(eg: I<Keystation 49e>),
+and if so sets up for a 49-note keyboard.
+Otherwise, the default is 88.
+
+=item B<-l 20130214_1425>
+
+B<L>oads the previously saved Loopset I<20130214_1425.dump>,
+probably from the user's I<~/midiloop/> directory,
+though this can be over-ridden with the environment variable I<$MIDILOOP_DIR>
+or with the B<-d> option.
+
+The Loopsets are saved in Perl I<Data::Dumper> format,
+but with helpful added comments to tell you which Loopset, Channel and Bar
+you're in. The file can be edited with some care and a text-editor.
+As from version 3.5, the events are I<MIDI::Event> events
+with times in milliseconds,
+as documented in I<perldoc MIDI::Event> in the section on I<EVENTS>.
+(previously they were saved as I<MIDI::ALSA> events, as documented in
+I<perldoc MIDI::ALSA> in the section on the function I<input()>)
+
+=item B<-m muscriptfile.txt>
+
+This option does not start a I<midiloop>.
+This option generates some header lines in B<M>uscript format,
+prepended to I<muscriptfile.txt>
+to allow it to be played into a running I<midiloop>.
+If the filename is not present, just the header lines are output.
+See the USING MUSCRIPT section.
+
+=item B<-o Syn>
+
+Connect the B<O>utput to ALSA-MIDI client I<Syn>.
+The special value I<-o 0> tells midiloop not to connect to any other client.
+If the I<-o> option is not specified,
+the default is the environment variable I<$ALSA_OUTPUT_PORTS>
+
+=item B<-v>
+
+Print the B<V>ersion
+
+=back
+
+=head1 COMMANDS
+
+=over 3
+
+=item B<Pause>
+
+Invoked by the note (eg: D) corresponding to 0,
+this toggles between Pause-mode (which pauses all the channels)
+and Play-mode.
+
+=item B<Mute>
+
+Invoked by the note (eg: E) corresponding to 1,
+this allows you to Mute any of the (currently unmuted) channels.
+
+=item B<Unmute>
+
+Invoked by the note (eg: F) corresponding to 2,
+this allows you to Unmute any of the (currently muted) channels.
+
+=item B<Record>
+
+Invoked by the note (eg: G) corresponding to 3, this allows you to
+Record a loop on the channel your MIDI-keyboard is currently set to.
+If that channel already exists, your new recording will overdub onto it;
+if that channel does not yet exist, the channel will be created.
+
+If the current LoopSet still has no channels,
+you will be asked to choose a Barlength (in seconds).
+All channels in the LoopSet share this same Barlength.
+The choices are:
+0=1.00, 1=1.04, 2=1.08, 3=1.12, 4=1.16, 5=1.20, 6=1.26, 7=1.32,
+8=1.38, 9=1.44, 10=1.52, 11=1.60, 12=1.68, 13=1.76, 14=1.84, 15=1.92 seconds.
+If you need a 2-second bar, you use two 1-second bars, and so on.
+(If you need finer graduations, you have to I<SaveLoopsets>
+ into a  I<dump> file, and edit it by hand.)
+
+In any case, you will then be asked to choose
+how many bars this channel's loop will last.
+(All channels in a LoopSet share a common BarLength,
+but their loops can last for different numbers of bars.)
+The choice B<0> means a Free loop; the recording will terminate at the next
+barline after you press the ModeChangeKey.
+
+You will be asked whether you want a Metronome.
+If it's a currently-empty LoopSet, you'll probably want to choose 1=Yes;
+but if there are already some recorded channels, you may want to choose 0=No.
+The Metronome is a guide only; it is not recorded.
+
+Later, when you Mute or UnMute, or change LoopSets,
+the change will occur not instantly, but at the next barline.
+The Metronome will help you to lay down a loop which has its end-of-loop
+in a musically sensible place.
+
+=item B<EraseChannel>
+
+Invoked by the note (eg: A) corresponding to 4,
+this allows you to Erase any of the channels in the current LoopSet.
+Do this if, for example, you're not happy with what you just recorded.
+B<If> there is more than one channel, you will be asked which channel.
+You will then be asked for confirmation.
+
+
+=item B<SaveMuting>
+
+Invoked by the note (eg: c) corresponding to 6,
+this creates a new MuteSet,
+and saves in it the current Muted/Unmuted state of all the channels.
+Each LoopSet can have up to 16 MuteSets (0..15).
+
+=item B<GotoMuting>
+
+Invoked by the note (eg: d) corresponding to 7,
+this allows you to invoke any of your MuteSets.
+The change takes place at the next Barline.
+B<If> there is more than one other Muting, you will be asked which Muting.
+
+=item B<EraseMuting>
+
+Invoked by the note (eg: e) corresponding to 8,
+this allows you to Erase any of the MuteSets (in in the current LoopSet).
+B<If> there is more than one Muting, you will be asked which Muting.
+
+=item B<NewLoopset>
+
+Invoked by the note (eg: f) corresponding to 9,
+this creates a new, empty, LoopSet, then goes to it and enters I<Pause> mode.
+
+=item B<GotoLoopset>
+
+Invoked by the note (eg: g) corresponding to 10,
+this allows you to switch to any one of your LoopSets.
+B<If> there is more than one other Loopset, you will be asked which Loopset.
+
+I<GotoLoopset> allows you change (at the next Barline) from
+one section of the piece (eg: the verse) to another (eg: the middle-8),
+
+=item B<SaveLoopsets>
+
+Invoked by the note (eg: a) corresponding to 11,
+this allows you to save all the LoopSets to a I<.dump> file in
+I<~/midiloop/>
+
+These files are in I<perl>, and can be edited with your favourite
+text-editor and checked with I<perl -c>
+
+As from version 3.5, the data is in I<MIDI::Event> format
+with times in milliseconds:
+see I<perldoc MIDI::Event> in the section on I<EVENTS>.
+(previously they were in I<MIDI::ALSA> format: see I<perldoc MIDI::ALSA>)
+
+=item B<LoadLoopsets>
+
+Invoked by the note (eg: b) corresponding to 12,
+this gives you a choice of the most recent I<.dump> files in
+I<~/midiloop/>
+
+One I<.dump> file can contain multiple LoopSets,
+each containing multiple Channels.
+
+=item B<Quit>
+
+Invoked by the note (eg: c~) corresponding to 13,
+this allows you to Quit from I<midiloop>
+You will be asked for confirmation with 1=Yes or 0=No.
+
+=back
+
+=head1 USING MUSCRIPT
+
+=over 3
+
+Because the user-interface of I<midiloop> uses the midi-keyboard,
+it can also be controlled by computer-generated midi files.
+This allows loops to be composed using eg: I<muscript>.
+The B<-m> option makes this easier.
+
+I<midiloop -m -k 88> or I<midiloop -m -k 49>
+output a set of variable-definitions for use as a header within
+I<muscript> files,
+see
+http://www.pjb.com.au/muscript/variables.html
+
+If a filename is given after the I<-m> then its contents are output
+after the header.
+Eg:
+
+ midiloop -m /tmp/myloop | muscript -midi | aplaymidi -p midiloop -
+
+C<$CMD> is the ModeChangeKey, which toggles in and out of Command-Mode
+
+Within Command-Mode, the main commands are: C<$PAUSE> C<$REC>
+C<$NEWMUTES> C<$NEWLOOPS> C<$GOTOLOOPS> C<$SAVE> and C<$QUIT>
+
+The numbers 0..15 are: C<$K0> C<$K1> C<$K2> C<$K3> C<$K4> C<$K5> C<$K6>
+C<$K7> C<$K8> C<$K9> C<$K10> C<$K11> C<$K12> C<$K13> C<$K14> and C<$K15>
+
+The binary keys are: C<$YES> and C<$NO>
+
+See
+http://www.pjb.com.au/midi/free/loop_1
+and
+http://www.pjb.com.au/midi/free/rubycon_1_390s
+for examples of such a file.
+The author tends to keep these files in
+I<~/midiloop/src/>
+
+Remember the commands C<$CMD> and C<$PAUSE> are toggles.
+Unlike a real human, I<muscript> can't see what the screen is saying,
+so when working in I<muscript> don't lose track of which mode it's in !
+Also other commands have a dialogue which changes with circumstances;
+for example C<$GOTOLOOPS> will not ask "I<Go to which Loopset>"
+if there's only one other Loopset.
+
+Remember also that only one channel can be Recorded at one time,
+so I<muscript> resources such as C<cha1+2> will not work as intended.
+
+To diagnose such problems it helps to play your file at much-reduced speed
+so you have time to follow the dialogue, and see at what point it goes wrong.
+
+=back
+
+=head1 DOWNLOAD
+
+I<midiloop> is available at
+ http://www.pjb.com.au/midi/midiloop.html
+
+It uses the I<MIDI::ALSA> module which is available at
+ http://search.cpan.org/perldoc?MIDI::ALSA
+
+I<muscript> is available at
+ http://www.pjb.com.au/muscript/muscript
+
+=head1 CHANGES
+
+ 20150825 3.7 -o 0 option is respected as documented
+ 20150711 3.6 check for safe dumpfile syntax before executing
+ 20150707 3.5 Loopsets stored in scoreevent form, but loaded in either
+ 20150706 3.4 Recording with nbars = 0 means free-loop, terminates on CmdKey
+ 20150626 3.3 notes-off when exiting from Record; Muteset renamed Muting
+ 20150624 3.2 much finer choice of Barlengths
+ 20150623 3.1 Message disappears after 3 displays; various bugfixes
+ 20150622 3.0 SaveMuteset, GotoMuteset and EraseMuteset working
+ 20150621 2.9 61-key kbds as 49; 25-key ask_n uses white-notes 48 to 71
+ 20150618 2.8 LoadLoopsets only offered if dumpfiles exist
+ 20150618 2.7 LoadLoopsets command works
+ 20150617 2.6 introduced '-m filename'
+ 20150615 2.5 starts with no loopsets, needing a NewLoopset command
+ 20150614 2.4 many bugs fixed around NewLoopset and GotoLoopset
+ 20150608 2.3 autodetects detects 49-note keyboards
+ 20150605 2.2 handles -k 49; NOTEON vol=0 means OFF; EraseChannel; bugfixes
+ 20150604 2.1 Pedal no longer enters Command-mode; Erase Loopset bug fixed;
+	NextLoopset entered immediately if Paused; screensaver disabled
+ 20130224 2.0 shorter varnames; @LoopChannels convenience-var eliminated
+ 20130223 1.9 each LoopChannel is a hashref
+ 20130222 1.8 each Loopset is a hashref
+ 20130221 1.7 LoadLoopsets corrects the channel if necessary
+ 20130209 1.6 Loopsets stored in NOTE-form; SaveLoopset much improved
+ 20130207 1.5 SaveLoopset works
+ 20130103 1.4 starting the change to Loopsets, BarLengths, NumBars
+ 20121024 1.3 overdubbing, muting, replacing any channel
+ 20120929 1.2 convert NOTEONs unterminated in the loop to NOTEs
+ 20120922 1.1 seems to respond correctly to the Pedal :-)
+ 20120909 1.0 forked from an old fade-based midiecho-like version
+
+=head1 AUTHOR
+
+Peter J Billam, http://www.pjb.com.au/comp/contact.html
+
+=head1 SEE ALSO
+
+ http://www.pjb.com.au/
+ http://www.pjb.com.au/midi/
+ http://www.pjb.com.au/midi/midiloop.html
+ http://search.cpan.org/perldoc?MIDI::ALSA
+ http://www.pjb.com.au/comp/lua/midialsa.html#input
+ http://www.pjb.com.au/muscript/index.html
+ http://www.pjb.com.au/muscript/variables.html
+
+=cut
+
+=head1 TO DO
+
+Midiloop with rabbit and mt2, as well as just cycle.
+
+Midiloop with a "this is the ending" Loopset, which doesn't loop
+
+A Loopset might also display comments,
+even if they have to be set by C<vi ~/midiloop/whatever.dump>
+

@@ -1,0 +1,418 @@
+#!/usr/bin/env lua
+---------------------------------------------------------------------
+--     This Lua5 script is Copyright (c) 2019, Peter J Billam      --
+--                       www.pjb.com.au                            --
+--  This script is free software; you can redistribute it and/or   --
+--         modify it under the same terms as Lua5 itself.          --
+---------------------------------------------------------------------
+local Version = '1.4  for Lua5'
+local VersionDate  = '28apr2019'
+local Synopsis = [[
+audio2midi [options] in.wav [out.mid]
+perldoc audio2midi
+]]
+
+local function round(x)
+	if not x then return nil end
+	return math.floor(x+0.5)
+end
+local function printf (...) print(string.format(...)) end
+function warn(...)
+    local a = {}
+    for k,v in pairs{...} do table.insert(a, tostring(v)) end
+    io.stderr:write(table.concat(a),'\n') ; io.stderr:flush()
+end
+local function die(...) warn(...);  os.exit(1) end
+
+Patch     = 0
+AudioFile = nil
+MidiFile  = nil
+p_min     = 28
+p_max     = 84
+Shortest  = 90
+Quietest  = 30
+local iarg=1; while arg[iarg] ~= nil do
+	if not string.find(arg[iarg], '^-[a-z]') then break end
+	local first_letter = string.sub(arg[iarg],2,2)
+	if first_letter == 'v' then
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate)
+		os.exit(0)
+	elseif first_letter == 'l' then
+		iarg = iarg + 1
+		p_min = tonumber(arg[iarg])
+	elseif first_letter == 'h' then
+		iarg = iarg + 1
+		p_max = tonumber(arg[iarg])
+	elseif first_letter == 'p' then
+		iarg = iarg + 1
+		Patch = tonumber(arg[iarg])
+	elseif first_letter == 'q' then
+		iarg = iarg + 1
+		Quietest = tonumber(arg[iarg])
+	elseif first_letter == 's' then
+		iarg = iarg + 1
+		Shortest = tonumber(arg[iarg])
+	else
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate.."\n\n"..Synopsis)
+		os.exit(0)
+	end
+	iarg = iarg+1
+end
+if arg[iarg] and string.find(arg[iarg], '.wav$') or
+  string.find(arg[iarg], '.flac$') or string.find(arg[iarg], '.mp3$') or
+  string.find(arg[iarg], '.ogg$') or string.find(arg[iarg], '.aiff$') then
+	AudioFile = arg[iarg]
+	iarg = iarg + 1
+end
+if arg[iarg] and string.find(arg[iarg], '.midi?$') then
+	MidiFile = arg[iarg]
+	iarg = iarg + 1
+end
+if not AudioFile then die('usage: audio2midi in.wav')
+end
+
+local MIDI = require 'MIDI'
+--ProFi = require 'ProFi'
+--ProFi:start()
+
+------------------------- audio stuff ----------------------
+
+SampleRate = 25000
+st          = 2.0 ^ (1/12)   -- semitone
+n_cycles    = 25   -- number of sin or cos cycles in each samples-table ( Q !)
+-- adjust so the quarter-tone is just under half-amplitude
+
+freqs       = {}
+freqs[69]   = 440.0
+for p = 68,p_min,-1 do freqs[p] = freqs[p+1] / st end
+for p = 70,p_max    do freqs[p] = freqs[p-1] * st end
+
+samples     = {}  -- samples per cycle, for each pitch
+i_sample    = 0   -- time (in samples) since the start of the audio
+for p = p_min,p_max do samples[p] = round(n_cycles*SampleRate/freqs[p]) end
+sin_tabs    = {}  -- table (by pitch) of arrays
+cos_tabs    = {}  -- table (by pitch) of arrays
+i_p         = {}  -- rotating indexes into the sin_tabs and cos_tabs
+norml       = {}  -- initial sample-add normalisation factor
+decay       = {}  -- exponential fade-out factor
+sin_window  = {}
+cos_window  = {}
+amplitude   = {} -- table of numbers (mono)
+on_notes    = {} -- pitches currently sounding, array of {t_start,amplitude}
+switch_on   = {} -- pitches that have just switched on
+switch_off  = {} -- pitches that have just switched off
+
+-- dummy functions that will be redefined below
+function note_on  (p, ms, amp) end
+function note_off (p, ms, amp) end
+
+local function ms()
+	return round(i_sample * 1000/SampleRate)
+end
+
+for p = p_min,p_max do  -- p means pitch ( p=60 means middle-C )
+	sin_tabs[p]   = {}
+	cos_tabs[p]   = {}
+	decay[p]      = 2.718281828459 ^ (-0.6 / samples[p])
+	norml[p]      = 1 - decay[p]
+	sin_window[p] = 0.0
+	cos_window[p] = 0.0
+	amplitude[p]  = 0.0
+	local sin   = math.sin
+	local cos   = math.cos
+	local twopi = 2.0 * math.pi
+	for i = 1,samples[p] do
+		sin_tabs[p][i] = sin(i*n_cycles*twopi/samples[p])
+		cos_tabs[p][i] = cos(i*n_cycles*twopi/samples[p])
+		i_p[p] = 1  -- for each sample, will   i_p =  (i_p+1) % samples[p]
+	end
+end
+
+local function sounding()
+	local amplitudes = {}
+	local scaled = {}
+	local are_sounding = {}
+	for p = p_min,p_max do -- fill out the table of amplitudes
+		amplitudes[p] = math.sqrt(sin_window[p]^2 + cos_window[p]^2)
+	end
+	for p = p_min,p_max do -- find the scaled amplitudes
+		local biggest_all = 0.05
+		local biggest_low = 0.05
+		for i =  p_min,p_max do
+			if amplitudes[i]>biggest_all then biggest_all = amplitudes[i] end
+		end
+		for i =  p_min, p do
+			if amplitudes[i]>biggest_low then biggest_low=amplitudes[i] end
+		end
+		scaled[p] = amplitudes[p] / math.sqrt(biggest_low*biggest_all)
+		--scaled[p] = amplitudes[p] / biggest_low
+	end
+	-- p_min and p_max sounding ?
+	if amplitudes[p_min] > 0.05 and amplitudes[p_min+1] < 0.03 then
+		are_sounding[p_min] = amplitudes[p_min]
+	else
+		are_sounding[p_min] = nil
+	end
+	if amplitudes[p_max] > 0.05 and amplitudes[p_max-1] < 0.03 then
+		are_sounding[p_max] = amplitudes[p_max]
+	else
+		are_sounding[p_max] = nil
+	end
+	-- the intermediate p's sounding ?
+	for p = p_min+1, p_max-1 do
+		if scaled[p] > 0.20 or -- there could be three neighbouring notes
+		  (amplitudes[p] > 0.1 and
+		  (scaled[p] > 0.8*scaled[p-1] or scaled[p] > 0.8*scaled[p+1])) then
+			are_sounding[p] = amplitudes[p]
+		else
+			are_sounding[p] = nil
+		end
+	end
+	for p = p_min, p_max do -- update list of on_notes
+		if are_sounding[p] then
+			if on_notes[p] then
+				if amplitudes[p] > on_notes[p][2] then  -- amp_max
+					on_notes[p][2] = amplitudes[p]
+				end
+			else
+				note_on (p, ms(), amplitudes[p])
+				on_notes[p] = {ms(), amplitudes[p]}
+			end
+		else  -- p is not sounding:
+			if on_notes[p] then
+				note_off (p, ms(), on_notes[p][2])
+				on_notes[p] = nil
+			end
+		end
+	end
+	return are_sounding
+end
+
+function update_windows(signal)
+	signal = 2.0 * signal
+	for p = p_min,p_max do
+		sin_window[p]
+		  = decay[p]*sin_window[p] + signal*sin_tabs[p][i_p[p]]*norml[p]
+		cos_window[p]
+		  = decay[p]*cos_window[p] + signal*cos_tabs[p][i_p[p]]*norml[p]
+		i_p[p] = i_p[p] % samples[p] + 1
+	end
+	if i_sample%250 == 0 then -- primitive once-per-mS performance kludge
+		sounding()
+	end
+	i_sample = i_sample + 1
+end
+
+function get_amplitude (p)
+	return math.sqrt(sin_window[p]^2 + cos_window[p]^2)
+end
+
+local function amp2midivol (amp)
+	-- perhaps we should not round here, because of the normalisation ?
+	return round(127 * amp)
+end
+
+------------------------- midi stuff ----------------------
+local my_score = {
+	1000,  -- ticks per beat
+	{    -- first track
+		{'patch_change', 0, 0, Patch},
+		{'set_tempo', 0, 1000000},
+	},  -- end of first track
+}
+
+-- amp_start and amp_end are not good measures of the volume; we use amp_max
+function note_on (p, t_start, amp_start)
+	-- on_notes[p] = {t_start, amp2midivol(amp_start)}
+	on_notes[p] = {t_start, amp_start}
+end
+function note_off (p, t_end, amp_end)
+	if not on_notes[p] then
+		warn('note ',p,' ended at ',t_end,' mS without having been started')
+		return nil
+	end
+	local t_start, amp = table.unpack(on_notes[p])
+	local duration = t_end - t_start
+	local vol      = amp2midivol(amp)
+	if duration > Shortest then -- must normalise before testing Quietest!
+		table.insert(my_score[2], {'note', t_start, duration, 0, p, vol})
+	end
+end
+
+----------------------- get the audio data --------------------
+
+local rawfile = '/tmp/audio2midi.raw'  -- to be randomised of course ...
+os.execute(string.format(
+  -- 'sox %s -r %d -c 1 -e unsigned -b 16 %s gain -2 bass +4',
+  'sox %s -r %d -c 1 -e unsigned -b 16 %s',
+  AudioFile, SampleRate, rawfile))
+local f_raw = assert(io.open(rawfile, 'r'))
+block_size = 20
+while true do
+	local block = f_raw:read(block_size)
+    if not block or string.len(block) < block_size then break end  -- 1.4
+	local ints = table.pack(string.unpack('I2I2I2I2I2I2I2I2I2I2', block))
+	for i = 1, #ints-1 do
+		update_windows((ints[i]-32767.5)/32770)
+	end
+end
+f_raw:close()
+os.remove(rawfile)
+
+----------------------- clean-up and play ---------------------
+local are_sounding = sounding()
+for p = p_min,p_max do  -- finish unfinished notes
+	if on_notes[p] then
+		local t_start, amp = table.unpack(on_notes[p])
+		local duration = ms() - t_start
+		if duration > 30 then -- eschew those short-lived artefact-notes
+			table.insert(my_score[2],
+			  {'note', t_start, duration, 0, p, amp2midivol(amp)})
+		end
+	end
+end
+local vol_max = 1 -- normalise volume
+for i,event in ipairs(my_score[2]) do
+	if event[1]=='note' and event[6]>vol_max then vol_max = event[6] end
+end
+local adjust_vol = 125 / vol_max
+for i,event in ipairs(my_score[2]) do
+	-- or adjust by some power of the ratio 125/event[6]
+	if event[1]=='note' then event[6] = round(event[6]*adjust_vol) end
+	if event[1]=='note' then  
+		local vol = round(event[6]*((125/event[6])^0.5))
+		if vol > Quietest then
+			event[6] = round(event[6]*((125/event[6])^0.5))  -- compress
+		else
+			event[6] = 0  -- should make a new copy of my_score ...
+		end
+	end
+end
+--ProFi:stop()
+--ProFi:writeReport( 'MyProfilingReport.txt' )
+--print("sed 's/       :/ :/g' MyProfilingReport.txt | less")
+--print('my_score =',DataDumper(my_score))
+if MidiFile then
+	local f = assert(io.open(MidiFile, 'w'))
+	f:write(MIDI.score2midi(my_score))
+	f:close()
+else
+	MIDI.play_score(my_score)
+end
+
+os.exit(0)
+
+
+--[=[
+
+=pod
+
+=head1 NAME
+
+audio2midi - measures the midi-pitch amplitudes, and generates MIDI
+
+=head1 SYNOPSIS
+
+ audio2midi infile.wav outfile.mid
+ audio2midi -l 55 -h 93 infile.wav outfile.mid  #
+ audio2midi -p 61  infile.wav outfile.mid  # uses brass-secion patch
+ audio2midi -s 150 infile.wav outfile.mid  # ignores short notes
+ # then...
+ midiedit outfile.mid
+
+=head1 DESCRIPTION
+
+This script measures the amplitudes of a range of midi-note-pitches
+in a given I<.wav> file,
+and generates a MIDI file with corresponding 'note' events.
+
+It works taking a sliding Fourier Transform
+(with an exponentially decaying window)
+for each of the midi-pitch frequencies.
+It only outputs notes on one midi-channel, using one patch.
+
+It does not handle drum-kits well,
+especially high frequencies like snare-drum, cymbals or hand-claps.
+
+=head1 OPTIONS
+
+=over 3
+
+=item I<-h 84>
+
+Sets the Highest midi-note that will be extracted.
+The default is 84 (soprano-C), but if your wav file is of a descant recorder,
+or piccolo or tin-whistle, you might want to try something like I<-h 96>
+
+=item I<-l 28>
+
+Sets the Lowest midi-note that will be extracted.
+The default is 28 (bass-guitar E string),
+but if your wav file is of a flute,
+you might want to try something like I<-l 60>,
+because I<audio2midi> will then run a lot faster.
+
+=item I<-p 82>
+
+Sets the midi-Patch which the output-file will use,
+to 82 = Calliope in this example. The default is 0 = Piano.
+See
+http://pjb.com.au/muscript/gm.html
+for a list of the General-Midi patches.
+
+=item I<-s 100>
+
+Sets (in milliseconds) the Shortest note which will be detected.
+The default is 90 mS, but if you have a wav-file with some very
+short notes you may find even down to C<-s 40> helps.
+Or if you have a wav-file with only long notes
+but are generating a midi-file with high-short-note artifacts,
+you may find that even something like C<-s 200> helps.
+The default is C<-s 90>
+
+=item I<-v>
+
+Print the Version
+
+=back
+
+=head1 DOWNLOAD
+
+This I<lua> script is available at
+http://pjb.com.au/midi/free/audio2midi
+
+Then just move it to somewhere in your C<$PATH>,
+make it executable, and if necessary edit the first line
+to correspond to where I<lua> is installed on your system.
+
+You will also need the I<MIDI.lua> module, eg: C<luarocks install midi>
+
+You will also need I<sox> installed, eg: C<aptitude install sox>
+
+=head1 AUTHOR
+
+Peter J Billam, http://pjb.com.au/comp/contact.html
+
+=head1 CHANGES
+
+ 20190428 1.4 defend against a short last block
+ 20190421 1.3 more fiddling with the heuristics of sounding()
+ 20190420 1.2 renamed to audio2midi, and accepts flac, mp3, ogg
+ 20190419 localised the scaled[p] criterion
+ 20190417 1.1 much fiddling with the heuristics of sounding()
+ 20190415 1.0 add -p option, and .wav and .mid filenames
+ 20190414 first half-working version
+
+=head1 SEE ALSO
+
+ http://pjb.com.au/comp/lua/MIDI.html
+ http://pjb.com.au/midi/midiedit.html
+ http://sox.sourceforge.net/
+ http://sox.sourceforge.net/AudioFormats.html
+ http://pjb.com.au/
+
+=cut
+
+]=]

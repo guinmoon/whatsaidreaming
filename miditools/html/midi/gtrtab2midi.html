@@ -1,0 +1,283 @@
+<HTML><HEAD><TITLE>gtrtab2midi</TITLE>
+<LINK rel=stylesheet type="text/css"
+href="../muscript/styles.css" title="PJB Muscript Styles">
+<META HTTP-EQUIV="Keywords"
+CONTENT="MIDI, Lua, Markov">
+</HEAD>
+<BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
+<DIV>
+<H1><IMG SRC="../muscript/logo.gif" ALT=" " WIDTH=81 HEIGHT=32>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<FONT COLOR="#800000"><I>gtrtab2midi</I></FONT>
+</H1>
+<p><a name="index"></a></p>
+<TABLE ALIGN="center" WIDTH="85%" BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left">
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#VOICE-LINE">VOICE-LINE</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#DOWNLOAD">DOWNLOAD</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#CHANGES">CHANGES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+</TD></TR>
+</TABLE>
+
+<H2 id="NAME">NAME</H2>
+<p>
+&nbsp; gtrtab2midi - converts ascii-tab guitar tablature to MIDI
+</p>
+
+<H2 id="SYNOPSIS">SYNOPSIS</H2>
+<pre><code> gtrtab2midi infile.tab | aplaymidi -
+ gtrtab2midi infile.tab | fluadity -
+
+ gtrtab2midi <A HREF="#p-24">-p  24</A> infile.tab | aplaymidi -   # patch 24
+ gtrtab2midi <A HREF="#t-140">-t 140</A> infile.tab | aplaymidi -   # 140mS/pulse
+ gtrtab2midi <A HREF="#T-8">-T 8</A>   infile.tab | aplaymidi -   # 8 pulses/sec
+
+ gtrtab2midi infile.tab &gt; outfile.mid
+ <A HREF="midiedit.html">midiedit</A> outfile.mid</code></pre>
+
+<H2 id="DESCRIPTION">DESCRIPTION</H2>
+<p>
+<I>gtrtab2midi</I>
+converts ascii-tab guitar tablature to MIDI, which can then be played using
+<I><A HREF="fluadity.html">fluadity</A></I>
+or <i>aplaymidi</i>, or edited using
+<I><A HREF="midiedit.html">midiedit</A></I>
+</p><p>
+<I>gtrtab2midi</I> 
+uses a more compact and rhythmic version of ascii-tab guitar tablature,
+in which each character represents a particular elapsed time
+(by default one sixth of a second). &nbsp; This means the ascii text is
+(at least) twice as compact, and the rhythm is clearly specified. &nbsp;
+The following example is the first four bars of
+<A HREF="../mus/arr.html#folk_gtr_solos">The London Rag</A>,
+and an MP3 of &nbsp;
+<CODE>gtrtab2midi&nbsp;london_rag.tab&nbsp;|&nbsp;<A HREF="fluadity.html">fluadity</A>&nbsp;-</CODE> &nbsp;
+<A HREF="free/london_rag_tab.mp3">can be heard here</A>.
+</P>
+<pre><code>    e|3-0---------|--0-----0---|--3--02-02-3|---3--3--3-3|
+    B|---3-0------|-----3-----0|--2---3--3-0|---0-0--12-3|
+    G|------3-02-0|1----1------|------2--2-0|------------|
+    D|---0-----0--|---0-----0--|---2--0-----|---3--2--1--|
+    A|------------|------------|0--------0--|------------|
+    E|3-----3-----|0-----0-----|------------|3-----------|</code></pre>
+<P>
+Therefore, to represent the high frets with one character, <I>gtrtab2midi</I>
+supports the following extension to standard guitar tablature notation:
+within the system, using hexadecimal notation for the high frets&nbsp;:<BR>
+<CODE> &nbsp; &nbsp; <B>A</B></CODE>
+ &nbsp; play the tenth 10th fret<BR>
+<CODE> &nbsp; &nbsp; <B>B</B></CODE>
+ &nbsp; play the eleventh 11th fret<BR>
+<CODE> &nbsp; &nbsp; <B>C</B></CODE>
+ &nbsp; play the twelfth 12th fret (the octave)<BR>
+<CODE> &nbsp; &nbsp; <B>D</B></CODE>
+ &nbsp; play the thirteenth 13th fret<BR>
+<CODE> &nbsp; &nbsp; <B>E</B></CODE>
+ &nbsp; play the fourteenth 14th fret<BR>
+<CODE> &nbsp; &nbsp; <B>F</B></CODE>
+ &nbsp; play the fifteenth 15th fret
+</P><P>
+<I>gtrtab2midi</I> supports only the following on-string symbols,
+which have the same rhythmic value as a dash <B>-</B> &nbsp; :<BR>
+<CODE> &nbsp; &nbsp; <B>x</B></CODE>
+ &nbsp; ends the note on that string<BR>
+<CODE> &nbsp; &nbsp; <B>*</B></CODE>
+ &nbsp; the adjoining number on the left (C,7,5 or 4) was a harmonic<BR>
+<CODE> &nbsp; &nbsp; <B>b</B></CODE>
+ &nbsp; bend up one semitone<BR>
+<CODE> &nbsp; &nbsp; <B>^</B></CODE>
+ &nbsp; bend up two semitones<BR>
+<CODE> &nbsp; &nbsp; <B>p</B></CODE>
+ &nbsp; pre-bend one semitone<BR>
+<CODE> &nbsp; &nbsp; <B>P</B></CODE>
+ &nbsp; pre-bend two semitones<BR>
+<CODE> &nbsp; &nbsp; <B>r</B></CODE>
+ &nbsp; release the one-semitone bend<BR>
+<CODE> &nbsp; &nbsp; <B>R</B></CODE>
+ &nbsp; release the two-semitone bend<BR>
+</P><P>
+Bending is only offered over one or two semitones.
+An example of bending: on the B-string,
+&nbsp; <CODE>---3-b3---</CODE> &nbsp;
+plays a <B>d</B> which bends smoothly up the <B>eb</B>,
+followed immediately by a new <B>d</B>.
+Or &nbsp; <CODE>---3-b--rx---</CODE> &nbsp;
+plays a <B>d</B> which bends smoothly up the <B>eb</B>
+and then releases back down again fo the <B>d</B>.
+</P><P>
+An example of pre-bending: on the B-string,
+&nbsp; <CODE>----5--p8-r-x--</CODE> &nbsp;
+plays an <B>e</B> then a pre-bent <B>g#</B> releasing back down to a <B>g</B>
+
+</P><P>
+Conventional ascii-tab guitar tablature is described in
+<A HREF="http://en.wikipedia.org/wiki/ASCII_tab">
+en.wikipedia.org/wiki/ASCII_tab</A>
+</P>
+
+<H2 id="VOICE-LINE">VOICE-LINE</H2>
+<p>
+Since version 1.6, <I>gtrtab2midi</I> offers a syntax for setting a voice-line.
+The voice-line starts with
+<B>VF|</B> or <B>VM|</B> for female or male voices respectively.
+It looks something like this example:
+<PRE><CODE> VM|---A-----------|---------F#-----|G--------------|F#-----E--D-----|
+  d|---------------|---------- -----|---------------|- --------------|
+  A|---------------|---------- -----|---------------|- --------------|
+  G|-----77-7--77-7|-----77-7- -77-7|-----77-7--77-7|- ----77-7--77-7|
+  D|7--7--7--7--7--|7--7--7--7 --7--|7--7--7--7--7--|7 --7--7--7--7--|
+  A|0--------0-----|0--------0 -----|0--------0-----|0 --------0-----|
+  D|0--------0-----|0--------0 -----|0--------0-----|0 --------0-----|
+</CODE></PRE>
+Voices don't have frets, so the pitches are notated differently,
+using a notation which borrows from
+<A HREF="https://pjb.com.au/muscript/index.html#pitches">muscript</A>
+but uses the tablature-time-pulse for rhythm.
+</P><P>
+Near the middle of each clef there is a "c". This note is written <B>c</B>
+and the notes above it are written <B>c# d eb en f f# g g# a bb b c~ c~#
+d~ e~b</B> and so on up to <B>b~</B>.
+Likewise, the notes below <B>c</B> are
+<B>B Bb A Ab G F# F E Eb D C# C B_ B_b A_</B> and so on down to <B>C_</B>.
+Thus on each voice-line you can write a range of nearly four octaves.
+</P><P>
+Each such note is one time-pulse long
+even if it uses two characters like <B>F#</B>
+so you may find it neater to pad the guitar-strings
+with a blank underneath the <B>#</B> or <B>b</B> in order to preserve the
+vertical alignment.
+</P><P>
+The default midi-patch for the voice is 82,
+but you can change this with the
+<B><A HREF="#P-85">-P</A></B>
+option.
+
+
+</p>
+
+<H2 id="ARGUMENTS">ARGUMENTS</H2>
+<dl>
+
+<dt id="p-24"><i>-p 24</i></dt>
+<dd><p>
+This option sets the MIDI <b>P</b>atch, to 24 = Acoustic Guitar(nylon)
+in this example. The default is 25 = Acoustic Guitar(steel). See
+<A HREF="http://www.pjb.com.au/muscript/gm.html#patch">
+www.pjb.com.au/muscript/gm.html</A>
+for a list of the General-MIDI patch numbers.
+</p>
+</dd>
+
+<dt id="P-85"><i>-P 85</i></dt>
+<dd><p>
+This option sets the MIDI <b>V</b>oice-patch, to 85 = Lead 6 (voice)
+in this example. The default is 82 = Lead 3 (calliope). See
+<A HREF="http://www.pjb.com.au/muscript/gm.html#patch">
+www.pjb.com.au/muscript/gm.html</A>
+for a list of the General-MIDI patch numbers.
+</p>
+</dd>
+
+<dt id="t-140"><i>-t 140</i></dt>
+<dd><p>
+This options sets the <b>T</b>empo, in milliseconds per pulse, where a
+pulse is the time taken by a <B><CODE>-</CODE></B> in the ascii-tab input.
+The pulse is therefore the shortest time-interval you can express in ascii-tab,
+a sixteenth-note (semiquaver) for example.
+The default is 167, meaning a sixth of a second.
+</p>
+</dd>
+
+<dt id="T-8"><i>-T 8</i></dt>
+<dd><p>
+This option is an alternative to the <B>-t</B> option;
+it sets the <B>T</B>empo in pulses per second, where a pulse
+is the time taken by a <B><CODE>-</CODE></B> in the ascii-tab input.
+The pulse is therefore the shortest time-interval you can express in ascii-tab.
+The default is 6, meaning 167 milliseconds.
+</p>
+</dd>
+
+<dt id="v"><i>-v</i></dt>
+<dd><p>
+Print the <b>V</b>ersion
+</p>
+</dd>
+
+</dl>
+
+<H2 id="DOWNLOAD">DOWNLOAD</H2>
+
+<p>This script is freely available at
+<A HREF="http://www.pjb.com.au/midi/free/gtrtab2midi">
+www.pjb.com.au/midi/free/gtrtab2midi</A><BR>
+Move it to somewhere in your <CODE>$PATH</CODE>,
+and if necessary change the first line
+to reflect where <I>lua</I> is installed.
+</p><p>
+It needs the <i>MIDI.lua</i> module, which is available from
+<A HREF="http://www.luarocks.org">www.luarocks.org</A>
+so you should be able to install it by:<BR>
+<code> &nbsp; &nbsp; luarocks install midi</code>
+</p>
+
+<H2 id="CHANGES">CHANGES</H2>
+<pre><code> 20200602 1.7 add back-compatible argument *a for io.read()
+ 20180826 1.6 add a VM or VF voice-line
+ 20180819 1.5 -T option for pulses/sec
+ 20180809 1.4 bending with -3-b3- and -p3-r1- also ^, P and R
+ 20180807 1.3 C* 7* 5* 4* 9* are the natural harmonics
+ 20180806 1.2 x ends the note on that string
+ 20180804 1.1 introduce -t and -p options
+ 20180801 1.0 initial release</code></pre>
+
+<H2 id="AUTHOR">AUTHOR</H2>
+<p>
+Peter J Billam,
+<A HREF="http://www.pjb.com.au/comp/contact.html">
+www.pjb.com.au/comp/contact.html</A>
+</p>
+
+<H2 id="SEE-ALSO">SEE ALSO</H2>
+<p>
+&nbsp; <A HREF="https://pjb.com.au/mus/arr/tab/folk_gtr_solos.tab">
+pjb.com.au/mus/arr/tab/folk_gtr_solos.tab</A><BR>
+&nbsp; <A HREF="https://en.wikipedia.org/wiki/ASCII_tab">
+en.wikipedia.org/wiki/ASCII_tab</A><BR>
+&nbsp; <A HREF="https://www.guitartricks.com/helptab.php">
+www.guitartricks.com/helptab.php</A><BR>
+&nbsp; <A HREF="https://how-to-play-electric-guitar.net/tab-symbols.html">
+how-to-play-electric-guitar.net/tab-symbols.html</A><BR>
+&nbsp; <A HREF="https://en.wikipedia.org/wiki/Tablature#Guitar_tablature">
+en.wikipedia.org/wiki/Tablature#Guitar_tablature</A><BR>
+&nbsp; <A HREF="https://pjb.com.au/muscript/gm.html">
+pjb.com.au/muscript/gm.html</A><BR>
+&nbsp; <A HREF="https://pjb.com.au/midi/gtrtab.html">
+pjb.com.au/midi/gtrtab.html</A><BR>
+&nbsp; <A HREF="https://pjb.com.au/midi/midiedit.html">
+pjb.com.au/midi/midiedit.html</A><BR>
+&nbsp; <A HREF="https://luarocks.org/modules/peterbillam">
+luarocks.org/modules/peterbillam</A><BR>
+&nbsp;
+<A HREF="https://pjb.com.au/muscript/index.html#pitches">
+pjb.com.au/muscript/index.html#pitches</A><BR>
+&nbsp; <A HREF="https://pjb.com.au/">pjb.com.au/</A>
+</P>
+
+</body>
+</html>
+

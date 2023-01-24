@@ -1,5 +1,6 @@
 import http.client
 import json,time,os,sys
+from time import sleep
 
 def init_load_model():
     conn = http.client.HTTPSConnection("api-inference.huggingface.co")

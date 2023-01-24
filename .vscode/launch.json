@@ -11,7 +11,10 @@
             "program": "${workspaceFolder}/scripts/abc_ttm_hufa.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
-            "args": ["the fish about the method says that it is not necessary to run after the fish."],
+            // "args": ["the fish about the method says that it is not necessary to run after the fish."],
+            "args": [
+                "ambient music"
+            ],
             "justMyCode": true
         },
         {
@@ -21,7 +24,9 @@
             "program": "${workspaceFolder}/scripts/mubert_gen.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
-            "args": ["../music_tmp/speech.ogg"],
+            "args": [
+                "../music_tmp/speech.ogg"
+            ],
             "justMyCode": true
         },
         {
@@ -31,7 +36,9 @@
             "program": "${workspaceFolder}/scripts/yandex_tts_free.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
-            "args": ["../music_tmp/speech.ogg"],
+            "args": [
+                "../music_tmp/speech.ogg"
+            ],
             "justMyCode": true
         },
         {
@@ -41,7 +48,12 @@
             "program": "${workspaceFolder}/scripts/music_tts_overlay.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
-            "args": ["../music_tmp/2023-01-19_14_24_17.mp3","../music_tmp/speech.ogg","../music_tmp/overlayed.mp3","-w"],
+            "args": [
+                "../music_tmp/2023-01-19_14_24_17.mp3",
+                "../music_tmp/speech.ogg",
+                "../music_tmp/overlayed.mp3",
+                "-w"
+            ],
             "justMyCode": true
         },
         {

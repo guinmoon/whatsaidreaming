@@ -1,0 +1,358 @@
+#!/usr/bin/env lua
+---------------------------------------------------------------------
+--     This Lua5 script is Copyright (c) 2021, Peter J Billam      --
+--                         pjb.com.au                              --
+--  This script is free software; you can redistribute it and/or   --
+--         modify it under the same terms as Lua5 itself.          --
+---------------------------------------------------------------------
+local Version = '1.6  for Lua5'  -- 1.6 also does À Ç È É Ñ
+local VersionDate  = '22feb2021'
+local Synopsis = [[
+ txt2morse [options]
+ echo hello, world | txt2morse
+ echo where am i   | txt2morse -b 5    # midi bank number 5
+ echo one moment   | txt2morse -p 80   # midi patch 80
+ echo hello again  | txt2morse -w 17   # 17 words per minute
+ echo 'meet soon ?' | txt2morse -n 79  # midi note 79
+ echo hey bro | txt2morse -s > foo.mid # writes midi to stdout
+ txt2morse -v                          # print version number
+ txt2morse -h                          # prints this help text
+ perldoc txt2morse                     # read the manual
+]]
+MIDI = require 'MIDI'
+local patch = 74 -- recorder; also 78 whistle or 80 squarewave
+local note  = 78 -- treble f#
+local usec_per_dot = 70000
+local bank  = nil
+StdOut      = false
+local iarg=1; while arg[iarg] ~= nil do
+	if not string.find(arg[iarg], '^-[a-z]') then break end
+	local first_letter = string.sub(arg[iarg],2,2)
+	if first_letter == 'v' then
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate)
+		os.exit(0)
+	elseif first_letter == 'b' then
+		iarg = iarg+1 ; bank = tonumber(arg[iarg])
+		if bank == 5 then patch = 3 end
+	elseif first_letter == 'm' then
+		iarg = iarg+1 ; usec_per_dot = 1000 * tonumber(arg[iarg])
+	elseif first_letter == 'n' then
+		iarg = iarg+1 ; note = tonumber(arg[iarg])
+	elseif first_letter == 'p' then
+		iarg = iarg+1 ; patch = tonumber(arg[iarg])
+	elseif first_letter == 's' then
+		iarg = iarg+1 ; StdOut = true
+	elseif first_letter == 'w' then
+		iarg = iarg+1
+		usec_per_dot = math.floor(0.5 + 60*1000*1000/(55*tonumber(arg[iarg])))
+	else
+		local n = string.gsub(arg[0],"^.*/","",1)
+		print(n.." version "..Version.."  "..VersionDate.."\n\n"..Synopsis)
+		os.exit(0)
+	end
+	iarg = iarg+1
+end
+
+local my_opus = {
+  1, -- MIDI-ticks per beat
+  {   -- first track:
+     {'patch_change', 0, 1, patch},
+     {'set_tempo', 0, usec_per_dot},
+  },  -- end of first track
+}
+local gap = 1
+if bank then
+	table.insert(my_opus[2], 1, {'control_change',  gap, 1, 0, bank})
+end
+local function dot ()
+	table.insert(my_opus[2], {'note_on',  gap, 1, note, 96})
+	table.insert(my_opus[2], {'note_off',  1,  1, note, 96})
+	gap = 1
+end
+local function dash ()
+	table.insert(my_opus[2], {'note_on',  gap, 1, note, 96})
+	table.insert(my_opus[2], {'note_off',  3,  1, note, 96})
+	gap = 1
+end
+local function new_word ()   gap = 7 end
+local function morse_A () dot(); dash(); gap=3 end
+local function morse_B () dash(); dot(); dot(); dot(); gap=3 end
+local function morse_C () dash(); dot(); dash(); dot(); gap=3 end
+local function morse_D () dash(); dot(); dot(); gap=3 end
+local function morse_E () dot(); gap=3 end
+local function morse_F () dot(); dot(); dash(); dot(); gap=3 end
+local function morse_G () dash(); dash(); dot(); gap=3 end
+local function morse_H () dot(); dot(); dot(); dot(); gap=3 end
+local function morse_I () dot(); dot(); gap=3 end
+local function morse_J () dot(); dash(); dash(); dash(); gap=3 end
+local function morse_K () dash(); dot(); dash(); gap=3 end
+local function morse_L () dot(); dash(); dot(); dot(); gap=3 end
+local function morse_M () dash(); dash(); gap=3 end
+local function morse_N () dash(); dot(); gap=3 end
+local function morse_O () dash(); dash(); dash(); gap=3 end
+local function morse_P () dot(); dash(); dash(); dot(); gap=3 end
+local function morse_Q () dash(); dash(); dot(); dash(); gap=3 end
+local function morse_R () dot(); dash(); dot(); gap=3 end
+local function morse_S () dot(); dot(); dot(); gap=3 end
+local function morse_T () dash(); gap=3 end
+local function morse_U () dot(); dot(); dash(); gap=3 end
+local function morse_V () dot(); dot(); dot(); dash(); gap=3 end
+local function morse_W () dot(); dash(); dash(); gap=3 end
+local function morse_X () dash(); dot(); dot(); dash(); gap=3 end
+local function morse_Y () dash(); dot(); dash(); dash(); gap=3 end
+local function morse_Z () dash(); dash(); dot(); dot(); gap=3 end
+local function morse_1 () dot(); dash(); dash(); dash(); dash(); gap=3 end
+local function morse_2 () dot(); dot(); dash(); dash(); dash(); gap=3 end
+local function morse_3 () dot(); dot(); dot(); dash(); dash(); gap=3 end
+local function morse_4 () dot(); dot(); dot(); dot(); dash(); gap=3 end
+local function morse_5 () dot(); dot(); dot(); dot(); dot(); gap=3 end
+local function morse_6 () dash(); dot(); dot(); dot(); dot(); gap=3 end
+local function morse_7 () dash(); dash(); dot(); dot(); dot(); gap=3 end
+local function morse_8 () dash(); dash(); dash(); dot(); dot(); gap=3 end
+local function morse_9 () dash(); dash(); dash(); dash(); dot(); gap=3 end
+local function morse_0 () dash(); dash(); dash(); dash(); dash(); gap=3 end
+function morse_stop() dot(); dash(); dot(); dash(); dot(); dash(); gap=3 end
+function morse_comm() dash(); dash(); dot(); dot(); dash(); dash(); gap=3 end
+function morse_ques() dot(); dot(); dash(); dash(); dot(); dot(); gap=3 end
+function morse_apos() dot(); dash(); dash(); dash(); dash(); dot(); gap=3 end
+function morse_excl() dash(); dot(); dash(); dot(); dash(); dash(); gap=3 end
+function morse_slas() dash(); dot(); dot(); dash(); dot(); gap=3 end
+function morse_paro() dash(); dot(); dash(); dash(); dot(); gap=3 end
+function morse_parc() dash(); dot(); dash(); dash(); dot(); dash(); gap=3 end
+function morse_ampr() dot(); dash(); dot(); dot(); dot(); gap=3 end
+function morse_colo() dash(); dash(); dash(); dot(); dot(); dot(); gap=3 end
+function morse_semi() dash(); dot(); dash(); dot(); dash(); dot(); gap=3 end
+function morse_equl() dash(); dot(); dot(); dot(); dash(); gap=3 end
+function morse_plus() dot(); dash(); dot(); dash(); dot(); gap=3 end
+function morse_minu() dash(); dot(); dot(); dot(); dot(); dash(); gap=3 end
+function morse_undr() dot(); dot(); dash(); dash(); dot(); dash(); gap=3 end
+function morse_dbqu() dot(); dash(); dot(); dot(); dash(); dot(); gap=3 end
+function morse_doll() dot(); dot(); dot(); dash(); dot(); dot(); dash(); gap=3 end
+function morse_snai() dot(); dash(); dash(); dot(); dash(); dot(); gap=3 end
+function morse_agrave() dot(); dash(); dash(); dot(); dash(); gap=3 end
+function morse_auml() dot(); dash(); dot(); dash(); gap=3 end
+function morse_egrave() dot(); dash(); dot(); dot(); dash(); gap=3 end
+function morse_eacute() dot(); dot(); dash(); dot(); dot(); gap=3 end
+function morse_ccedil() dash(); dot(); dash(); dot(); dot(); gap=3 end
+function morse_ntilde() dash(); dash(); dot(); dash(); dash(); gap=3 end
+function morse_ouml() dash(); dash(); dash(); dot(); gap=3 end
+function morse_uuml() dot(); dot(); dash(); dash(); gap=3 end
+
+local c2f = {
+  ["A"] = morse_A, ["a"] = morse_A,
+  ["B"] = morse_B, ["b"] = morse_B,
+  ["C"] = morse_C, ["c"] = morse_C,
+  ["D"] = morse_D, ["d"] = morse_D,
+  ["E"] = morse_E, ["e"] = morse_E,
+  ["F"] = morse_F, ["f"] = morse_F,
+  ["G"] = morse_G, ["g"] = morse_G,
+  ["H"] = morse_H, ["h"] = morse_H,
+  ["I"] = morse_I, ["i"] = morse_I,
+  ["J"] = morse_J, ["j"] = morse_J,
+  ["K"] = morse_K, ["k"] = morse_K,
+  ["L"] = morse_L, ["l"] = morse_L,
+  ["M"] = morse_M, ["m"] = morse_M,
+  ["N"] = morse_N, ["n"] = morse_N,
+  ["O"] = morse_O, ["o"] = morse_O,
+  ["P"] = morse_P, ["p"] = morse_P,
+  ["R"] = morse_R, ["r"] = morse_R,
+  ["S"] = morse_S, ["s"] = morse_S,
+  ["T"] = morse_T, ["t"] = morse_T,
+  ["U"] = morse_U, ["u"] = morse_U,
+  ["V"] = morse_V, ["v"] = morse_V,
+  ["W"] = morse_W, ["w"] = morse_W,
+  ["X"] = morse_X, ["x"] = morse_X,
+  ["Y"] = morse_Y, ["y"] = morse_Y,
+  ["Z"] = morse_Z, ["z"] = morse_Z,
+  ["1"] = morse_1,
+  ["2"] = morse_2,
+  ["3"] = morse_3,
+  ["4"] = morse_4,
+  ["5"] = morse_5,
+  ["6"] = morse_6,
+  ["7"] = morse_7,
+  ["8"] = morse_8,
+  ["9"] = morse_9,
+  ["0"] = morse_0,
+  [" "] = new_word,   ["\n"] = new_word,
+  ["."] = morse_stop, [","] = morse_comm,
+  ["?"] = morse_ques, ["'"] = morse_apos,
+  ["!"] = morse_excl, ["/"] = morse_slas,
+  ["("] = morse_paro, [")"] = morse_parc,
+  ["&"] = morse_ampr, [":"] = morse_colo,
+  [";"] = morse_semi, ["="] = morse_equl,
+  ["+"] = morse_plus, ["-"] = morse_minu,
+  ["_"] = morse_undr, ['"'] = morse_dbqu,
+  ["$"] = morse_doll, ['@'] = morse_snai,
+  ["\xC0"] = morse_agrave, ["\xE0"] = morse_agrave,
+  ["\xC4"] = morse_auml,   ["\xE4"] = morse_auml, ["\xC6"] = morse_auml,
+  ["\xC7"] = morse_ccedil, ["\xE7"] = morse_ccedil,
+  ["\xC8"] = morse_egrave, ["\xE8"] = morse_egrave,
+  ["\xC9"] = morse_eacute, ["\xE9"] = morse_eacute,
+  ["\xD1"] = morse_ntilde, ["\xF1"] = morse_ntilde,
+  ["\xD6"] = morse_ouml,   ["\xF6"] = morse_ouml,
+  ["\xDC"] = morse_uuml,   ["\xFC"] = morse_uuml,
+}
+
+while true do
+	local c = io.read(1)
+	if not c then break end
+	-- s/([\xC2\xC3])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
+	-- see /home/pbin/muscript_lua in function escape_and_utf2iso(s)
+	local iso_byte = nil   -- 1.5
+	if c=='\xC2' then iso_byte=128 elseif c=='\xC3' then iso_byte=192 end
+	if iso_byte then
+		local db = string.byte(io.read(1))
+		if db >= 128 and db <=191 then iso_byte = iso_byte + db%64 end
+		c = string.char(iso_byte)
+	end
+	local f = c2f[c]
+	if f then f() end
+end
+if StdOut then
+	io.stdout:write(MIDI.opus2midi(my_opus))
+else
+	MIDI.play_score(MIDI.opus2score(my_opus))
+end
+
+--[=[
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+txt2morse - converts text into morse, then into MIDI, then plays it.
+
+=head1 SYNOPSIS
+
+ echo Hello, world | txt2morse
+ echo where am i   | txt2morse -b 5    # midi bank number 5
+ echo one moment   | txt2morse -p 80   # midi patch 80
+ echo hello again  | txt2morse -w 17   # 17 words per minute
+ echo 'meet soon ?' | txt2morse -n 79  # midi note 79
+ echo hey bro | txt2morse -s           # output to stdout
+ txt2morse -v                          # print version number
+ txt2morse -h                          # prints this help text
+ perldoc txt2morse                     # read the manual
+
+=head1 DESCRIPTION
+
+Morse code used by C<txt2morse> can only speak the ascii A-Z alphabet,
+the Gerke umlauts Ä Ö Ü,
+the 0-9 digits, and eighteen punctuation marks (see below).
+
+The dot duration is the basic unit of time measurement in Morse code.
+The duration of a dash is three times the duration of a dot.
+Each dot or dash within a character is followed by period of
+signal absence, called a space, equal to the dot duration.
+The letters of a word are separated by a duration equal to three dots,
+and the words are separated by a space equal to seven dots.
+
+ A . _   B _ . . .   C _ . _ .   D _ . .   E .   F . . _ .
+ G _ _ .   H . . . .   I . .   J . _ _ _   K _ . _   L . _ . .
+ M _ _   N _ .   O _ _ _   P . _ _ .   Q _ _ . _   R . _ .  S . . .
+ T _   U . . _   V . . . _   W . _ _    Y _ . _ _   Z _ _ . .
+ Ä . _ . _     Ö _ _ _ .     Ü . . _ _     Ñ _ _ . _ _
+ À . _ _ . _   É . . _ . .   È . _ . . _   Ç _ . _ . .  
+
+ 1 . _ _ _ _   2 . . _ _ _   3 . . . _ _   4 . . . . _   5 . . . . .
+ 6 _ . . . .   7 _ _ . . .   8 _ _ _ . .   9 _ _ _ _ .   0 _ _ _ _ _
+
+ "." . _ . _ . _   "," _ _ . . _ _   "?" . . _ _ . .   "'" . _ _ _ _ .
+ "!" _ . _ . _ _   "/" _ . . _ .     "(" _ . _ _ .     ")" _ . _ _ . _
+ "&" . _ . . .     ":" _ _ _ . . .   ";" _ . _ . _ .   "=" _ . . . _
+ "+" . _ . _ .     "-" _ . . . . _   "_" . . _ _ . _   '"' . _ . . _ .
+ "$" . . . _ . . _   "@" . _ _ . _ .
+
+=head1 ARGUMENTS
+
+=over 3
+
+=item I<-b 5>
+
+Sets the midi bank number, to 5 in this example.
+This gives the C<-p> option access to a different selection of patches.
+If the bank number is 5 it also changes the default patch number to 3,
+for ease of use with
+https://pjb.com.au/midi/free/Bank5.sf2
+
+=item I<-m 50>
+
+Sets the speed in milliseconds per dot.
+The default is 70.
+The speed can also be set by the C<-w> option.
+
+=item I<-n 79>
+
+Sets the midi note to 79 (treble g) in this example.
+The default is 78 (f#).
+
+=item I<-p 80>
+
+Sets the midi patch number to 80 (square wave) in this example.
+The default is 78 (recorder).
+
+=item I<-s>
+
+The midi will be written to C<stdout> so that it can be saved to a file,
+or piped to a different play command (like C<fluadity> or C<fluidsytnth>).
+Without the I<-s> option, the midi is played by C<aplaymidi>.
+
+=item I<-w 20>
+
+Sets the speed in words per minute.
+Morse code speed is often specified in "words per minute",
+where the "word" is often taken to be PARIS or CODEX.
+This program takes the "word" to be 55 dots long,
+so that the default speed of 70 milliseconds per dot corresponds to
+C<-w 15.584>
+
+=item I<-v>
+
+Print the Version
+
+=back
+
+=head1 DOWNLOAD
+
+This script is available at
+https://pjb.com.au/midi/free/txt2morse
+
+It depends on the MIDI.lua module:
+C<luarocks install MIDI>
+and on the C<aplaymidi> executable, which in debian for example
+is in the C<alsa-tools> package.
+
+=head1 AUTHOR
+
+Peter J Billam, https://pjb.com.au/comp/contact.html
+
+=head1 CHANGES
+
+ 20210222 1.6 also does À Ç È É Ñ
+ 20210221 1.5 also does the Gerke umlauts Ä Ö Ü on A O U
+ 20210221 1.4 add -s option
+ 20210220 1.3 add -b option
+ 20210220 1.2 add -n option
+ 20210219 1.1 also does punctuation
+ 20210219 1.0 first working version
+
+=head1 SEE ALSO
+
+ https://pjb.com.au/midi/free/txt2morse
+ https://en.wikipedia.org/wiki/Morse_code
+ https://upload.wikimedia.org/wikipedia/en/5/5a/Morse_comparison.svg
+ https://upload.wikimedia.org/wikipedia/commons/b/b5/International_Morse_Code.svg
+ https://en.wikipedia.org/wiki/Morse_code#Letters,_numbers,_punctuation,_prosigns_for_Morse_code_and_non-English_variants
+ https://pjb.com.au/muscript/gm.html
+ https://pjb.com.au/midi/free/Bank5.sf2
+ http://aluigi.org/mytoolz.htm
+ http://www.qsl.net/5b4az/pkg/morse/xdemorse/xdemorse.html
+ https://pjb.com.au/
+
+=cut
+
+]=]

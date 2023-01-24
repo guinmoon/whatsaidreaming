@@ -1,0 +1,172 @@
+<HTML><HEAD><TITLE>audio2midi</TITLE>
+<LINK rel=stylesheet type="text/css"
+href="../muscript/styles.css" title="PJB Muscript Styles">
+<META HTTP-EQUIV="Keywords"
+CONTENT="MIDI, tape-loop, echo, Term::Clui">
+</HEAD>
+<BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
+<DIV>
+<H1><IMG SRC="../muscript/logo.gif" ALT=" " WIDTH=81 HEIGHT=32>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<FONT COLOR="#800000"><I>audio2midi</I></FONT>
+</H1>
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<TABLE ALIGN="center" WIDTH="85%" BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left">
+<ul>
+  <li><a href="#name">NAME</a></li>
+  <li><a href="#synopsis">SYNOPSIS</a></li>
+  <li><a href="#description">DESCRIPTION</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#options">OPTIONS</a></li>
+  <li><a href="#download">DOWNLOAD</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#author">AUTHOR</a></li>
+  <li><a href="#changes">CHANGES</a></li>
+  <li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+</TD></TR>
+</TABLE>
+<!-- INDEX END -->
+
+<a name="name"><HR></a>
+<h3>NAME</h3>
+<p>audio2midi - measures the midi-pitch amplitudes, and generates MIDI</p>
+
+<a name="synopsis"><HR></a>
+<h3>SYNOPSIS</h3>
+<pre>
+ audio2midi infile.wav outfile.mid
+ audio2midi -l 55 -h 93 infile.wav outfile.mid  #
+ audio2midi -p 61  infile.wav outfile.mid  # uses brass-section patch
+ audio2midi -s 150 infile.wav outfile.mid  # ignores short notes
+ # then...
+ midiedit outfile.mid
+</pre>
+
+<a name="description"><HR></a>
+<h3>DESCRIPTION</h3>
+<p>
+This script measures the amplitudes of a range of midi-note-pitches in
+a given <i>.wav</i> file, and generates a MIDI file with corresponding
+&#39;note&#39; events.
+</p><p>
+It works taking a sliding Fourier Transform (with an exponentially
+decaying window) for each of the midi-pitch frequencies. It only outputs
+notes on one midi-channel, using one patch.
+</p><p>
+It does not handle drum-kits well, especially high frequencies like
+snare-drum, cymbals or hand-claps.</p>
+</p><p>
+It was the subject of
+<A HREF="https://pjb.com.au/midi/audio2midi_talk/index.html">
+a talk to the Tasmanian Linux User Group </A>
+in July 2019.
+
+<a name="options"><HR></a>
+<h3>OPTIONS</h3>
+
+<dl>
+<dt id="h-84"><i>-h 84</i></dt>
+<dd>
+<p>Sets the Highest midi-note that will be extracted. The default is 84
+(soprano-C), but if your wav file is of a descant recorder, or piccolo
+or tin-whistle, you might want to try something like <i>-h 96</i></p>
+</dd>
+
+<dt id="l-28"><i>-l 28</i></dt>
+<dd>
+<p>Sets the Lowest midi-note that will be extracted. The default is 28
+(bass-guitar E string), but if your wav file is of a flute, you might
+want to try something like <i>-l 60</i>, because <i>audio2midi</i>
+will then run a lot faster.</p>
+</dd>
+
+<dt id="p-82"><i>-p 82</i></dt>
+<dd>
+<p>Sets the midi-Patch which the output-file will use, to
+82 = Calliope in this example. The default is 0 = Piano. See
+<A HREF="http://pjb.com.au/muscript/gm.html">pjb.com.au/muscript/gm.html</A>
+for a list of the General-Midi
+patches.</p>
+</dd>
+
+<dt id="s-100"><i>-s 100</i></dt>
+<dd>
+<p>Sets (in milliseconds) the Shortest note which will be detected. The
+default is 90 mS, but if you have a wav-file with some very short
+notes you may find even down to <code>-s 40</code> helps. Or if you
+have a wav-file with only long notes but are generating a midi-file
+with high-short-note artifacts, you may find that even something like
+<code>-s 200</code> helps. The default is <code>-s 90</code></p>
+</dd>
+
+<dt id="v"><i>-v</i></dt>
+<dd>
+<p>Print the Version</p>
+</dd>
+</dl>
+
+<a name="download"><HR></a>
+<h3>DOWNLOAD</h3><p>
+This <i>lua</i> script is available at
+<A HREF="http://pjb.com.au/midi/free/audio2midi">
+pjb.com.au/midi/free/audio2midi</A>
+</p><p>
+Then just move it to somewhere in your <code>$PATH</code>, make it
+executable, and if necessary edit the first line to correspond to where
+<i>lua</i> is installed on your system.
+</p><p>
+You will also need the <i>MIDI.lua</i> module, eg:
+<code>luarocks&nbsp;install&nbsp;midi</code>
+</p><p>
+You will also need <i>sox</i> installed, eg:
+<code>aptitude&nbsp;install&nbsp;sox</code>
+</p>
+
+<a name="author"><hr></a>
+<h3>AUTHOR</h3><p>
+Peter J Billam,
+<A HREF="http://pjb.com.au/comp/contact.html">
+pjb.com.au/comp/contact.html</A>
+</p>
+
+<a name="changes"><hr></a>
+<h3>CHANGES</h3>
+<pre><code> 20190428 1.4 defend against a short last block
+ 20190421 1.3 more fiddling with the heuristics of sounding()
+ 20190420 1.2 renamed to audio2midi, and accepts flac, mp3, ogg
+ 20190419 localised the scaled[p] criterion
+ 20190417 1.1 much fiddling with the heuristics of sounding()
+ 20190415 1.0 add -p option, and .wav and .mid filenames
+ 20190414 first half-working version</code></pre>
+
+<hr />
+<h3><a name="see_also">SEE ALSO</a></h3>
+<p>
+<A HREF="http://pjb.com.au/comp/lua/MIDI.html">
+pjb.com.au/comp/lua/MIDI.html</A><BR>
+<A HREF="http://pjb.com.au/midi/midiedit.html">
+pjb.com.au/midi/midiedit.html</A><BR>
+<A HREF="http://sox.sourceforge.net/">sox.sourceforge.net/</A><BR>
+<A HREF="http://sox.sourceforge.net/AudioFormats.html">
+sox.sourceforge.net/AudioFormats.html</A><BR>
+<A HREF="https://pjb.com.au/midi/audio2midi_talk/index.html">
+pjb.com.au/midi/audio2midi_talk/</A><BR>
+<A HREF="https://pjb.com.au/midi/free/audio2midi_talk.tgz">
+pjb.com.au/midi/free/audio2midi_talk.tgz</A><BR>
+<A HREF="http://pjb.com.au/">pjb.com.au/</A>
+</p>
+
+
+</body>
+
+</html>
+
+

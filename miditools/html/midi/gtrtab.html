@@ -1,0 +1,206 @@
+<HTML><HEAD><TITLE>gtrtab</TITLE>
+<LINK rel=stylesheet type="text/css"
+href="../muscript/styles.css" title="PJB Muscript Styles">
+<META HTTP-EQUIV="Keywords"
+CONTENT="MIDI, Lua, Markov">
+</HEAD>
+<BODY LINK="#000066" VLINK="#000066" ALINK="#000066">
+<DIV>
+<H1><IMG SRC="../muscript/logo.gif" ALT=" " WIDTH=81 HEIGHT=32>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<FONT COLOR="#800000"><I>gtrtab</I></FONT>
+</H1>
+<p><a name="index"></a></p>
+<TABLE ALIGN="center" WIDTH="85%" BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left">
+<ul>
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#ANNOTATIONS">ANNOTATIONS</a></li>
+  <li><a href="#ARGUMENTS">ARGUMENTS</a></li>
+  <li><a href="#DOWNLOAD">DOWNLOAD</a></li>
+</ul>
+</TD><TD ALIGN="left">
+<ul>
+  <li><a href="#CHANGES">CHANGES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+</ul>
+</TD></TR>
+</TABLE>
+
+<H2 id="NAME">NAME</H2>
+
+<p>gtrtab - outputs an empty ascii-tab template</p>
+
+<H2 id="SYNOPSIS">SYNOPSIS</H2>
+
+<pre><code> gtrtab                 # output seven systems
+ gtrtab -s 2            # outputs two systems
+ gtrtab -t DADGAd       # strings labelled D A D G A d
+ gtrtab -t D,A,D,F#,A,d # strings labelled D A D F# A d
+ gtrtab -p 18           # outputs bars of 18 dashes (=rhythmic pulses)</code></pre>
+
+<H2 id="DESCRIPTION">DESCRIPTION</H2>
+
+<p>This script outputs an empty ascii-tab template, allowing different
+tunings, different numbers of systems, and different bar-lengths. It&#39;s
+like manuscript music-paper.
+<BR>
+You can then edit this, using Your Favourite Text Editor,
+to produce a guitar piece in ascii-tab form, eg:</p>
+
+<pre><code> e|3-0---------|--0-----0---|--3--02-02-3|---3--3--3-3|
+ B|---3-0------|-----3-----0|--2---3--3-0|---0-0--12-3|
+ G|------3-02-0|1----1------|------2--2-0|------------|
+ D|---0-----0--|---0-----0--|---2--0-----|---3--2--1--|
+ A|------------|------------|0--------0--|------------|
+ E|3-----3-----|0-----0-----|------------|3-----------|
+   G            E            Am    D      G  G7 C  Cm</code></pre>
+
+<p>
+Such ascii-tab can be converted into MIDI, using
+<A HREF="free/gtrtab2midi">gtrtab2midi</A><BR>
+</P><P>
+It might be nice to be able to convert it into PostScript,
+perhaps even to integrate ascii-tab systems into a
+<A HREF="../muscript/index.html">muscript</A>
+score.</p>
+
+<H2 id="ANNOTATIONS">ANNOTATIONS</H2>
+
+<p>Tablature can use various lines, arrows, and other symbols to denote
+bends, hammer-ons, trills, pull-offs, slides, and so on. These are the
+symbols that usually represent various techniques, though the symbols
+may vary:</p>
+
+<pre><code>    h     hammer on
+    p     pull off
+    b     bend string up
+    r     release bend
+    /     slide up
+    \     slide down
+    v     vibrato (sometimes written as ~)
+    t     right hand tap
+    s     legato slide
+    S     shift slide
+    *     natural harmonic
+    [n]   artificial harmonic
+    n(n)  tapped harmonic
+    tr    trill
+    T     tap
+    TP    tremolo picking
+    PM    palm muting (also written as _ and .)
+    N.C.  No chord: tacet or rest
+    \n/   tremolo arm dip; n = amount to dip
+    \n    tremolo arm down
+    n/    tremolo arm up
+    /n\   tremolo arm inverted dip
+    =     hold bend; also acts as connecting device for hammers/pulls
+    &lt;&gt;    volume swell (louder/softer)
+    x     on rhythm slash represents muted slash
+    o     on rhythm slash represents single note slash</code></pre>
+
+<p>Guitar tablature is not standardised and different sheet-music
+publishers adopt different conventions. Songbooks and guitar magazines
+usually include a legend setting out the convention in use.
+<BR>
+I find these extra symbols useful above the system:</p>
+
+<pre><code>    d     down-stroke (usually with a plectrum; or also with fingernail)
+    u     up-stroke   (usually with a plectrum; or also with fingernail)</code></pre>
+And, within the system, using hexadecimal notation for the high frets:
+<pre><code>    A     play the tenth 10th fret
+    B     play the eleventh 11th fret
+    C     play the twelfth 12th fret (the octave)
+    D     play the thirteenth 13th fret
+    E     play the fourteenth 14th fret
+    F     play the fifteenth 15th fret</code></pre>
+
+<H2 id="ARGUMENTS">ARGUMENTS</H2>
+
+<dl>
+
+<dt id="p-12"><i>-p 12</i></dt>
+<dd>
+<p>Sets the number of <b>P</b>ulses per bar, each pulse being indicated
+by a minus-sign. The number of bars per system is calculated to fit
+onto a screen of 80 colums. So <code>gtrtab -t DADGAd -p 12 -s 1</code>
+will print out:</p>
+
+<pre><code> d|------------|------------|------------|------------|------------|
+ A|------------|------------|------------|------------|------------|
+ G|------------|------------|------------|------------|------------|
+ D|------------|------------|------------|------------|------------|
+ A|------------|------------|------------|------------|------------|
+ D|------------|------------|------------|------------|------------|</code></pre>
+
+<p>The default <b>-p</b> is 24, with which three bars <i>just</i> fit
+onto one line. If <b>-p</b> is set to 0, then no barlines are added.
+</p></dd>
+
+<dt id="s-4"><i>-s 4</i></dt>
+<dd><p>
+This example outputs just four <b>S</b>ystems. The default is seven,
+which takes up 63 lines of text output, which probably just fits on one
+page on your printer ...
+</p>
+</dd>
+
+<dt id="t-DADGAd-or--t-D-A-D-G-A-d-or--t-D-A-D-F-A-d"><i>-t DADGAd</i> or <i>-t D,A,D,G,A,d</i> or <i>-t D,A,D,F#,A,d</i></dt>
+<dd><p>
+Sets the <b>T</b>uning, from the lowest string to the highest. This
+is the order, bottom upwards, in which the letters will be shown in
+the output. The strings can also be specified in comma-separated form,
+such as <i>-t D,A,D,G,A,d</i> which is especially useful if there are
+sharps or flats involved, for example <i>-t D,A,D,F#,A,d</i>
+</p></dd>
+
+<dt id="v"><i>-v</i></dt>
+<dd><p>
+Print the Version
+</p>
+</dd>
+</dl>
+
+<H2 id="DOWNLOAD">DOWNLOAD</H2>
+<p>
+This script is freely available at
+<A HREF="http://www.pjb.com.au/midi/free/gtrtab">
+www.pjb.com.au/midi/free/gtrtab</A>
+</p>
+
+<H2 id="CHANGES">CHANGES</H2>
+<pre>
+ 20180801 1.0 initial release
+</pre>
+
+<H2 id="AUTHOR">AUTHOR</H2>
+
+<p>Peter J Billam, http://www.pjb.com.au/comp/contact.html</p>
+
+<H2 id="SEE-ALSO">SEE ALSO</H2><P>
+&nbsp; <A HREF="https://en.wikipedia.org/wiki/Tablature#Guitar_tablature">en.wikipedia.org/wiki/Tablature#Guitar_tablature</A><BR>
+&nbsp; <A HREF="https://en.wikipedia.org/wiki/ASCII_tab">
+en.wikipedia.org/wiki/ASCII_tab</A><BR>
+&nbsp; <A HREF="https://www.guitartricks.com/helptab.php">
+www.guitartricks.com/helptab.php</A><BR>
+&nbsp; <A HREF="https://how-to-play-electric-guitar.net/tab-symbols.html">
+how-to-play-electric-guitar.net/tab-symbols.html</A><BR>
+&nbsp; <A HREF="http://www.pjb.com.au/midi/gtrtab2midi.html">www.pjb.com.au/midi/gtrtab2midi.html</A><BR>
+&nbsp; <A HREF="http://www.pjb.com.au/midi/free/gtrtab2midi">www.pjb.com.au/midi/free/gtrtab2midi</A><BR>
+&nbsp; <A HREF="http://www.pjb.com.au/mus/arr.html#folk_gtr_solos">www.pjb.com.au/mus/arr.html#folk_gtr_solos</A><BR>
+&nbsp; <A HREF="http://www.pjb.com.au/muscript/index.html">www.pjb.com.au/muscript/index.html</A><BR>
+&nbsp; <A HREF="http://www.pjb.com.au/">www.pjb.com.au/</A><BR>
+</P>
+
+</DIV>
+</body>
+
+</html>
+
+
