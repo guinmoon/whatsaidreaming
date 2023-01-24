@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Py: abc_hufa",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/abc_ttm_hufa.py",
+            "cwd": "${workspaceFolder}/scripts/",
+            "console": "integratedTerminal",
+            "args": ["the fish about the method says that it is not necessary to run after the fish."],
+            "justMyCode": true
+        },
+        {
             "name": "Py: mubert gen",
             "type": "python",
             "request": "launch",
