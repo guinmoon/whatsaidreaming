@@ -1,8 +1,8 @@
 fluidsynth "A320U.sf2" 2023-01-23_14_56_101.mid -g 2
 
 
-python miditools/midisox_py -m 2023-01-24_21_42_391.mid 2023-01-24_21_42_392.mid 2023-01-24_21_42_393.mid
-fluidsynth "A320U.sf2" 2023-01-24_15_28_151.mid -g 2 -i -f progr0.txt -nli -r 48000 -o synth.cpu-cores=2 -T oga -F example.ogg
+python ../miditools/midisox_py -M 2023-01-24_21_42_391.mid 2023-01-24_21_42_392.mid 2023-01-24_21_42_394.mid
+fluidsynth "A320U.sf2" 2023-01-24_21_42_39_.mid -g 2 -i -f progr0.txt -nli -r 48000 -o synth.cpu-cores=8 -T oga -F 2023-01-24_21_42_39_.ogg
 
 player_start
 player_stop
