@@ -74,6 +74,7 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False
             print("pending")
             exit(0)
     while latest_task["state"] != "completed":
+        print(latest_task["state"])
         time.sleep(display_freq)
         conn.request("GET", f"/api/tasks/{id}", body, headers)
         data=conn.getresponse().read()        
