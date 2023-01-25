@@ -83,7 +83,7 @@ if len(sys.argv)<2:
     exit(1)
 inputs=sys.argv[1]
 for i in range(1,3):
-    abc=gen_abc(cookies,inputs=inputs,max_req=3)
+    abc=gen_abc(cookies,inputs=inputs,max_req=10)
     full_abc+=f"\nX:{i}\n"+abc
     print(abc)
 
