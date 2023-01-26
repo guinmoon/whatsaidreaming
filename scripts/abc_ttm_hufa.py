@@ -45,6 +45,10 @@ def gen_abc(cookies,inputs="ambient music",max_req=3):
             "max_length": 1024,
             # "num_tunes":2,
             "do_sample": True
+        },
+        "options":{
+            "wait_for_model": True,
+            "use_cache": False,
         }
         })
         headers = {
