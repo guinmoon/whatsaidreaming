@@ -1,19 +1,12 @@
 
 #!/usr/bin/python3
 
-import http.client
-import json
-import time
-import argparse
-import random
-import os
-import pickle
-import ssl
-import urllib.request    
+import os,subprocess,time,argparse,pickle
+import json, random
+import ssl, urllib.request,http.client   
 from datetime import datetime
 from PIL import Image
 
-import os
 from sqlalchemy import create_engine, ForeignKey,select
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship, backref,Session
@@ -63,7 +56,7 @@ def get_random_think(engine):
 
 if __name__ == '__main__':
     # exit(0)
-    __dir=os.path.dirname(os.path.realpath(__file__)) 
+    __dir=os.path.dirname(os.path.realpath(__file__))     
     config_path = os.path.join(os.path.dirname(__file__),'config_think.json')
     with open(config_path) as json_file:
         Config = json.load(json_file)
@@ -115,12 +108,20 @@ if __name__ == '__main__':
     # with open('balaboba.dump', 'rb') as f:
     #     prompt_balaboba = pickle.load(f)    
     prompt_ru = prompt_balaboba['query']+prompt_balaboba['text']
+    if prompt_ru=='':
+        print("empty balaboba")
+        exit(1)
+
     if choice=='mutate':
         prompt_ru=prompt_balaboba['text']
     prompt_ru = prompt_ru.replace('\n','')
     prompt_ru = prompt_ru.replace('+','')
     prompt_en=translate(prompt_ru, 'en')
     prompt_en = escape_prompt(prompt_en)
+
+    if prompt_en!='':
+        result = subprocess.run(["python3",f"{__dir}/abc_ttm_hufa_api.py", prompt_en],cwd=__dir)
+
     style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")
     res = identify(identify_key=identify_key)
     img_uri = create(res["id_token"], prompt_en, style,None,False,full=True)

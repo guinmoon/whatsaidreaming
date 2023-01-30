@@ -1,3 +1,11 @@
+######################## INPUT TEXT ########################
+
+# This is a traditional Irish dance music.
+# Note Length-1/8
+# Meter-6/8
+# Key-D
+
+
 import requests
 import json,time,os,sys
 import http.client
@@ -5,11 +13,20 @@ import subprocess
 
 Config=None
 
+def fix_abc(in_abc):
+    abc=in_abc.replace('L1','L:1')
+    abc = abc.replace(':1/4','L:1/4')
+    abc = abc.replace('LL:','L:')
+    abc = abc.replace('41K:','4\nK:')
+    abc = abc.replace('#K:','\nK:')
+    abc = abc.replace('minK','\nK:')
+    abc = abc.replace('Dmin','D')
+    return abc
 
 def gen_abc(inputs):
     conn = http.client.HTTPSConnection("api-inference.huggingface.co")
     payload = json.dumps({
-    "inputs": inputs,
+    "inputs": inputs+"\nNote Length-1/4",
     "parameters": {
         "top_p": 0.9,
         "max_length": 1024,
@@ -27,7 +44,8 @@ def gen_abc(inputs):
     # output=output[0]
     data = res.read()
     output=json.loads(data)[0]
-    abc = output['generated_text'].replace('\\n','\n').replace('L1','L:1')
+    abc = output['generated_text'].replace('\\n','\n')
+    abc=fix_abc(abc)
     return abc
 
 if __name__ == '__main__':
@@ -52,6 +70,6 @@ if __name__ == '__main__':
     with open(abc_fname+'.abc', 'w') as f:
         f.write(full_abc)
 
-    abc_fname='/home/m_vs_m/whatsaidreaming/scripts/../output_tunes/2023-01-26_15_43_03'
-    result = subprocess.call([f"{__dir}/mp3_from_abc.sh", abc_fname])
+    # abc_fname='/home/m_vs_m/whatsaidreaming/scripts/../output_tunes/2023-01-26_15_43_03'
+    result = subprocess.call([f"{__dir}/mp3_from_abc.sh", abc_fname,inputs],cwd=__dir)
     
