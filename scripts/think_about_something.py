@@ -86,6 +86,7 @@ if __name__ == '__main__':
         base_id = rand_think[0].id
 
     # prompt_balaboba = sync_balaboba_urlib(prompt,11)
+    prompt_en=translate(prompt, 'en')
     prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:

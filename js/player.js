@@ -25,9 +25,11 @@ function play_pause_stream(player){
     // } //FOR RAW HTML5     
     if (player.state!="playing"){
         player.play();
+        $("#play_pause_cat").attr('class', 'fa fa-pause');
     }
     else{
         player.stop();
+        $("#play_pause_cat").attr('class', 'fa fa-play');
     }
 }
 

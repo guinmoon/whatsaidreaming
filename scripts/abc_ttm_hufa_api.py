@@ -10,18 +10,11 @@ import requests
 import json,time,os,sys
 import http.client
 import subprocess
+from fix_abc import fix_abc
 
 Config=None
 
-def fix_abc(in_abc):
-    abc=in_abc.replace('L1','L:1')
-    abc = abc.replace(':1/4','L:1/4')
-    abc = abc.replace('LL:','L:')
-    abc = abc.replace('41K:','4\nK:')
-    abc = abc.replace('#K:','\nK:')
-    abc = abc.replace('minK','\nK:')
-    abc = abc.replace('Dmin','D')
-    return abc
+
 
 def gen_abc(inputs):
     conn = http.client.HTTPSConnection("api-inference.huggingface.co")
