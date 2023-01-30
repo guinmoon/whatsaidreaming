@@ -63,6 +63,9 @@
             "program": "${workspaceFolder}/scripts/think_about_something.py",
             "cwd": "${workspaceFolder}/scripts/",
             "console": "integratedTerminal",
+            "args": [
+                "-n"
+            ],
             "justMyCode": true
         },
         {

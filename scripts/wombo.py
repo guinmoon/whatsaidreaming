@@ -192,11 +192,16 @@ def sync_balaboba_old(orig_text,text_type=32,cookie=''):
         'origin': 'https://yandex.ru',        
         'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
     }    
-    conn.request("POST", "/lab/api/yalm/text3", payload, headers)
-    res = conn.getresponse()
-    data = res.read()
-    data=json.loads(data)
-    return data
+    try:
+        conn.request("POST", "/lab/api/yalm/text3", payload, headers)
+        res = conn.getresponse()
+        data = res.read()
+        data=json.loads(data)
+        return data
+    except Exception as ee:
+        print(ee)
+        data = {'query':orig_text,'text':orig_text}
+        return data
 
 def escape_prompt(in_prompt):
     prompt = in_prompt.replace("'","")

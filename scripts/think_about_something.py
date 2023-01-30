@@ -14,6 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from wombo import *
 from thinks_model import *
+from ai_news import *
 
 DEBUG=False
 
@@ -34,6 +35,7 @@ parser = argparse.ArgumentParser(
                     epilog = 'Enjoy.')
 parser.add_argument('-k','--key')
 parser.add_argument('-u','--update',action='store_true')          
+parser.add_argument('-n','--news',action='store_true')
 # parser.add_argument('-i','--iterations',action='store_true')
 # parser.add_argument('-o','--one',action='store_true')
 # parser.add_argument('-c','--crop',action='store_true')
@@ -72,21 +74,26 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)    
 
     numberList = ['mutate','new']
-    choice=random.choices(numberList, weights=(80, 20), k=1)[0]
+    choice=random.choices(numberList, weights=(20, 80), k=1)[0]
     
     # choice='mutate'
 
     print(choice)
     
-    prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")
+    prompt = generate_prompt(__dir+"/words1.txt",__dir+"/words2.txt")    
     base_id= None
     if choice=='mutate':
         rand_think=get_random_think(engine)
         prompt = rand_think[0].base_text+' '+rand_think[0].balaboba_text
         base_id = rand_think[0].id
 
+
+    if args.news:
+        news_prompt = get_prompt_from_news("https://news.1777.ru/rss/yandex")
+        if news_prompt is not None:
+            prompt= news_prompt
     # prompt_balaboba = sync_balaboba_urlib(prompt,11)
-    prompt_en=translate(prompt, 'en')
+    # prompt_en=translate(prompt, 'en')
     prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
@@ -113,8 +120,13 @@ if __name__ == '__main__':
         print("empty balaboba")
         exit(1)
 
+    if args.news:
+        prompt_ru=prompt_balaboba['query']
+
     if choice=='mutate':
         prompt_ru=prompt_balaboba['text']
+    
+    
     prompt_ru = prompt_ru.replace('\n','')
     prompt_ru = prompt_ru.replace('+','')
     prompt_en=translate(prompt_ru, 'en')
