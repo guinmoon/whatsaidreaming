@@ -22,7 +22,7 @@ out = output.icecast(
 )
 
 radio = switch([
-	({ 30m-36m }, radio_playlist),
+	({ 0m - 3m }, radio_playlist),
 	({ true }, ai_playlist)
 ])
 
