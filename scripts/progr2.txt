@@ -1,5 +1,5 @@
 prog 0 96
-prog 1 13
+prog 1 50
 cc 1 7 50
 prog 2 300
 prog 3 300
