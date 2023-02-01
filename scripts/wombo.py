@@ -99,11 +99,14 @@ def generate_prompt(prompttext1,prompttext2):
     return prompt1[random.randint(0,len(prompt1)-1)]+" "+prompt2[random.randint(0,len(prompt2)-1)]+" "+prompt1[random.randint(0,len(prompt1)-1)]
 
 
-def update_styles(styles_fname):
+def update_styles(styles_fname=None):
     conn = http.client.HTTPSConnection("paint.api.wombo.ai",context = _unverified_context)    
     conn.request("GET", f"/api/styles")
     data=conn.getresponse().read()        
     styles = json.loads(data)
+    if styles_fname is None:
+        print(json.dumps(styles,indent=4))
+        return
     lines = []
     for style in styles:
         lines.append(str(style["id"]))
