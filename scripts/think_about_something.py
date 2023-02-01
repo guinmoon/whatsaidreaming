@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship, backref,Session
 from sqlalchemy.ext.declarative import declarative_base
 
 from wombo import *
+from balaboba_helper import *
 from thinks_model import *
 from ai_news import *
 

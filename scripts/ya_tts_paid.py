@@ -1,62 +1,46 @@
 import os
 import time
-from creds import token, folder_id
  
 import requests
  
-root_path = os.path.dirname(__file__)
-target_path = root_path
  
-"""
-Протухает через 12 часов не использования
-yc iam create-token >> /home/web/token.txt
- 
-Кусок текста меньше 5000 симв
- 
- 
-https://cloud.yandex.ru/docs/speechkit/tts/request#wav
-https://cloud.yandex.ru/docs/speechkit/tts/request
-https://cloud.yandex.ru/docs/speechkit/api-ref/grpc/tts_service
-"""
- 
-def synthesize(text):
+def synthesize(text,folder_id,token,voice='alena',emotion='neutral',lang='ru-RU',speed='1.0',format='mp3'):
     url = 'https://tts.api.cloud.yandex.net/speech/v1/tts:synthesize'
     headers = {'Authorization': 'Bearer ' + token,}
  
     data = {
         'folderId': folder_id,
         'text': text,
-        'lang': 'en-EN',
-        # 'voice':'alena', # премиум - жрет в 10 раз больше денег
-        'voice':'alena', # oksana
-        'emotion':'good',
-        'speed':'1.0',
-        # по умолчанию конвертит в oggopus, кот никто не понимает, зато занимат мало места
-        'format': 'mp3'
+        'lang': lang,
+        'voice':voice, # oksana
+        'emotion':emotion,
+        'speed':speed,
+        'format': format
         # 'sampleRateHertz': 48000,
     }
  
     with requests.post(url, headers=headers, data=data, stream=True) as resp:
         if resp.status_code != 200:
             raise RuntimeError("Invalid response received: code: %d, message: %s" % (resp.status_code, resp.text))
- 
+
         for chunk in resp.iter_content(chunk_size=None):
             yield chunk
  
-def write_file(text):
-    """
-    Пишет чанки в вайл
-    :param text:
-    :return:
-    """
-    filename = str(int(time.time()))
-    with open(target_path + filename + ".mp3", "wb") as f:
-        for audio_content in synthesize(text):
+def tts_to_mp3(text,f_path,folder_id,token,voice='alena',emotion='neutral',lang='ru-RU',speed='1.0'):
+    with open(f_path, "wb") as f:
+        for audio_content in synthesize(text,folder_id,token,voice,emotion,lang,speed):
             f.write(audio_content)
- 
-    time.sleep(2)
- 
-    return filename
- 
+    return f_path
 
-write_file("hello")
+def tts_to_lpcm(text,f_path,folder_id,token,voice='alena',emotion='neutral',lang='ru-RU',speed='1.0'):
+    with open(f_path, "wb") as f:
+        for audio_content in synthesize(text,folder_id,token,voice,emotion,lang,speed,format='lpcm'):
+            f.write(audio_content)
+    return f_path
+ 
+if __name__=='__main__':
+    root_path = os.path.dirname(__file__)
+    target_path = root_path
+    filename = str(int(time.time()))
+    f_path=target_path + filename + ".mp3"
+    tts_to_mp3("hello",f_path)
