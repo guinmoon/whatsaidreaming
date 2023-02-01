@@ -75,7 +75,7 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)    
 
     numberList = ['mutate','new']
-    choice=random.choices(numberList, weights=(20, 80), k=1)[0]
+    choice=random.choices(numberList, weights=(60, 40), k=1)[0]
     
     # choice='mutate'
 
@@ -95,7 +95,9 @@ if __name__ == '__main__':
             prompt= news_prompt
     # prompt_balaboba = sync_balaboba_urlib(prompt,11)
     # prompt_en=translate(prompt, 'en')
-    prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+    prompt_balaboba = {'query':prompt,'text':prompt}
+    if not args.news:
+        prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")
@@ -106,11 +108,11 @@ if __name__ == '__main__':
     with open('balaboba.dump', 'wb') as f:
         pickle.dump(prompt_balaboba, f)
 
-    tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'],base_id=base_id)        
-        
-    with Session(engine) as session:        
-        session.add(tmp_think)        
-        session.commit()
+    if not args.news:
+        tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'],base_id=base_id)                    
+        with Session(engine) as session:        
+            session.add(tmp_think)        
+            session.commit()
     
     # ##PICKLE
     # prompt_balaboba = {}

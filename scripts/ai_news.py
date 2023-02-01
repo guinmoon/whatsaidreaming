@@ -16,8 +16,8 @@ def get_prompt_from_news(feed_url):
     if os.path.exists(news_date_fname):
         with open(news_date_fname,'rb') as f:
             latest_date=pickle.load(f)
-            # if(NewsFeed.entries[0].published_parsed<=latest_date):
-            #     return None
+            if(NewsFeed.entries[0].published_parsed<=latest_date):
+                return None
             
     with open(news_date_fname,'wb') as f:
         pickle.dump(NewsFeed.entries[0].published_parsed, f)        
