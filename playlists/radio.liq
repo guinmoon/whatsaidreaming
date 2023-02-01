@@ -4,8 +4,11 @@
 set("log.file.path","/home/m_vs_m/whatsaidreaming/playlists/radio.log")
 
 # Music
-myplaylist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/parts/")
-radio = myplaylist
+ai_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/parts/")
+
+radio_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/news_parts/",mode = "normal")
+
+# radio = ai_playlist
 
 out = output.icecast(
 	host = "127.0.0.1",
@@ -18,13 +21,18 @@ out = output.icecast(
 	encoding = "UTF-8"
 )
 
+radio = switch([
+	({ 30m-36m }, radio_playlist),
+	({ true }, ai_playlist)
+])
+
 # добавляем crossfade
-radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
+#radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
 
 
 
 out(
- %mp3(bitrate = 192, id3v2 = true),
+ %mp3(bitrate = 128, id3v2 = true),
  description = "MP3 192 Kbps",
  mount = "ai_radio_192",
  mksafe(radio)
