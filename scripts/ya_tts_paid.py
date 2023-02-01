@@ -38,6 +38,18 @@ def tts_to_lpcm(text,f_path,folder_id,token,voice='alena',emotion='neutral',lang
             f.write(audio_content)
     return f_path
  
+def get_new_iam_token(oToken):
+    import urllib.request
+    import json
+    API_URL = 'https://iam.api.cloud.yandex.net/iam/v1/tokens'
+    payload = {"yandexPassportOauthToken": oToken}
+    params = json.dumps(payload).encode('utf8')
+    req = urllib.request.Request(API_URL, data=params)
+    res = urllib.request.urlopen(req)
+    data = res.read()
+    data=json.loads(data)
+    return data
+
 if __name__=='__main__':
     root_path = os.path.dirname(__file__)
     target_path = root_path

@@ -40,15 +40,15 @@ def synt_news(feed_url,max_news_count=10,source_every_x=3):
     news_dir=os.path.join(__dir,'../news_parts')
     arch_news(news_dir,os.path.join(__dir,'../news_arch'))
     news_count=0
-    tts_to_lpcm(source_tts,f'{news_dir}/tmp_b.pcm',ya_conf['folder_id'],ya_conf['token'],voice='ermil')
-    result = subprocess.call(["lame",f'{news_dir}/tmp_b.pcm','-s','24', '--tt', f"{source_tts}", '-b', '256', '-r',f'source.mp3',],cwd=news_dir)
+    iamToken = ya_conf['token']
+    iamToken = get_new_iam_token(ya_conf['oToken'])['iamToken']
     for entry in  NewsFeed.entries:        
         print(entry.title)
         print(entry.published)        
         timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", entry.published_parsed)  
-        tts_to_lpcm(entry.title,f'{news_dir}/tmp_a.pcm',ya_conf['folder_id'],ya_conf['token'])
+        tts_to_lpcm(entry.title,f'{news_dir}/tmp_a.pcm',ya_conf['folder_id'],iamToken)
         result = subprocess.call(["lame",f'{news_dir}/tmp_a.pcm','-s','24', '--tt', f"{entry.title}", '-b', '256', '-r',f'{news_dir}/{timestamp}_a.mp3',],cwd=news_dir)
-        tts_to_lpcm(entry.summary,f'{news_dir}/tmp_b.pcm',ya_conf['folder_id'],ya_conf['token'],voice='ermil')
+        tts_to_lpcm(entry.summary,f'{news_dir}/tmp_b.pcm',ya_conf['folder_id'],iamToken,voice='ermil')
         result = subprocess.call(["lame",f'{news_dir}/tmp_b.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_b.mp3',],cwd=news_dir)
         if news_count%source_every_x==0:
             shutil.copy(source_tts_file,f'{news_dir}/{timestamp}_c.mp3')
