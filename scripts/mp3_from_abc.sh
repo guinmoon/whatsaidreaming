@@ -2,6 +2,6 @@
 
 abc2midi $1.abc
 python3 ../miditools/midisox_py -M $1\1.mid $1\2.mid $1\full.mid
-fluidsynth -l -T raw -F - guinmoon.sf2 $1\full.mid -f progr4.txt -g 1 | lame --tt "$2" -b 256 -r - $1.mp3 
+fluidsynth -l -T raw -F - guinmoon.sf2 $1\full.mid -f progr4.txt  | lame --tt "$2" -b 256 -r - $1.mp3 
 rm $1\1.mid $1\2.mid $1\full.mid
 mv $1.mp3 ../parts
