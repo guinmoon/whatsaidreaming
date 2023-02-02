@@ -19,7 +19,7 @@ Config=None
 def gen_abc(inputs):
     conn = http.client.HTTPSConnection("api-inference.huggingface.co")
     payload = json.dumps({
-    "inputs": inputs+"\nNote Length-1/4",
+    "inputs": inputs+"\nNote Length-1/2",
     "parameters": {
         "top_p": 0.9,
         "max_length": 1024,
@@ -46,11 +46,11 @@ if __name__ == '__main__':
     config_path = os.path.join(os.path.dirname(__file__),'config_hufa.json')
     with open(config_path) as json_file:
         Config = json.load(json_file)
-    if len(sys.argv)<2:
-        print("enter text")
-        exit(1)
-    # To live is not to grieve, not to condemn anyone, not to annoy anyone, and all my respect.
+    # if len(sys.argv)<2:
+    #     print("enter text")
+    #     exit(1)
     inputs=sys.argv[1]
+    # inputs="To live is not to grieve, not to condemn anyone, not to annoy anyone, and all my respect."    
     full_abc=f"% {inputs}\n"
     for i in range(1,3):
         abc=gen_abc(inputs=inputs)
