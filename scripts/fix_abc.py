@@ -10,6 +10,7 @@ def fix_abc(in_abc):
     abc = abc.replace('Dmin','D')
     abc = abc.replace('4/42','4/4')
     abc = abc.replace('::',':')
+    abc = abc.replace('/)','/')
     return abc
 
 

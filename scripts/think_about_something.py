@@ -16,12 +16,14 @@ from wombo import *
 from balaboba_helper import *
 from thinks_model import *
 from ai_news import *
+from text2textGPT2_hufa import *
 
 DEBUG=False
 
 
 
 Config={}
+Config_hufa={}
 
 identify_key = "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
 
@@ -59,10 +61,11 @@ def get_random_think(engine):
 
 if __name__ == '__main__':
     # exit(0)
-    __dir=os.path.dirname(os.path.realpath(__file__))     
-    config_path = os.path.join(os.path.dirname(__file__),'config_think.json')
-    with open(config_path) as json_file:
+    __dir=os.path.dirname(os.path.realpath(__file__))         
+    with open(os.path.join(os.path.dirname(__file__),'config_think.json')) as json_file:
         Config = json.load(json_file)
+    with open(os.path.join(os.path.dirname(__file__),'config_hufa.json')) as json_file:
+        Config_hufa = json.load(json_file)
     sqlite_filepath = os.path.join(__dir,"thinks_map.db")
 
     if args.update:
@@ -97,7 +100,8 @@ if __name__ == '__main__':
     # prompt_en=translate(prompt, 'en')
     prompt_balaboba = {'query':prompt,'text':prompt}
     if not args.news:
-        prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
+        prompt_balaboba['text']=translate(gpt2_text2text(translate(prompt, 'en'),Config_hufa['API_TOKEN']),'ru')
+        # prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")
