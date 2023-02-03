@@ -12,8 +12,8 @@ $(document).ready(function(){
         { onMetadata }                        // options (onMetadata callback)
     );
     // const { mediasource, html5, webaudio } = IcecastMetadataPlayer.canPlayType();
-    // stream_player.playbackMethod = "html5";
-    stream_player.playbackMethod = "webaudio";
+    stream_player.playbackMethod = "html5";
+    // stream_player.playbackMethod = "webaudio";
 });
 
 function play_pause_stream(player){    
