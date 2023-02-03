@@ -11,8 +11,10 @@ import json,time,os,sys
 import http.client
 import subprocess
 from fix_abc import fix_abc
+import random
 
-Config=None
+Config={}
+Config_synth={}
 
 
 
@@ -43,9 +45,15 @@ def gen_abc(inputs):
 
 if __name__ == '__main__':
     __dir=os.path.dirname(os.path.realpath(__file__)) 
-    config_path = os.path.join(os.path.dirname(__file__),'config_hufa.json')
-    with open(config_path) as json_file:
+    with open(os.path.join(__dir,'config_hufa.json')) as json_file:
         Config = json.load(json_file)
+    with open(os.path.join(__dir,'../synth/synth_conf.json')) as json_file:
+        Config_synth = json.load(json_file)
+    with open(os.path.join(__dir,'../synth/cur_prog.txt'),'w') as f:
+        prog_0 = Config_synth['prog0'][random.randint(0,len(Config_synth['prog0'])-1)]
+        prog_1 = Config_synth['prog1'][random.randint(0,len(Config_synth['prog1'])-1)]
+        f.write(f"prog 0 {prog_0}\nprog 1 {prog_1}")
+
     # if len(sys.argv)<2:
     #     print("enter text")
     #     exit(1)
