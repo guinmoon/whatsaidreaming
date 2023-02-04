@@ -47,4 +47,12 @@
     chat_max_msg_count = 4;
     image_change_delay=5000;
     init_flying_images();
+    if (stream_player!=undefined){   
+        if (stream_player.state=="playing"){
+            $("#play_pause_cat").attr('class', 'fa fa-pause');
+        }
+        else{
+            $("#play_pause_cat").attr('class', 'fa fa-play');
+        }
+    }
 </script>

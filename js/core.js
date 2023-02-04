@@ -12,7 +12,7 @@ function reset_spcae_height(){
 
 function load_template(template_name){    
     clearInterval(flying_interval);
-    clearInterval(galery_interval);    
+    clearInterval(galery_interval);     
     about_page = false;
     $.ajax({
         url: `/templates/${template_name}`,

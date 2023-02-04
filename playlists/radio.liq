@@ -8,7 +8,7 @@ ai_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/parts/")
 
 radio_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/news_parts/",mode = "normal")
 
-# radio = ai_playlist
+radio_news = radio_playlist
 
 out = output.icecast(
 	host = "127.0.0.1",
@@ -21,10 +21,7 @@ out = output.icecast(
 	encoding = "UTF-8"
 )
 
-radio = switch([
-	({ (1m-4m) }, radio_playlist),
-	({ true }, ai_playlist)
-])
+radio = switch([({ (0m-3m) or (30m-33m)}, radio_playlist), ({ true }, ai_playlist)])
 
 # добавляем crossfade
 #radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
@@ -32,10 +29,17 @@ radio = switch([
 
 
 out(
- %mp3(bitrate = 128, id3v2 = true),
+ %mp3(bitrate = 192, id3v2 = true),
  description = "MP3 192 Kbps",
  mount = "ai_radio_192",
  mksafe(radio)
+)
+
+out(
+ %mp3(bitrate = 128, id3v2 = true),
+ description = "MP3 128 Kbps news",
+ mount = "ai_radio_128_news",
+ mksafe(radio_news)
 )
 
 # out(
