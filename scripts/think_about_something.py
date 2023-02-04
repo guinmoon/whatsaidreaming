@@ -112,11 +112,13 @@ if __name__ == '__main__':
     with open('balaboba.dump', 'wb') as f:
         pickle.dump(prompt_balaboba, f)
 
+    tmp_think_id=-1
     if not args.news:
         tmp_think = Think(prompt_balaboba['query'],prompt_balaboba['text'],base_id=base_id)                    
         with Session(engine) as session:        
             session.add(tmp_think)        
-            session.commit()
+            res=session.commit()
+            tmp_think_id = tmp_think.id
     
     # ##PICKLE
     # prompt_balaboba = {}
@@ -139,6 +141,7 @@ if __name__ == '__main__':
     prompt_en=translate(prompt_ru, 'en')
     prompt_en = escape_prompt(prompt_en)
 
+
     if prompt_en!='':
         result = subprocess.run(["python3",f"{__dir}/abc_ttm_hufa_api.py", prompt_en],cwd=__dir)
 
@@ -146,9 +149,8 @@ if __name__ == '__main__':
     res = identify(identify_key=identify_key)
     img_uri = create(res["id_token"], prompt_en, style,None,False,full=True)
     # img_uri='https://images.wombo.art/exports/f4fca3bc-f2d3-4ae9-95ba-da203ab6661b/blank_tradingcard.jpg?Expires=1680405084&Signature=FbSsHfOE~wdpaAtmTAJpcGjZqpUxXchfQ3vemmwKQH1d~NUOYcwgML8WLHtxSFxTLgZx37XDbfcDIdS29jIyMg7mzEuI2y94GQwVgzgUJce2YIZLLRhZ-hWKC8Gp3JyxL01h5jA6jYDRLuDGzMI-5bixsJwiR7Tpx6o3Ijc2yp-QLNXkGGjIk18~1YZZ0by8yWC6sve0IQ5eeyFHOVmQVS1n2FawqO5-2pqRYRVBzPw89yOw-96hJz57c5H90l~hPR-JD4LgUgrGb2C5k4p~5oH6vnw9AFI59VjfBPr1wrcI46wUlALRrsP-zFCINEQHfzAxx9KuENLacgXU8F~Qjw__&Key-Pair-Id=K1ZXCNMC55M2IL'    
-    ssl._create_default_https_context = ssl._create_unverified_context    
-    now = datetime.now()               
-    dt_string = now.strftime("%Y-%m-%d_%H_%M_%S")
+    ssl._create_default_https_context = ssl._create_unverified_context                 
+    dt_string = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     res_f_name = os.path.join(__dir,out_dir)
     res_f_name = os.path.join(res_f_name,f'{dt_string}.jpg')
     urllib.request.urlretrieve(img_uri, res_f_name)
@@ -161,9 +163,15 @@ if __name__ == '__main__':
     bottom = height-154
     im = im.crop((left, top, right, bottom))        
              
-    with open(res_f_name+'.txt', 'w') as f:
-        f.writelines(prompt_en)
+    # with open(res_f_name+'.txt', 'w') as f:
+    #     f.writelines(prompt_en)
+
     im.save(res_f_name)
     print("crop done")
+
+    img_info={"db_id":tmp_think_id,"prompt":prompt_ru,"prompt_en":prompt_en,"prompt_query":prompt_balaboba['query'],"prompt_text":prompt_balaboba['text']}
+    with open(res_f_name+'.json', 'w') as f:
+        f.write(json.dumps(img_info,indent=4,ensure_ascii=False))
+
     a=1
     

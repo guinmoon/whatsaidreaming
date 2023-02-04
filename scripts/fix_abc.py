@@ -12,6 +12,7 @@ def fix_abc(in_abc):
     abc = abc.replace('4/44','4/4')
     abc = abc.replace('::',':')
     abc = abc.replace('/)','/')
+    abc = abc.replace('#120','min')
     return abc
 
 

@@ -46,6 +46,15 @@ def run(outf,only_today=False,verbose=False,clnup=False):
                     tmp_img_info["prompt"]= tmp_prompt
                 else:
                     continue
+        elif os.path.exists(image+".json"):
+            img_info={}
+            with open(image+".json") as json_file:
+                img_info = json.load(json_file)
+                tmp_prompt = img_info["prompt_en"]
+                if tmp_prompt!="":
+                    tmp_img_info["prompt"]= tmp_prompt
+                else:
+                    continue
         else:
             continue
         galery["images"].append(tmp_img_info)
@@ -86,5 +95,5 @@ if __name__ == '__main__':
     # if args.update:
     #     update_styles("styles")
 
-    run(res_json_fname,clnup=True)
+    run(res_json_fname,clnup=False)
     run("today.json",only_today=True,verbose=True)
