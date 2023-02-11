@@ -48,7 +48,7 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False
         data=conn.getresponse().read()        
         r=json.loads(data)                     
         print(f"Status: {r['state']}")
-        display_freq = r["input_spec"]["display_freq"] / 10
+        display_freq = 0.5
         with open('headers.dump', 'wb') as f:
             pickle.dump(headers, f)
         with open('id.dump', 'w') as f:

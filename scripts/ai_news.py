@@ -6,6 +6,7 @@ import glob
 
 from ya_tts_paid import *
 from balaboba_helper import *
+from chatGPT_helper import *
 
 __dir=os.path.dirname(os.path.realpath(__file__))  
 
@@ -46,12 +47,22 @@ def synt_news(feed_url,max_news_count=10,source_every_x=3):
         print(entry.title)
         print(entry.published)        
         timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", entry.published_parsed)  
-        tts_to_lpcm(entry.title,f'{news_dir}/tmp_a.pcm',ya_conf['folder_id'],iamToken)
-        result = subprocess.call(["lame",f'{news_dir}/tmp_a.pcm','-s','24', '--tt', f"{entry.title}", '-b', '256', '-r',f'{news_dir}/{timestamp}_a.mp3',],cwd=news_dir)
-        tts_to_lpcm(entry.summary,f'{news_dir}/tmp_b.pcm',ya_conf['folder_id'],iamToken,voice='ermil')
-        result = subprocess.call(["lame",f'{news_dir}/tmp_b.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_b.mp3',],cwd=news_dir)
-        if news_count%source_every_x==0:
-            shutil.copy(source_tts_file,f'{news_dir}/{timestamp}_c.mp3')
+        if not os.path.exists(f'{news_dir}/{timestamp}_a.mp3'):
+            tts_to_lpcm(entry.title,f'{news_dir}/tmp_a.pcm',ya_conf['folder_id'],iamToken)
+            result = subprocess.call(["lame",f'{news_dir}/tmp_a.pcm','-s','24', '--tt', f"{entry.title}", '-b', '256', '-r',f'{news_dir}/{timestamp}_a.mp3',],cwd=news_dir)
+        if not os.path.exists(f'{news_dir}/{timestamp}_b.mp3'):
+            tts_to_lpcm(entry.summary,f'{news_dir}/tmp_b.pcm',ya_conf['folder_id'],iamToken,voice='ermil')
+            result = subprocess.call(["lame",f'{news_dir}/tmp_b.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_b.mp3',],cwd=news_dir)
+        if not os.path.exists(f'{news_dir}/{timestamp}_c.mp3'):
+            if news_count%source_every_x==0:
+                shutil.copy(source_tts_file,f'{news_dir}/{timestamp}_c.mp3')
+        if not os.path.exists(f'{news_dir}/{timestamp}_d.mp3'):
+            chatGPTThink=davincii003_query(entry.title)
+            chatGPTThink = "Думаю что "+chatGPTThink
+            print(chatGPTThink)
+            tts_to_lpcm(chatGPTThink,f'{news_dir}/tmp_d.pcm',ya_conf['folder_id'],iamToken,voice='filipp')
+            result = subprocess.call(["lame",f'{news_dir}/tmp_d.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_d.mp3',],cwd=news_dir)
+            
         # tts_to_mp3(source_tts,f'{news_dir}/{timestamp}_с.mp3',ya_conf['folder_id'],ya_conf['token'])
         # prompt_balaboba = sync_balaboba_old(entry.title,6,think_conf['balaboba_cookie'])
         # if prompt_balaboba['text']!='' and prompt_balaboba['text']!=entry.title:
@@ -60,8 +71,12 @@ def synt_news(feed_url,max_news_count=10,source_every_x=3):
         if news_count>max_news_count:
             break
     shutil.copy(source_tts_file,f'{news_dir}/{timestamp}_c.mp3')
-    os.remove(f'{news_dir}/tmp_a.pcm')
-    os.remove(f'{news_dir}/tmp_b.pcm')
+    if os.path.exists(f'{news_dir}/tmp_a.pcm'):
+        os.remove(f'{news_dir}/tmp_a.pcm')
+    if os.path.exists(f'{news_dir}/tmp_b.pcm'):
+        os.remove(f'{news_dir}/tmp_b.pcm')
+    if os.path.exists(f'{news_dir}/tmp_d.pcm'):
+        os.remove(f'{news_dir}/tmp_d.pcm')
 
 def concat_news(news_dir):
     a=1
@@ -71,7 +86,11 @@ def arch_news(news_dir,arch_dir):
     # playlist={}
     # playlist["tracks"]=[]
     for track in tracks:
-        result = subprocess.call(["mv",track,arch_dir],cwd=__dir)
+        c_date=datetime.fromtimestamp(os.path.getmtime(track))
+        diff_dates = (datetime.today() - c_date)
+        diff_dates_hours = (diff_dates.days*24 * 60 * 60+diff_dates.seconds)/3600
+        if diff_dates_hours>=3.0:
+            result = subprocess.call(["mv",track,arch_dir],cwd=__dir)
         # track_base_name=os.path.basename(track)
         # c_date=datetime.fromtimestamp(os.path.getmtime(track))
         # diff_dates = (datetime.today() - c_date)

@@ -9,6 +9,17 @@
     max-width: 85vw;
 }
 
+#metadata{
+    left: 10px;
+    position: fixed;
+    z-index: 8;
+    margin-left: 1em;
+    margin-bottom: 2vh;
+    max-width: 85vw;
+    bottom: 0;
+    color: #ffffff26;
+}
+
 .chat_message{
     font-size: 2.5vh;
     background: #38373757;

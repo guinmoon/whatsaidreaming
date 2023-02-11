@@ -2,14 +2,18 @@ $(document).ready(function(){
     // stream_player = new Audio('radio/ai_radio_192'); //FOR RAW HTML5 
     
     const onMetadata = (metadata) => {
-        // document.getElementById("metadata").innerHTML = metadata.StreamTitle;
+        document.getElementById("metadata").innerHTML = metadata.StreamTitle;
+    };
+
+    const onMetadataEnqueue = (metadata) => {
+        document.getElementById("metadata").innerHTML = metadata.StreamTitle;
     };
 
     stream_player = 
     new IcecastMetadataPlayer(
         "radio/ai_radio_192", // stream endpoint
         // "radio/vorbis_avg_128", // stream endpoint
-        { onMetadata }                        // options (onMetadata callback)
+        { onMetadata,onMetadataEnqueue }                        // options (onMetadata callback)
     );
     // const { mediasource, html5, webaudio } = IcecastMetadataPlayer.canPlayType();
     stream_player.playbackMethod = "html5";

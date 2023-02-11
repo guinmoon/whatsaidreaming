@@ -50,7 +50,8 @@ def run(outf,only_today=False,verbose=False,clnup=False):
             img_info={}
             with open(image+".json") as json_file:
                 img_info = json.load(json_file)
-                tmp_prompt = img_info["prompt_en"]
+                # tmp_prompt = img_info["prompt_en"]
+                tmp_prompt = img_info["prompt"]
                 if tmp_prompt!="":
                     tmp_img_info["prompt"]= tmp_prompt
                 else:
