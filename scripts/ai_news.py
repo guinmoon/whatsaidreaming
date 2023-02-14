@@ -3,6 +3,7 @@ from datetime import datetime
 import shutil
 import subprocess
 import glob
+import random
 
 from ya_tts_paid import *
 from balaboba_helper import *
@@ -39,10 +40,19 @@ def synt_news(feed_url,max_news_count=10,source_every_x=3):
     source_tts="Источник: 1777.ru"
     source_tts_file=os.path.join(__dir,'../sounds/source1777.mp3')
     news_dir=os.path.join(__dir,'../news_parts')
-    arch_news(news_dir,os.path.join(__dir,'../news_arch'))
+
+    tracks=glob.glob(news_dir+"/*.mp3")
+    if len(tracks)>(max_news_count)*4:
+        arch_news(news_dir,os.path.join(__dir,'../news_arch'))
+
     news_count=0
     iamToken = ya_conf['token']
     iamToken = get_new_iam_token(ya_conf['oToken'])['iamToken']
+
+    # prompt="GPT: Интересно послушать твое мнение."
+    # tts_to_lpcm(prompt,f'{news_dir}/tmp_a.pcm',ya_conf['folder_id'],iamToken)
+    # result = subprocess.call(["lame",f'{news_dir}/tmp_a.pcm','-s','24', '--tt', f"{prompt}", '-b', '256', '-r',os.path.join(__dir,'../sounds/gpt_pre3.mp3'),],cwd=news_dir)
+
     for entry in  NewsFeed.entries:        
         print(entry.title)
         print(entry.published)        
@@ -57,11 +67,14 @@ def synt_news(feed_url,max_news_count=10,source_every_x=3):
             if news_count%source_every_x==0:
                 shutil.copy(source_tts_file,f'{news_dir}/{timestamp}_c.mp3')
         if not os.path.exists(f'{news_dir}/{timestamp}_d.mp3'):
+            gpt_pre_file = os.path.join(__dir,f'../sounds/gpt_pre{random.randint(1, 3)}.mp3')
+            shutil.copy(gpt_pre_file,f'{news_dir}/{timestamp}_d.mp3')
+        if not os.path.exists(f'{news_dir}/{timestamp}_g.mp3'):
             chatGPTThink=davincii003_query(entry.title)
             chatGPTThink = "Думаю что "+chatGPTThink
             print(chatGPTThink)
-            tts_to_lpcm(chatGPTThink,f'{news_dir}/tmp_d.pcm',ya_conf['folder_id'],iamToken,voice='filipp')
-            result = subprocess.call(["lame",f'{news_dir}/tmp_d.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_d.mp3',],cwd=news_dir)
+            tts_to_lpcm(chatGPTThink,f'{news_dir}/tmp_g.pcm',ya_conf['folder_id'],iamToken,voice='filipp')
+            result = subprocess.call(["lame",f'{news_dir}/tmp_g.pcm','-s','24', '--tt', f"{entry.summary}", '-b', '256', '-r',f'{news_dir}/{timestamp}_g.mp3',],cwd=news_dir)
             
         # tts_to_mp3(source_tts,f'{news_dir}/{timestamp}_с.mp3',ya_conf['folder_id'],ya_conf['token'])
         # prompt_balaboba = sync_balaboba_old(entry.title,6,think_conf['balaboba_cookie'])

@@ -1,5 +1,5 @@
 
-import os, json
+import os, json, time
 import openai
 
 def davincii003_query(prompt):
@@ -16,11 +16,32 @@ def davincii003_query(prompt):
         temperature=0.5,
         top_p=1,
         frequency_penalty=0,
-        presence_penalty=0
+        presence_penalty=0     
     )
     return(completion.choices[0].text)
 
+
 if __name__=="__main__":
-    prompt="Придумай ТЗ для модуля взаимодействия с перефирийными устройствами."
-    print(prompt)
-    print(davincii003_query(prompt))
+    __dir=os.path.dirname(os.path.realpath(__file__)) 
+    prompt = ""
+    context = ""
+    timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime())  
+    history_log = f"{__dir}/gpt_history/{timestamp}.log"
+    file = open(history_log, "w")
+
+    while True:
+        print(">>")
+        prompt = input()
+        if prompt == 'exit':
+            break
+        if prompt == 'new':
+            context = ""
+            continue
+        file.write(prompt)
+        response = davincii003_query(prompt="context:" + context + "\n\n" + "prompt:" + prompt)
+        file.write(response+ "\n")
+        print("\n Re:"+response + "\n")
+        context += "\n".join([context, prompt, response])
+        file.flush()
+
+    file.close()

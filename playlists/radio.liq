@@ -26,7 +26,7 @@ radio = ai_playlist
 #radio = switch([({ (0m-3m) or (30m-33m)}, radio_playlist), ({ true }, ai_playlist)])
 
 # добавляем crossfade
-radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
+# radio = crossfade(start_next=1., fade_out=1., fade_in=1., radio)
 
 
 
