@@ -1,3 +1,4 @@
+var i_was_here=false;
 function update_spcae_height(){
     $("#stars").css('height', $("#galery").css('height')); 
     $("#twinkling").css('height', $("#galery").css('height'));
@@ -9,6 +10,10 @@ function reset_spcae_height(){
     $("#clouds").css('height', '100vh');
 }
 
+window.onpopstate = function(e){
+    load_template(e.state.template_name)
+};
+
 
 function load_template(template_name){    
     clearInterval(flying_interval);
@@ -18,6 +23,7 @@ function load_template(template_name){
         url: `/templates/${template_name}`,
         type: 'GET',        
         success: function(res) {
+            is_i_was_her();
             $("#main_container").css('opacity',0);            
             var delayInMilliseconds = 800;
             setTimeout(function() {
@@ -26,6 +32,8 @@ function load_template(template_name){
                 $("#main_container").css('opacity',1);
             }, delayInMilliseconds);
             reset_spcae_height();
+            // document.title = "What's AI dreaming?";
+            window.history.pushState({"template_name":template_name},"", "");
         }
     });
     
@@ -40,3 +48,35 @@ $(document).ready(function(){
         update_spcae_height();
     });
 });
+
+
+function is_i_was_her(){
+    i_was_here=getCookie('i_was_here');
+    if (i_was_here==undefined||i_was_here==""){
+        setCookie('i_was_here', true,365);
+    }
+}
+
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  }
+  
+  function getCookie(cname) {
+    let name = cname + "=";
+    let ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+      }
+    }
+    return "";
+  }
+  
+ 

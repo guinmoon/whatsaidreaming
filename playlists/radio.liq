@@ -5,7 +5,6 @@ set("log.file.path","/home/m_vs_m/whatsaidreaming/playlists/radio.log")
 
 # Music
 ai_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/parts/")
-
 radio_playlist = playlist(reload = 360,"/home/m_vs_m/whatsaidreaming/news_parts/",mode = "normal")
 
 radio_news = radio_playlist

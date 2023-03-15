@@ -1,18 +1,21 @@
+var global_galery = {}
 function parse_galery(res){
   console.log(res);
             galery_div=$("#galery") ;
             var img_num=0;
             var lazy_src="src";
+            global_galery=res;
             res.images.forEach((image) => {
                 if (img_num>2){
                   lazy_src="data-src";
                 }
                 galery_div.append(`<div class="img_galery">
-                <a href="${glaery_dir_name}/${encodeURI(image.f_name)}">
-                <img class="img_main lazy" ${lazy_src}="${glaery_dir_name}/${encodeURI(image.f_name)}" alt="${image.prompt}">
+                
+                <img class="img_main lazy" ${lazy_src}="${glaery_dir_name}/${encodeURI(image.f_name)}" onclick="showimg(${img_num})" alt="${image.prompt}">
                 <p class="img_caption">${image.prompt}</p>
                 </div>
-                </a>`);   
+                
+                `);   
                 img_num++;             
               });
               (function () {
@@ -60,6 +63,21 @@ function parse_galery(res){
                   // callback_finish: callback_finish
                 });
               })();
+}
+
+function showimg(img_num){
+  $("#img_wrapper").css('display', 'block');
+  $("#img_view").css('display', 'block');    
+  $("#img_view").css('opacity', 1); 
+  img_view_div=$("#img_view_img")
+  img_view_div.attr("src",`${glaery_dir_name}/${encodeURI(global_galery.images[img_num].f_name)}`)
+  $("#img_caption").text(global_galery.images[img_num].prompt)
+}
+
+function close_img_view(){
+  $("#img_wrapper").css('display', 'none');
+  $("#img_view").css('display', 'none');
+  $("#img_view").css('opacity', 0); 
 }
 
 function init_galery(){

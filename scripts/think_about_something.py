@@ -100,9 +100,9 @@ if __name__ == '__main__':
     # prompt_en=translate(prompt, 'en')
     prompt_balaboba = {'query':prompt,'text':prompt}
     if not args.news:
-        prompt_balaboba['text']=translate(gpt2_text2text(translate(prompt, 'en'),Config_hufa['API_TOKEN']),'ru')
+        # prompt_balaboba['text']=translate(gpt2_text2text(translate(prompt, 'en'),Config_hufa['API_TOKEN']),'ru')
+        prompt_balaboba = sync_balaboba_urlib(prompt,11)
         # prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
-    # prompt_balaboba = sync_balaboba(prompt,11)
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")
         exit(0)
@@ -173,5 +173,6 @@ if __name__ == '__main__':
     with open(res_f_name+'.json', 'w') as f:
         f.write(json.dumps(img_info,indent=4,ensure_ascii=False))
 
+    result = subprocess.run(["python3.9",f"{__dir}/make_galery.py"],cwd=__dir)
     a=1
     

@@ -18,10 +18,10 @@ Config_synth={}
 
 
 
-def gen_abc(inputs):
+def gen_abc(inputs,use_cache=False):
     conn = http.client.HTTPSConnection("api-inference.huggingface.co")
     payload = json.dumps({
-    "inputs": inputs+"\nNote Length-1/2",
+    "inputs": inputs,
     "parameters": {
         "top_p": 0.9,
         "max_length": 1024,
@@ -30,7 +30,7 @@ def gen_abc(inputs):
     },
     "options":{
         "wait_for_model": True,
-        "use_cache": False,
+        "use_cache": use_cache,
     }
     })
     headers = {"Authorization": f"Bearer {Config['API_TOKEN']}"}
@@ -52,22 +52,34 @@ if __name__ == '__main__':
     with open(os.path.join(__dir,'../synth/cur_prog.txt'),'w') as f:
         prog_0 = Config_synth['prog0'][random.randint(0,len(Config_synth['prog0'])-1)]
         prog_1 = Config_synth['prog1'][random.randint(0,len(Config_synth['prog1'])-1)]
-        f.write(f"prog 0 {prog_0}\nprog 1 {prog_1}")
+        prog_2 = Config_synth['prog2'][random.randint(0,len(Config_synth['prog2'])-1)]
+        f.write(f"prog 0 {prog_0}\nprog 1 {prog_1}\nprog 2 {prog_2} ")
 
     # if len(sys.argv)<2:
     #     print("enter text")
     #     exit(1)
-    inputs=sys.argv[1]
-    # inputs="To live is not to grieve, not to condemn anyone, not to annoy anyone, and all my respect."    
+    if len(sys.argv)>1:
+        inputs=sys.argv[1]
+    else:
+        inputs="To live is not to grieve, not to condemn anyone, not to annoy anyone, and all my respect."    
     full_abc=f"% {inputs}\n"
-    for i in range(1,3):
-        abc=gen_abc(inputs=inputs)
+    for i in range(1,4):
+        # if i==3:
+        #     abc=gen_abc(inputs=inputs,use_cache=True)
+        # else:
+        abc=gen_abc(inputs=inputs+"\nNote Length-1/2")
         full_abc+=f"\nX:{i}\n"+abc
         print(abc)
 
     __dir=os.path.dirname(os.path.realpath(__file__)) 
     timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime())  
     abc_fname=__dir+'/../output_tunes/'+timestamp
+
+    full_abc =  full_abc.replace('L:1/4','L:1/2')
+    full_abc =  full_abc.replace('L:1/8','L:1/2')
+    full_abc =  full_abc.replace('M:4/4','M:2/2')
+    full_abc =  full_abc.replace('M:3/4','M:2/2')
+
     with open(abc_fname+'.abc', 'w') as f:
         f.write(full_abc)
 

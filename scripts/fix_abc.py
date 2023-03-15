@@ -13,6 +13,9 @@ def fix_abc(in_abc):
     abc = abc.replace('::',':')
     abc = abc.replace('/)','/')
     abc = abc.replace('#120','min')
+    abc = abc.replace('/4#','/4=')
+    abc = abc.replace("Q:1'","Q:1")
+    abc = abc.replace("K:none","K:D")
     return abc
 
 

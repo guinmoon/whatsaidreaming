@@ -1,6 +1,6 @@
 
 
-<div id="h1_title">All...</div>
+<div id="h1_title">Dreamed all...</div>
 <div class="menu_wrapper">
   <div id="top_menu">
     <i class="top_menu_item fa fa-picture-o" onclick="load_template('galery_today.html')"></i>
@@ -8,11 +8,21 @@
     <i class="top_menu_item fa fa-home" onclick="load_template('main.html')"></i>
   </div>
 </div>
+
 <div id="galery_wrapper">
 <div id="galery">
 
+<div id="img_wrapper" onclick="close_img_view()">
+  <p id="img_caption"></p>
+</div>
+<div id="img_view">
+  <p id="close_img_view" onclick="close_img_view()">X</p>
+  <img id="img_view_img" src="">
+</div>
+
 </div>
 </div>
+
 <p>
   <a href="https://github.com/guinmoon/guinmoon.github.io">guinmoon.github.io</a>
 </p>
