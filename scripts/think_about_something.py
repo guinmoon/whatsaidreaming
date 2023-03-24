@@ -12,11 +12,14 @@ from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import relationship, backref,Session
 from sqlalchemy.ext.declarative import declarative_base
 
+import openai
+
 from wombo import *
 from balaboba_helper import *
 from thinks_model import *
 from ai_news import *
 from text2textGPT2_hufa import *
+from chatGPT_helper import *
 
 DEBUG=False
 
@@ -66,6 +69,9 @@ if __name__ == '__main__':
         Config = json.load(json_file)
     with open(os.path.join(os.path.dirname(__file__),'config_hufa.json')) as json_file:
         Config_hufa = json.load(json_file)
+    with open(os.path.join(os.path.dirname(__file__),'config_openai.json')) as json_file:
+        Config_openai = json.load(json_file)
+    openai.api_key = Config_openai['api_key']
     sqlite_filepath = os.path.join(__dir,"thinks_map.db")
 
     if args.update:
@@ -141,6 +147,10 @@ if __name__ == '__main__':
     prompt_en=translate(prompt_ru, 'en')
     prompt_en = escape_prompt(prompt_en)
 
+    # song_query=f"write song about: {prompt_en}"
+    # print(song_query)
+    # song_text = gpt35_query([song_query],[])
+    # print(song_text)
 
     if prompt_en!='':
         result = subprocess.run(["python3",f"{__dir}/abc_ttm_hufa_api.py", prompt_en],cwd=__dir)

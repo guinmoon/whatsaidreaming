@@ -1,0 +1,39 @@
+#song_consturctor_wrapper{
+    color: white;
+    left: 10px;
+    position: fixed;
+    z-index: 6;
+    margin-left: 1em;
+    margin-top: 1vh;
+    width: 35em;
+    max-width: 85vw;
+    height: 88vh;
+    background: #8080806b;
+    border-radius: 5px;
+    z-index: 22;
+}
+
+#song_consturctor{
+    margin: 20px;
+}
+
+#song_status{
+    bottom:10px;
+    right:10px;
+    position:absolute;
+    color:white;
+}
+
+#song_text{
+    height: 225px;
+    max-height: 29vh;
+    background: #7471712b;
+    color: white;
+}
+
+#abc_text{
+    height: 225px;
+    max-height: 29vh;
+    background: #7471712b;
+    color: white;
+}

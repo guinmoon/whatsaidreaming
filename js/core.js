@@ -47,13 +47,20 @@ $(document).ready(function(){
     document.addEventListener("scroll", (event) => {
         update_spcae_height();
     });
+    is_i_was_her();
+    // alert(is_i_was_her());
+
 });
 
 
 function is_i_was_her(){
     i_was_here=getCookie('i_was_here');
     if (i_was_here==undefined||i_was_here==""){
-        setCookie('i_was_here', true,365);
+        salt=Math.floor(Math.random() * 10)
+        setCookie('i_was_here', (Date.now())+salt,365);
+        return false;
+    }else{
+        return true;
     }
 }
 
