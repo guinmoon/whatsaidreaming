@@ -25,19 +25,7 @@ body {
     padding-right: 570px;
 }
 
-#play_pause_cat{
-  color: rgb(188, 125, 82);
-  position: absolute;
-  /* left: 65%; */
-  right: 0;
-  margin-right: 170px;
-  font-size: 80px;
-  top: 40%;
-}
 
-#play_pause_cat:hover{
-  color:white;
-}
 
 wave{  
   z-index: 7;

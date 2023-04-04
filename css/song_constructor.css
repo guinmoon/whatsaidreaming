@@ -3,18 +3,21 @@
     left: 10px;
     position: fixed;
     z-index: 6;
-    margin-left: 1em;
-    margin-top: 1vh;
-    width: 35em;
-    max-width: 85vw;
-    height: 88vh;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+    /* margin-top: 5vh; */
+    margin-top: 4.2em;
+    width: 45em;
+    max-width: 97vw;
+    /* height: 92vh; */
     background: #8080806b;
     border-radius: 5px;
     z-index: 22;
 }
 
 #song_consturctor{
-    margin: 20px;
+    margin: 10px;
+    margin-bottom: 45px;
 }
 
 #song_status{
@@ -22,6 +25,7 @@
     right:10px;
     position:absolute;
     color:white;
+    font-size: small;
 }
 
 #song_text{
@@ -34,6 +38,82 @@
 #abc_text{
     height: 225px;
     max-height: 29vh;
+    margin-bottom: 2px;
     background: #7471712b;
     color: white;
+    width: 100%;
+}
+
+#selection{
+    visibility: hidden;
+}
+
+#abc_warnings{
+    visibility: hidden;
+}
+
+#abc_audio_control{
+    width: 100%;
+}
+
+#tune_selector{
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-bottom: 5px;
+    /* display: block; */
+    width: 100px;
+}
+
+svg .abcjs-note_selected{
+    /* fill: rgb(235, 140, 156); */
+    fill:#eb8ca5;
+    /* fill:purple; */
+    /* stroke: pink; */
+}
+
+svg .color{
+    /* fill: rgb(233, 115, 135); */
+    fill:#eb8ca5;
+    /* fill:purple; */
+}
+
+#player_wrapper{
+    width: 100%;   
+}
+
+#mp3_player{
+    position: relative;
+    left: 40px;
+}
+
+#play_pause_mp3{
+    float: left;
+}
+/* .color {
+    stroke: red;
+    fill: red;
+ } */
+
+.a5a5a5{
+    color:#a5a5a5;
+}
+
+.a5a5a5:not(.collapsed){
+    color:#ece9e9;
+}
+
+.abcjs-inline-audio .abcjs-btn{
+    height: auto !important;
+}
+
+@media (prefers-color-scheme: dark) {
+   .abcjs-cursor {
+       stroke: #8587a1;
+   }
+}
+path {
+   transition: opacity 1s;
+}
+.abcjs-note.hidden, .abcjs-beam-elem.hidden {
+   opacity: 0;
 }

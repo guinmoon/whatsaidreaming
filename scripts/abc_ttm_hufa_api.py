@@ -46,7 +46,7 @@ def gen_abc(inputs,api_token,use_cache=False):
     abc=fix_abc(abc)
     return abc
 
-def gen_music(inputs,track_count=3,user_id=-1,synth=True):
+def gen_music(inputs,music_options="Note Length-1/2",track_count=3,user_id=-1,synth=True):
     __dir=os.path.dirname(os.path.realpath(__file__)) 
     with open(os.path.join(__dir,'config_hufa.json')) as json_file:
         Config = json.load(json_file)
@@ -72,8 +72,10 @@ def gen_music(inputs,track_count=3,user_id=-1,synth=True):
     inputs = inputs.replace("\n"," ")
     inputs = inputs.replace("'","")
     inputs = inputs.replace(",","")
-    full_abc=f"% {inputs}\n"
-    options="\nNote Length-1/2"
+    full_abc=""
+    if synth:
+        full_abc=f"% {inputs}\n"
+    options="\n"+music_options
     for i in range(1,track_count+1):
         # if i==3:
         #     abc=gen_abc(inputs=inputs,use_cache=True)
@@ -85,11 +87,12 @@ def gen_music(inputs,track_count=3,user_id=-1,synth=True):
     __dir=os.path.dirname(os.path.realpath(__file__)) 
     timestamp = time.strftime("%Y-%m-%d_%H_%M_%S", time.localtime())  
     abc_fname=__dir+'/../output_tunes/'+timestamp
-
-    full_abc =  full_abc.replace('L:1/4','L:1/2')
-    full_abc =  full_abc.replace('L:1/8','L:1/2')
-    full_abc =  full_abc.replace('M:4/4','M:2/2')
-    full_abc =  full_abc.replace('M:3/4','M:2/2')
+    
+    if user_id==-1:
+        full_abc =  full_abc.replace('L:1/4','L:1/2')
+        full_abc =  full_abc.replace('L:1/8','L:1/2')
+        full_abc =  full_abc.replace('M:4/4','M:2/2')
+        full_abc =  full_abc.replace('M:3/4','M:2/2')
 
     with open(abc_fname+'.abc', 'w') as f:
         f.write(full_abc)
@@ -104,8 +107,47 @@ def gen_music(inputs,track_count=3,user_id=-1,synth=True):
         result = subprocess.call([f"{__dir}/mp3_from_abc.sh", abc_fname,inputs],cwd=__dir)
         return result
     
+def renum_tunes(full_abc):
+    res_abc=""
+    tunes_count=0
+    for line in full_abc.strip().split("\n"):
+        f_ind=line.find("X:")
+        if f_ind>=0:
+            tunes_count+=1
+            line = f"X:{tunes_count}"
+        res_abc+=line+"\n"
+    return (tunes_count,res_abc)
+    
 
-
+def synth_from_abc(full_abc,user_id=-1,synth_options=""):
+    __dir=os.path.dirname(os.path.realpath(__file__)) 
+    abc_fname = f"{__dir}/../synth/tmp/{user_id}"
+    # abc_fname= f"{__dir}/../synth/tmp/1679640467456"
+    progs = synth_options.split(",")
+    progs=[p.strip() for p in progs]
+    full_abc=renum_tunes(full_abc)
+    with open(abc_fname+'.abc', 'w') as f:
+        f.write(full_abc[1])
+    with open(abc_fname+'.prog.txt', 'w') as f:
+        ind=0
+        for prog in progs:
+            f.write(f"prog {ind} {prog}\n")
+            ind+=1
+    result = subprocess.call(["pkill", "lame"],cwd=__dir)
+    print(f"({result}) pkill lame")
+    result = subprocess.call(["abc2midi", f"{abc_fname}.abc"],cwd=f"{__dir}/../synth/tmp/")
+    print(f"({result}) abc2midi {abc_fname}.abc ")
+    midisox_py_args=["python3", "../../miditools/midisox_py","-M"]
+    for ind in range(1,full_abc[0]+1):
+        midisox_py_args.append(f"{abc_fname}{ind}.mid")
+    midisox_py_args.append(f"{abc_fname}full.mid")
+    result = subprocess.call(midisox_py_args,cwd=f"{__dir}/../synth/tmp/")
+    # result = subprocess.call(["python3", "../../miditools/midisox_py","-M",abc_fname+"1.mid",abc_fname+"2.mid",abc_fname+"full.mid"],cwd=f"{__dir}/../synth/tmp/")
+    fluidsynth_cmd = f"fluidsynth -l -T raw -F - {__dir}/../synth/guinmoon.sf2 {abc_fname}full.mid -f {abc_fname}.prog.txt -g 0.5 | lame -b 256 -r - {abc_fname}.mp3"
+    print(f"{fluidsynth_cmd}")
+    fluidsynth_ps = subprocess.Popen(fluidsynth_cmd,shell=True,cwd=f"{__dir}/../synth/tmp/")
+    fluidsynth_ps.wait()
+    return f"synth/tmp/{user_id}.mp3"
 
 if __name__ == '__main__':    
     __dir=os.path.dirname(os.path.realpath(__file__)) 

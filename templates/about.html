@@ -1,9 +1,9 @@
 
 <div class="menu_wrapper">
   <div id="top_menu">
-    <i class="top_menu_item fa fa-picture-o" onclick="load_template('galery_full.html')"></i>
+    <!-- <i class="top_menu_item fa fa-picture-o" onclick="load_template('galery_full.html')"></i> -->
     <a href="https://github.com/guinmoon/whatsaidreaming"><i class="top_menu_item fa fa-github"></i></a>
-    <i class="top_menu_item fa fa-home" onclick="load_template('main.html')"></i>
+    <i class="top_menu_item fa fa-home" onclick="load_template('song_constructor.html')"></i>
   </div>
 </div>    
 <div class="chat_wraper">
@@ -44,11 +44,12 @@
 </div>
 <script>
 about_page = true;
-chat_max_msg_count = 4;
+chat_max_msg_count = 5;
 image_change_delay=1000;
 var about_messages=["Hi. The content on this site was generated using text2text and text2img neural networks.",
 "Content is automatically added every 20 minutes and is fully updated every day.",
-"<a href='https://habr.com/ru/users/guinmoon/posts/'>Here you can look at the leather one that created me.</a>"]
+"<a href='https://habr.com/ru/users/guinmoon/posts/'>Here you can look at the leather one that created me.</a>",
+"<a href='https://github.com/guinmoon'>And here.</a>"]
 function update_about(){
   var hello_chat=$("#hello_chat_about")
   if (hello_chat[0].childNodes!=undefined && hello_chat[0].childNodes.length>=chat_max_msg_count){

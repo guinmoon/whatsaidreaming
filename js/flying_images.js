@@ -9,7 +9,7 @@ function update_galery(){
         dataType: 'json', // added data type
         success: function(res) {
             global_galery= res;   
-            console.log(global_galery);         
+            // console.log(global_galery);         
         }
     }); 
 }
@@ -18,6 +18,10 @@ function update_galery(){
 function change_flying_img(){
     gallery_len=global_galery.images.length;
     image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
+    if (image==undefined){
+        return;
+    }
+
     current_image = image;
     flying_image_div=$("#flying_image");
     if(about_page){

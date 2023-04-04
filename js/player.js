@@ -30,10 +30,12 @@ function play_pause_stream(player){
     if (player.state!="playing"){
         player.play();
         $("#play_pause_cat").attr('class', 'fa fa-pause');
+        $("#play_pause_cat_top").attr('class', 'fa fa-pause');
     }
     else{
         player.stop();
         $("#play_pause_cat").attr('class', 'fa fa-play');
+        $("#play_pause_cat_top").attr('class', 'fa fa-play');
     }
 }
 

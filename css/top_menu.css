@@ -1,10 +1,18 @@
  
-#top_menu{
+/* #top_menu{
     z-index: 20;
     right: 1em;
     top: 2cm;
     position: fixed;
     font-size: 350%;
+} */
+
+#top_menu{
+    z-index: 99;
+    right: 1em;
+    top: 20px;
+    position: fixed;
+    font-size: 250%;
 }
 
 .top_menu_item{

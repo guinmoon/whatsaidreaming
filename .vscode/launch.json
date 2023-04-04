@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Py: server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/server.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            // "args": ["the fish about the method says that it is not necessary to run after the fish."],
+            "args": [],
+            "justMyCode": true
+        },
+        {
             "name": "Py: abc_hufa",
             "type": "python",
             "request": "launch",

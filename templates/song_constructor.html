@@ -3,7 +3,7 @@
     <div id="top_menu">
     <!-- <a href="galery_today.html"><i class="top_menu_item fa fa-picture-o"></i></a> -->
     <i class="top_menu_item fa fa-picture-o" onclick="load_template('galery_today.html')"></i>
-    <a href="https://github.com/guinmoon/whatsaidreaming"><i class="top_menu_item fa fa-github"></i></a>
+    <!-- <a href="https://github.com/guinmoon/whatsaidreaming"><i class="top_menu_item fa fa-github"></i></a> -->
     <i class="top_menu_item fa fa-question-circle"  onclick="load_template('about.html')"></i>
     </div>
 </div>    
@@ -15,31 +15,108 @@
 </div> -->
 <div id="song_consturctor_wrapper">
     <div id="song_consturctor">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text" data-bs-theme="dark">Song about:</span>
+        <div class="accordion bg-dark" id="accordionExample">
+            
+            <div class="accordion-item bg-dark">
+              <h2 class="accordion-header bg-dark" id="headingOne">
+                <button class="accordion-button bg-dark a5a5a5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  Lyrics generator
+                </button>
+              </h2>
+              <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body bg-dark text-white">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" data-bs-theme="dark">Song about:</span>
+                        </div>
+                        <input type="text" value="bottle on the table" id="song_text_query" data-bs-theme="dark" class="form-control bg-dark text-white" placeholder="Song description" aria-label="Song description" aria-describedby="basic-addon1">
+                        <div class="input-group-append" data-bs-theme="dark">
+                            <button class="btn btn-outline-secondary bg-dark" type="button"  onclick="generate_song_text()">Gen</button>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <textarea id="song_text" class="form-control bg-dark text-white" aria-label="With textarea">irish song</textarea>
+                    </div>
+                </div>
+              </div>
             </div>
-            <input type="text" value="bottle on the table" id="song_text_query" data-bs-theme="dark" class="form-control bg-dark text-white" placeholder="Song description" aria-label="Song description" aria-describedby="basic-addon1">
-            <div class="input-group-append" data-bs-theme="dark">
-                <button class="btn btn-outline-secondary bg-dark" type="button"  onclick="generate_song_text()">Gen</button>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button bg-dark a5a5a5 collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  Music generator
+                </button>
+              </h2>
+              <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                <div class="accordion-body bg-dark text-white">
+                    <div class="input-group mb-3">
+                        <input type="text" id="music_options" class="form-control bg-dark text-white" value="Note Length-1/8 + Meter-3/4 + Key-D" placeholder="Melody options" aria-label="Melody options" aria-describedby="basic-addon2">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary bg-dark" type="button" onclick="generate_music()">Gen</button>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                    <textarea class="form-control bg-dark text-white" name="abc_text" id="abc_text">
+X:1
+L:1/8
+Q:1/2=90
+M:2/2min
+K:E
+    F2 F2 | A2 A2 | G2 G2 | F4 | F2 c2 | c2 c3/2 B/ | A3 G | F3 z | c4 | B4 | A4 | G4 | D4 | E4 |
+    F4- | !fermata!F2 z2!D.C.! |]
+
+X: 2
+M: 4/4
+L: 1/8
+K: Emin
+|:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|   
+                    </textarea>      
+                    
+                    <hr />
+                    <span class="a5a5a5" style="margin:auto; font-size: medium;">Tune:</span><select class="form-control bg-dark text-white" id="tune_selector"></select> 
+                    <div id="abc_audio_control">
+                        <!-- <br>
+                        <button id="midi">Download MIDI</button>
+                        <a id="midi-download" download="example.mid"></a> -->
+                    </div>
+                    
+                    <!-- <div id="warnings"></div> -->
+                    <div id="abc_paper0" class="paper"></div>
+                    <!-- <div id="paper1" class="paper"></div>
+                    <div id="paper2" class="paper"></div>
+                    <div id="paper3" class="paper"></div> -->
+                    <div id="selection"></div>
+                    <div id="abc_warnings"></div>
+                    </div>
+                </div>
+              </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <textarea id="song_text" class="form-control bg-dark text-white" aria-label="With textarea">irish song</textarea>
-        </div>
-        <div class="input-group mb-3">
-            <input type="text" class="form-control bg-dark text-white" placeholder="Melody options" aria-label="Melody options" aria-describedby="basic-addon2">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary bg-dark" type="button" onclick="generate_music()">Gen</button>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button bg-dark a5a5a5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  Synth
+                </button>
+              </h2>
+              <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                <div class="accordion-body bg-dark text-white">
+                  <div class="input-group mb-3">
+                    <input type="text" id="synth_options" class="form-control bg-dark text-white" value="1,2 ,3" placeholder="Synth options" aria-label="Melody options" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary bg-dark" type="button" onclick="synth_music()">Synth</button>
+                    </div>                    
+                  </div>
+                  <div id="player_wrapper">
+                    <div id="mp3_player"></div>
+                    <div id="play_pause_mp3" class="fa fa-play" onclick="mp3_player_play_pause();"></div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-        <div class="input-group mb-3">
-            <textarea id="abc_text" class="form-control bg-dark text-white" aria-label="With textarea">X1:</textarea>
-        </div>
-        <div id="song_notes">
-          
-        </div>
-        <div id="song_status">status...</div>
+
+          </div>
+
+        <div id="song_status">...</div>
     </div>
 </div>
 
@@ -85,4 +162,6 @@
             $("#play_pause_cat").attr('class', 'fa fa-play');
         }
     }
+    init_tune_selector($("#abc_text").val());
+    initEditor();
 </script>
