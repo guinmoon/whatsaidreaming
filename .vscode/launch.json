@@ -95,7 +95,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             // "console": "internalConsole",
-            "justMyCode": true
+            "justMyCode": false
         }
     ]
 }

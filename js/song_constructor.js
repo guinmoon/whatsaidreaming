@@ -10,8 +10,9 @@ var tuneBook;
 var cursorControl;
 var cursor=null;
 var wavesurfer = null;
+var mp3_download_url=null;
 
-
+var current_tunes_count=0;
 
 
 function check_song_generating(){
@@ -24,6 +25,7 @@ function check_song_generating(){
         $("#song_status").text(status[0]);
         if (status[0]=="done"){
             $("#song_text").val(status[1]);
+            on_song_text_change(status[1]);
             clearInterval(generate_song_text_interval);  
             generate_song_text_interval = null;
         }
@@ -116,15 +118,20 @@ function check_music_synth(){
         $("#song_status").text(status[0]);
         if (status[0]=="done"){
             let mp3_link=status[1];
+            mp3_download_url = mp3_link;
+            $('#download_mp3').attr({target: '_blank', href  : mp3_download_url,download:mp3_download_url});
             // $("#mp3_player").text(mp3_link);
+            $("#mp3_player").empty();
+            $("#player_wrapper").css("display","block");
             clearInterval(synth_music_interval);  
             synth_music_interval = null;
             wavesurfer = WaveSurfer.create({
                 container: '#mp3_player',
                 waveColor: '#7987b5',
                 progressColor: '#eb8ca5',
-                barWidth:3,
-                responsive:true
+                barWidth:2,
+                barHeight:3,
+                responsive:false
         
             });
             wavesurfer.load('/'+mp3_link);
@@ -170,6 +177,10 @@ function mp3_player_play_pause(){
     }
 }
 
+function download_mp3(){
+
+}
+
 function clickListener(abcElem, tuneNumber, classes, analysis, drag, mouseEvent) {
 
     cursor.setAttribute("x1", abcElem.abselem.notePositions[0].x-abcElem.abselem.w+2);
@@ -195,6 +206,12 @@ function selectionChangeCallback(start, end) {
     if (abcjsEditor) {
         var el = abcjsEditor.tunes[0].getElementFromChar(start);
         rebind_cursor(cursor);
+        let abc=$("#abc_text").val();
+        let tuneBook = new ABCJS.TuneBook(abc);
+        if (tuneBook.tunes.length!=current_tunes_count){
+            init_tune_selector(abc);
+        }
+        setCookie('abc_text', abc.replaceAll("\n","\\n"),365);
     //   console.log(el);
     }
 }
@@ -301,6 +318,7 @@ function init_tune_selector(abc) {
     var optionContent = document.createTextNode("-- select tune --");
     // option.appendChild(optionContent);
     // select.append(option)
+    current_tunes_count = tuneBook.tunes.length;
     for (var i = 0; i < tuneBook.tunes.length; i++) {
         option = document.createElement("option");
         title=tuneBook.tunes[i].title
@@ -332,7 +350,8 @@ function initEditor(startingTune=0) {
         synth: {
             el: "#abc_audio_control",
             cursorControl,
-            options: { displayLoop: true, displayRestart: false, displayPlay: true, displayProgress: true, displayWarp: false }
+            options: { displayLoop: true, displayRestart: false, displayPlay: true, displayProgress: true, displayWarp: false
+                /*,soundFontUrl: "https://aliceghome.online/synth/guinmoon-lite.sf2"*/ }
         },
         generate_warnings: false,
         // warnings_id:"abc_warnings",
@@ -390,4 +409,44 @@ function initEditor(startingTune=0) {
     // }
 }
 
+function on_song_text_change(text){
+    setCookie('song_text', text.replaceAll("\n","\\n"),365);
+}
 
+function on_music_options_change(text){
+    setCookie('music_options', text.replaceAll("\n","\\n"),365);
+}
+
+
+function on_synth_options_change(text){
+    setCookie('synth_options', text.replaceAll("\n","\\n"),365);
+}
+
+function first_load(){
+    let abc_text=getCookie('abc_text');
+    if (!(abc_text==undefined||abc_text=="")){
+        $("#abc_text").val(abc_text.replaceAll("\\n","\n"));
+    }
+    let song_text=getCookie('song_text');
+    if (!(song_text==undefined||song_text=="")){
+        $("#song_text").val(song_text.replaceAll("\\n","\n"));
+    }
+    let music_options=getCookie('music_options');
+    if (!(music_options==undefined||music_options=="")){
+        $("#music_options").val(music_options.replaceAll("\\n","\n"));
+    }
+    let synth_options=getCookie('synth_options');
+    if (!(synth_options==undefined||synth_options=="")){
+        $("#synth_options").val(synth_options.replaceAll("\\n","\n"));
+    }
+    $('#song_text').bind('input propertychange', function() {
+        on_song_text_change(this.value);
+    });
+    $('#music_options').bind('input propertychange', function() {
+        on_music_options_change(this.value);
+    });
+    $('#synth_options').bind('input propertychange', function() {
+        on_synth_options_change(this.value);
+    });
+    // $('#song_text').bind('input propertychange', on_song_text_change(this.value));
+}

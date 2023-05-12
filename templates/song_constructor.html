@@ -29,7 +29,7 @@
                         <div class="input-group-prepend">
                           <span class="input-group-text" data-bs-theme="dark">Song about:</span>
                         </div>
-                        <input type="text" value="bottle on the table" id="song_text_query" data-bs-theme="dark" class="form-control bg-dark text-white" placeholder="Song description" aria-label="Song description" aria-describedby="basic-addon1">
+                        <input type="text" value="song about rain" id="song_text_query" data-bs-theme="dark" class="form-control bg-dark text-white" placeholder="Song description" aria-label="Song description" aria-describedby="basic-addon1">
                         <div class="input-group-append" data-bs-theme="dark">
                             <button class="btn btn-outline-secondary bg-dark" type="button"  onclick="generate_song_text()">Gen</button>
                         </div>
@@ -56,22 +56,7 @@
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                    <textarea class="form-control bg-dark text-white" name="abc_text" id="abc_text">
-X:1
-L:1/8
-Q:1/2=90
-M:2/2min
-K:E
-    F2 F2 | A2 A2 | G2 G2 | F4 | F2 c2 | c2 c3/2 B/ | A3 G | F3 z | c4 | B4 | A4 | G4 | D4 | E4 |
-    F4- | !fermata!F2 z2!D.C.! |]
-
-X: 2
-M: 4/4
-L: 1/8
-K: Emin
-|:D2|EB{c}BA B2 EB|~B2 AB dBAG|FDAD BDAD|FDAD dAFD|   
-                    </textarea>      
-                    
+                    <textarea class="form-control bg-dark text-white" name="abc_text" id="abc_text"></textarea>                          
                     <hr />
                     <span class="a5a5a5" style="margin:auto; font-size: medium;">Tune:</span><select class="form-control bg-dark text-white" id="tune_selector"></select> 
                     <div id="abc_audio_control">
@@ -101,14 +86,17 @@ K: Emin
               <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                 <div class="accordion-body bg-dark text-white">
                   <div class="input-group mb-3">
-                    <input type="text" id="synth_options" class="form-control bg-dark text-white" value="1,2 ,3" placeholder="Synth options" aria-label="Melody options" aria-describedby="basic-addon2">
+                    <input type="text" id="synth_options" class="form-control bg-dark text-white" value="1,11,41,4" placeholder="Synth options" aria-label="Melody options" aria-describedby="basic-addon2">
                     <div class="input-group-append">
                       <button class="btn btn-outline-secondary bg-dark" type="button" onclick="synth_music()">Synth</button>
                     </div>                    
                   </div>
                   <div id="player_wrapper">
                     <div id="mp3_player"></div>
-                    <div id="play_pause_mp3" class="fa fa-play" onclick="mp3_player_play_pause();"></div>
+                    <div id="mp3_player_control">
+                      <div id="play_pause_mp3" class="fa fa-play" onclick="mp3_player_play_pause();"></div>
+                      <a id="download_mp3" class="fa fa-download" ></a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -162,6 +150,7 @@ K: Emin
             $("#play_pause_cat").attr('class', 'fa fa-play');
         }
     }
+    first_load();
     init_tune_selector($("#abc_text").val());
     initEditor();
 </script>

@@ -19,7 +19,8 @@ def sort_by_str_date(val):
     return val['created']
 
 def move_to_arch(track):    
-    result = subprocess.call(["mv",track,arch_dir],cwd=__dir)
+    # result = subprocess.call(["mv",track,arch_dir],cwd=__dir)
+    result = subprocess.call(["rm",track],cwd=__dir)
 
 def run(outf,verbose=False):        
     tracks=glob.glob(target_dir+"/*.mp3")

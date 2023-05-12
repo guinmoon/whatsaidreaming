@@ -37,6 +37,7 @@ def davincii003_query(prompts,responses,request_timeout=30):
             )
             has_answer = True
         except Exception as eee:
+            print(eee)
             if str(eee).find("maximum context length")>=0:
                 has_answer = False
                 prompts.pop(0)
@@ -45,7 +46,7 @@ def davincii003_query(prompts,responses,request_timeout=30):
     return(completion.choices[0].message.content)
 
 
-def gpt35_query(prompts,responses,request_timeout=30):
+def gpt35_query(prompts,responses,request_timeout=50):
     # model_engine = "text-davinci-003"
     model_engine = "gpt-3.5-turbo"
     has_answer = False
@@ -77,7 +78,7 @@ def gpt35_query(prompts,responses,request_timeout=30):
             )
             has_answer = True
         except Exception as eee:
-            return eee
+            return str(eee)
             if str(eee).find("maximum context length")>=0:
                 has_answer = False
                 prompts.pop(0)
@@ -111,7 +112,7 @@ if __name__=="__main__":
         prompts.append(prompt)
         file.write(f">> {prompt}\n")
         # response = davincii003_query(prompt="context:" + context + "\n\n" + "prompt:" + prompt)
-        response = davincii003_query(prompts,responses)
+        response = gpt35_query(prompts,responses)
         # response = response.lstrip()
         responses.append(response)
         print(f"<< {response}\n")

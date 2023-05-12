@@ -64,6 +64,9 @@ def get_random_think(engine):
 
 if __name__ == '__main__':
     # exit(0)
+   
+   
+    
     __dir=os.path.dirname(os.path.realpath(__file__))         
     with open(os.path.join(os.path.dirname(__file__),'config_think.json')) as json_file:
         Config = json.load(json_file)
@@ -73,6 +76,9 @@ if __name__ == '__main__':
         Config_openai = json.load(json_file)
     openai.api_key = Config_openai['api_key']
     sqlite_filepath = os.path.join(__dir,"thinks_map.db")
+
+    
+
 
     if args.update:
         update_styles("styles.txt")
@@ -106,8 +112,8 @@ if __name__ == '__main__':
     # prompt_en=translate(prompt, 'en')
     prompt_balaboba = {'query':prompt,'text':prompt}
     if not args.news:
-        # prompt_balaboba['text']=translate(gpt2_text2text(translate(prompt, 'en'),Config_hufa['API_TOKEN']),'ru')
-        prompt_balaboba = sync_balaboba_urlib(prompt,11)
+        prompt_balaboba['text']=translate(gpt2_text2text(translate(prompt, 'en'),Config_hufa['API_TOKEN']),'ru')
+        # prompt_balaboba = sync_balaboba_urlib(prompt,11)
         # prompt_balaboba = sync_balaboba_old(prompt,11,Config['balaboba_cookie'])
     if prompt_balaboba['text'].find('www')>=0:
         print("[bad balaboba]")
@@ -155,6 +161,8 @@ if __name__ == '__main__':
     if prompt_en!='':
         result = subprocess.run(["python3",f"{__dir}/abc_ttm_hufa_api.py", prompt_en],cwd=__dir)
 
+    #FIX
+    # https://github.com/joshehlinger/wombo_extract/blob/master/wombo/extract.py
     style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")
     res = identify(identify_key=identify_key)
     img_uri = create(res["id_token"], prompt_en, style,None,False,full=True)
@@ -165,19 +173,19 @@ if __name__ == '__main__':
     res_f_name = os.path.join(res_f_name,f'{dt_string}.jpg')
     urllib.request.urlretrieve(img_uri, res_f_name)
     print("download img done")       
-    im = Image.open(res_f_name)
-    width, height = im.size
-    left = 62
-    top = 215
-    right = width-62
-    bottom = height-154
-    im = im.crop((left, top, right, bottom))        
+    # im = Image.open(res_f_name)
+    # width, height = im.size
+    # left = 62
+    # top = 215
+    # right = width-62
+    # bottom = height-154
+    # im = im.crop((left, top, right, bottom))        
              
-    # with open(res_f_name+'.txt', 'w') as f:
-    #     f.writelines(prompt_en)
+    # # with open(res_f_name+'.txt', 'w') as f:
+    # #     f.writelines(prompt_en)
 
-    im.save(res_f_name)
-    print("crop done")
+    # im.save(res_f_name)
+    # print("crop done")
 
     img_info={"db_id":tmp_think_id,"prompt":prompt_ru,"prompt_en":prompt_en,"prompt_query":prompt_balaboba['query'],"prompt_text":prompt_balaboba['text']}
     with open(res_f_name+'.json', 'w') as f:

@@ -1,4 +1,5 @@
 #song_consturctor_wrapper{
+    /* padding-top: env(safe-area-inset-top); */
     color: white;
     left: 10px;
     position: fixed;
@@ -6,13 +7,16 @@
     margin-left: 0.2em;
     margin-right: 0.2em;
     /* margin-top: 5vh; */
-    margin-top: 4.2em;
+    margin-top: calc(4.2em + env(safe-area-inset-top));
     width: 45em;
     max-width: 97vw;
     /* height: 92vh; */
     background: #8080806b;
     border-radius: 5px;
     z-index: 22;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 90vh;
 }
 
 #song_consturctor{
@@ -30,14 +34,15 @@
 
 #song_text{
     height: 225px;
+    font-size: 70%;
     max-height: 29vh;
     background: #7471712b;
     color: white;
 }
 
 #abc_text{
-    height: 225px;
-    max-height: 29vh;
+    height: 125px;
+    font-size: 70%;
     margin-bottom: 2px;
     background: #7471712b;
     color: white;
@@ -62,6 +67,7 @@
     margin-bottom: 5px;
     /* display: block; */
     width: 100px;
+    height: 2.1em;
 }
 
 svg .abcjs-note_selected{
@@ -79,6 +85,7 @@ svg .color{
 
 #player_wrapper{
     width: 100%;   
+    display:none;
 }
 
 #mp3_player{
@@ -86,8 +93,32 @@ svg .color{
     left: 40px;
 }
 
+#mp3_player_control{
+    /* position: absolute; */
+}
+
+#download_mp3{
+    position: absolute;
+    left: 30px;
+    color: #bdbbbb;
+    bottom: 60px;
+    text-decoration: none;
+}
+
 #play_pause_mp3{
-    float: left;
+    bottom: 110px;
+    position: absolute;
+    color: #bdbbbb;
+    left: 30px;
+    font-size: xx-large;
+}
+
+#download_mp3:hover{
+    color:white;
+}
+
+#play_pause_mp3:hover{
+    color:white;
 }
 /* .color {
     stroke: red;

@@ -1,15 +1,21 @@
 # aaa
 import http.client
-import json
-import time
-import argparse
-import random
-import os
+import os, time, argparse, random, json
 import pickle
-import ssl
+import ssl, urllib.request,http.client   
+from datetime import datetime
 
 
 _unverified_context = ssl._create_unverified_context()
+
+ASPECT_RATIOS = {
+    '1:1': 'ratio_1',
+    '16:9': 'ratio_16_9',
+    '9:16': 'ratio_9_16',
+    '4:3': 'ratio_4_3',
+    '3:4': 'ratio_3_4',
+    '960:1568': 'old_vertical_ratio',
+}
 
 def identify(identify_key):    
     conn = http.client.HTTPSConnection("identitytoolkit.googleapis.com",context = _unverified_context)    
@@ -36,17 +42,23 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False
             "User-Agent": "Mozilla/5.0",
         }
     
-    body = '{"input_spec":{"prompt":"' + prompt + '","style":' + str(style)+ ',"display_freq":10}}'        
+    # body = '{"input_spec":{"prompt":"' + prompt + '","style":' + str(style)+ ',"display_freq":10}}'     
+    ratio = "old_vertical_ratio"   
+    body = {"input_spec": {"display_freq": 10, "style": style, "prompt": prompt,"aspect_ratio": ratio}}
+    body = json.dumps(body,ensure_ascii=False)
 
     id=ID
     display_freq = 1
     if ID is None:        
-        conn.request("POST", f"/api/tasks", '{"premium": false}', headers)
+        # conn.request("POST", f"/api/v2/tasks", '{"premium": false}', headers)
+        conn.request("POST", f"/api/v2/tasks",body, headers)
         data=conn.getresponse().read()        
-        id=json.loads(data)["id"]
-        conn.request("PUT", f"/api/tasks/{id}", body, headers)
-        data=conn.getresponse().read()        
-        r=json.loads(data)                     
+        # id=json.loads(data)["id"]
+        # conn.request("PUT", f"/api/v2tasks/{id}", body, headers)
+        # data=conn.getresponse().read()        
+        r=json.loads(data)          
+        id=r["id"]   
+        user_id=r["user_id"]       
         print(f"Status: {r['state']}")
         display_freq = 0.5
         with open('headers.dump', 'wb') as f:
@@ -64,7 +76,7 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False
         with open('id.dump', 'r') as f:
             id = f.readline()
    
-    conn.request("GET", f"/api/tasks/{id}", body, headers)
+    conn.request("GET", f"/api/v2/tasks/{id}", body, headers)
     data=conn.getresponse().read()        
     latest_task=json.loads(data)     
     if latest_task["state"] != "completed" and one:
@@ -73,7 +85,7 @@ def create(id_token: str, prompt: str, style: int, ID=None,one=False, full=False
     while latest_task["state"] != "completed":
         print(latest_task["state"])
         time.sleep(display_freq)
-        conn.request("GET", f"/api/tasks/{id}", body, headers)
+        conn.request("GET", f"/api/v2/tasks/{id}", body, headers)
         data=conn.getresponse().read()        
         latest_task=json.loads(data)         
 
@@ -150,3 +162,54 @@ def escape_prompt(in_prompt):
     prompt = prompt.replace("  "," ")
     prompt = prompt.replace("\\","")
     return prompt
+
+
+
+
+if __name__ == '__main__':
+
+    prompt_en = "your magic ptompt"
+
+    __dir=os.path.dirname(os.path.realpath(__file__))
+    identify_key = "AIzaSyDCvp5MTJLUdtBYEKYWXJrlLzu1zuKM6Xw"
+    parser = argparse.ArgumentParser(
+                    prog = 'wombo create',
+                    description = 'get image from wombo',
+                    epilog = 'Enjoy.')
+    parser.add_argument('-u','--update',action='store_true')          
+    parser.add_argument('-i','--iterations',action='store_true')
+    parser.add_argument('-o','--one',action='store_true')
+    parser.add_argument('-d','--download',action='store_true')          
+    parser.add_argument('-r','--rename',action='store_true')
+    parser.add_argument('-b','--blacklist',action='store_true')
+    parser.add_argument('-s', '--style')      
+    parser.add_argument('-t', '--translate',action='store_true')
+    parser.add_argument('-p', '--prompt')  
+    args = parser.parse_args()
+    if args.update:
+        update_styles("styles.txt")
+        print("done")
+        exit(0)
+
+    if args.style is not None:
+        style = args.style 
+    else:
+        if args.blacklist:
+            style = get_random_style(__dir+"/styles.txt",__dir+"/styles_blist.txt")        
+        else:
+            style = get_random_style(__dir+"/styles.txt")        
+    
+
+    if args.prompt is not None:  
+        prompt_en = args.prompt
+        
+    res = identify(identify_key=identify_key)
+    img_uri = create(res["id_token"], prompt_en, style,None,False,full=True)
+    # img_uri='https://images.wombo.art/exports/f4fca3bc-f2d3-4ae9-95ba-da203ab6661b/blank_tradingcard.jpg?Expires=1680405084&Signature=FbSsHfOE~wdpaAtmTAJpcGjZqpUxXchfQ3vemmwKQH1d~NUOYcwgML8WLHtxSFxTLgZx37XDbfcDIdS29jIyMg7mzEuI2y94GQwVgzgUJce2YIZLLRhZ-hWKC8Gp3JyxL01h5jA6jYDRLuDGzMI-5bixsJwiR7Tpx6o3Ijc2yp-QLNXkGGjIk18~1YZZ0by8yWC6sve0IQ5eeyFHOVmQVS1n2FawqO5-2pqRYRVBzPw89yOw-96hJz57c5H90l~hPR-JD4LgUgrGb2C5k4p~5oH6vnw9AFI59VjfBPr1wrcI46wUlALRrsP-zFCINEQHfzAxx9KuENLacgXU8F~Qjw__&Key-Pair-Id=K1ZXCNMC55M2IL'    
+    ssl._create_default_https_context = ssl._create_unverified_context                 
+    dt_string = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+    res_f_name = os.path.join(__dir,f'res.jpg')
+    if args.rename:
+        res_f_name = os.path.join(__dir,f'{dt_string}.jpg')
+    urllib.request.urlretrieve(img_uri, res_f_name)
+    print("download img done") 

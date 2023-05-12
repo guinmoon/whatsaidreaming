@@ -69,9 +69,11 @@ def gen_music(inputs,music_options="Note Length-1/2",track_count=3,user_id=-1,sy
         # inputs=inputs.split("\n")[0]+" "+inputs.split("\n")[1]
 
         a=1
+    inputs = inputs.split("\n")[0] #temporary
     inputs = inputs.replace("\n"," ")
     inputs = inputs.replace("'","")
     inputs = inputs.replace(",","")
+    print(f"gen by: {inputs}")
     full_abc=""
     if synth:
         full_abc=f"% {inputs}\n"
@@ -143,7 +145,8 @@ def synth_from_abc(full_abc,user_id=-1,synth_options=""):
     midisox_py_args.append(f"{abc_fname}full.mid")
     result = subprocess.call(midisox_py_args,cwd=f"{__dir}/../synth/tmp/")
     # result = subprocess.call(["python3", "../../miditools/midisox_py","-M",abc_fname+"1.mid",abc_fname+"2.mid",abc_fname+"full.mid"],cwd=f"{__dir}/../synth/tmp/")
-    fluidsynth_cmd = f"fluidsynth -l -T raw -F - {__dir}/../synth/guinmoon.sf2 {abc_fname}full.mid -f {abc_fname}.prog.txt -g 0.5 | lame -b 256 -r - {abc_fname}.mp3"
+    # fluidsynth_cmd = f"fluidsynth -l -T raw --audio-file-endian little --audio-file-format=s16 --sample-rate 44100 -F - {__dir}/../synth/guinmoon.sf2 {abc_fname}full.mid -f {abc_fname}.prog.txt -g 0.5 | lame -f -b 128 -r - {abc_fname}.mp3"
+    fluidsynth_cmd = f"fluidsynth -l -T raw -F - {__dir}/../synth/guinmoon.sf2 {abc_fname}full.mid -f {abc_fname}.prog.txt -g 0.5 | ffmpeg -y -f s32le -i - -b:a 128k {abc_fname}.mp3"
     print(f"{fluidsynth_cmd}")
     fluidsynth_ps = subprocess.Popen(fluidsynth_cmd,shell=True,cwd=f"{__dir}/../synth/tmp/")
     fluidsynth_ps.wait()

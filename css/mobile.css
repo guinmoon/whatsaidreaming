@@ -1,0 +1,26 @@
+
+@media (max-width: 1150px) {
+    #play_pause_cat {        
+        position: fixed;
+        top: 25px;
+        right: 1em;
+        color: #6e6e6e;
+        font-size: 250%;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    .block-cat {
+        width: 90vw;
+        position: absolute;
+        right: 10px;
+    }
+    .block {
+        position: fixed;
+        width: 100%;
+        z-index: 7;
+        bottom: 26vw;
+    }
+    #flying_image{
+        display:none;
+    }
+
+}

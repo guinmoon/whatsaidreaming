@@ -16,6 +16,10 @@ function update_galery(){
 
 
 function change_flying_img(){
+    flying_image_div=$("#flying_image");
+    if ((flying_image_div).css('display')=='none'){
+        return;
+    }
     gallery_len=global_galery.images.length;
     image=global_galery.images[Math.floor(Math.random() * gallery_len-1)];
     if (image==undefined){
@@ -23,7 +27,8 @@ function change_flying_img(){
     }
 
     current_image = image;
-    flying_image_div=$("#flying_image");
+    
+
     if(about_page){
         update_about();
     }else{

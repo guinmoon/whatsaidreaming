@@ -14,6 +14,47 @@ from scripts.abc_ttm_hufa_api import *
 
 PRODUCTION=False
 
+
+# Verse 1:
+# Got something to share, gotta get it out
+# Habr blog's where it's at, no doubt
+# Tech and coding, all in one place
+# Follow along, keep up with the pace
+
+# Chorus:
+# Habr blog, Habr blog
+# Where tech geniuses come to log
+# Code and innovation, all in one spot
+# Habr blog, Habr blog, never stop
+
+# Verse 2:
+# From AI to cybersecurity
+# Habr blog's got it covered, oh my
+# Learn from the best, no need to pay
+# Habr blog's free, just come and play
+
+# Chorus:
+# Habr blog, Habr blog
+# Where tech geniuses come to log
+# Code and innovation, all in one spot
+# Habr blog, Habr blog, never stop
+
+# Bridge:
+# Stay connected, never miss a beat
+# Join the Habr community and take a seat
+# Comment, share, and contribute too
+# Habr blog, there's always something new
+
+# Chorus:
+# Habr blog, Habr blog
+# Where tech geniuses come to log
+# Code and innovation, all in one spot
+# Habr blog, Habr blog, never stop
+
+# Outro:
+# Habr blog, Habr blog, never stop
+# Keep on coding, keep on sharing, until the last drop.
+
 song_text_sample="""
 (Verse 1)
 Artemka's the winner,
@@ -68,7 +109,7 @@ K:F
  F4- | !fermata!F2 z2!D.C.! |]
 """
 
-mp3_link_sample = "synth/tmp/1679640467456.mp3"
+mp3_link_sample = "synth/tmp/sample5.mp3"
 
 class generate_song_item:
     def __init__(self,song_text_query,i_was_here):
@@ -108,7 +149,7 @@ class generate_music_item:
         self.song_text = song_text
         self.music_options = music_options
         self.abc_text = ""
-        self.status="generation..."
+        self.status="generating..."
     
     def _gen_thread(self):
         print(self.song_text)
@@ -116,8 +157,16 @@ class generate_music_item:
         while not generated:
             self.status="generating..."
             if PRODUCTION:
-                self.abc_text = gen_music(self.song_text,music_options=self.music_options,track_count=1,user_id=self.i_was_here,synth=False)
+                try:
+                    self.abc_text = gen_music(self.song_text,music_options=self.music_options,track_count=1,user_id=self.i_was_here,synth=False)
+                    self.abc_text = self.abc_text.strip()
+                except Exception as eee:
+                    print(eee)
+                    self.status = eee
+                    sleep(5)
+                    continue
             else:
+                # self.abc_text = gen_music(self.song_text,music_options=self.music_options,track_count=1,user_id=self.i_was_here,synth=False)
                 self.abc_text = abc_text_sample
             sleep(0.2)
             generated=True
@@ -148,8 +197,8 @@ class synth_music_item:
             if PRODUCTION:
                 self.mp3_link = synth_from_abc(self.abc_text,synth_options=self.synth_options,user_id=self.i_was_here)
             else:
-                self.mp3_link = synth_from_abc(self.abc_text,synth_options=self.synth_options,user_id=self.i_was_here)
-                # self.mp3_link = mp3_link_sample
+                # self.mp3_link = synth_from_abc(self.abc_text,synth_options=self.synth_options,user_id=self.i_was_here)
+                self.mp3_link = mp3_link_sample
             sleep(0.2)
             synthed=True
         print(self.mp3_link)
@@ -320,7 +369,7 @@ def run_server():
     if PRODUCTION:
         web_server.run(host="0.0.0.0", port="36000", debug=True,threaded=True, use_reloader=False)
     else:
-        web_server.run(host="0.0.0.0", port="4444", debug=True,threaded=True, use_reloader=False)
+        web_server.run(host="0.0.0.0", port="36000", debug=True,threaded=True, use_reloader=False)
 
 
 
@@ -342,3 +391,20 @@ if __name__ == '__main__':
 
 
 # https://github.com/spv420/chatgpt-clone
+
+# Note Length-1/8 + Meter-3/4 + Key-D
+# X:1
+# L:1/8
+# M:3/4
+# K:D
+#  A,2 |"D" D2 D>E F>G |"A" E2 E>F G>A |"Bm" B2 d2 c>B |"F#m" A4 (3ABc |"G" d2 B2 G2 |
+# "A7" A2 F>D E>D |"Em" B,2 E2 (3EDB, |"^(A7)" A,4 A,B,/C/ | D2 DE FG | E2 EF GA | B2 Bd cB | A4 Bc |
+#  d3 c B2 | A2 FD ED | B,3 A, B,C | D4 |]
+
+# X:1
+# L:1/8
+# M:3/4
+# K:D
+#  A2 |"D" A2 F2 F>A |"A7" G2 E2 E>F |"Em" E2 D2 D>E |"Bm" D4 A,>B, | D3 E F>G |"G" B2 A2 (3FED |
+# "A" E3 F E>D | E4 A>B | d3 e f>e |"F#m" d2 A3 F |"C" G3 A B>c |"^D/f#" A4 (F>E) | D2 d2 c2 |
+#  B3 A F2 | E3 D D2 | D4 |]
